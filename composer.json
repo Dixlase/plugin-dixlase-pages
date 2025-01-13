@@ -1,0 +1,23 @@
+{
+    "name": "plugins/PagesPlugin",
+    "directory": "PagesPlugin",
+    "description": "This is the PagesPlugin plugin.",
+    "author": "Your Name or Company",
+    "email": "your-email@example.com",
+    "web": "https://yourwebsite.com",
+    "version": "1.0.0",
+    "license": "AGPL-3.0",
+    "require": {
+        "php": ">=8.0",
+        "some/dependency": "^1.2"
+    },
+    "extra": {
+        "keywords": ["laravel", "plugin", "custom"],
+        "category": "plugin"
+    }
+}
+
+
+
+
+
