@@ -3,7 +3,7 @@
 /**
  * This file is part of MySoftware.
  *
- * Copyright (C) 2025 {author}
+ * Copyright (C) 2025 exc-D inc.
  * Website: https://exc-d.com
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 use Illuminate\Support\Facades\Route;
-use Plugins\EventsPlugin\app\Http\Controllers\EventsPluginController;
+use Plugins\PagesPlugin\app\Http\Controllers\Admin\AdminPagesPluginController;
 use App\Models\SettingSecurity;
 
 $adminUrl = SettingSecurity::get('admin_url', config('security.admin_url'));
@@ -35,15 +36,15 @@ Route::prefix($adminUrl)
                 ->group(
                     function () {
                         // イベント一覧
-                        Route::get('/pages', [EventsPluginController::class, 'index'])->name('pages.index');
+                        Route::get('/pages', [AdminPagesPluginController::class, 'index'])->name('pages.index');
                         // イベント作成
-                        Route::get('/pages/create', [EventsPluginController::class, 'create'])->name('pages.create');
+                        Route::get('/pages/create', [AdminPagesPluginController::class, 'create'])->name('pages.create');
                         // イベント保存
-                        Route::post('/pages/store', [EventsPluginController::class, 'store'])->name('pages.store');
+                        Route::post('/pages/store', [AdminPagesPluginController::class, 'store'])->name('pages.store');
                         // ページ編集
-                        Route::get('/pages/edit/{event}', [EventsPluginController::class, 'edit'])->name('pages.edit');
+                        Route::get('/pages/edit/{event}', [AdminPagesPluginController::class, 'edit'])->name('pages.edit');
                         // ページ削除
-                        Route::delete('/pages/delete/{event}', [EventsPluginController::class, 'destroy'])->name('pages.destroy');
+                        Route::delete('/pages/delete/{event}', [AdminPagesPluginController::class, 'destroy'])->name('pages.destroy');
                     }
                 );
         }

@@ -3,7 +3,7 @@
 /**
  * This file is part of MySoftware.
  *
- * Copyright (C) 2025 {author}
+ * Copyright (C) 2025 exc-D inc.
  * Website: https://exc-d.com
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 namespace Plugins\PagesPlugin\App\Http\Controllers\Admin;
 
@@ -55,7 +56,7 @@ class AdminPagesPluginController extends AdminController
         $pages = Page::paginate(10); // 1ページあたり10件表示
         $this->viewParams['pages'] = $pages;
         return view(
-            'admin::contents.pages.index',
+            'pages-plugins::admin.pages.index',
             $this->viewParams
         );
     }
@@ -66,7 +67,7 @@ class AdminPagesPluginController extends AdminController
         $this->viewParams['heading'] = 'admin.features.contents.pages.create.heading';
 
         return view(
-            'admin::contents.pages.create',
+            'pages-plugins::admin.pages.create',
             $this->viewParams
         );
     }
