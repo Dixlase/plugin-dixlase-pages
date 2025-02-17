@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'title',
-        'text' => 'admin.features.contents.pages.title',
+        'text' => 'pages-plugin::admin.features.pages.title',
     ])
     @include('components::form.text', [
         'id' => 'title',
@@ -40,7 +40,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'slug',
-        'text' => 'admin.features.contents.pages.slug',
+        'text' => 'pages-plugin::admin.features.pages.slug',
     ])
     @include('components::form.text', [
         'id' => 'slug',
@@ -58,7 +58,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'content',
-        'text' => 'admin.features.contents.pages.content',
+        'text' => 'pages-plugin::admin.features.pages.content',
     ])
     @include('components::form.textarea', [
         'id' => 'content',
@@ -72,7 +72,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'status',
-        'text' => 'admin.features.contents.pages.status',
+        'text' => 'pages-plugin::admin.features.pages.status',
     ])
     @include('components::form.select', [
         'id' => 'status',

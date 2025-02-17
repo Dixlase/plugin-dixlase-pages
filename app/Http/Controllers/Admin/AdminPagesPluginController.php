@@ -49,7 +49,7 @@ class AdminPagesPluginController extends AdminController
     public function index()
     {
 
-        $this->viewParams['heading'] = 'admin.features.contents.pages.index.heading';
+        $this->viewParams['heading'] = 'pages-plugin::admin.features.pages.index.heading';
 
 
         // ページネーションで取得
@@ -64,7 +64,7 @@ class AdminPagesPluginController extends AdminController
     public function create()
     {
 
-        $this->viewParams['heading'] = 'admin.features.contents.pages.create.heading';
+        $this->viewParams['heading'] = 'pages-plugin::admin.features.pages.create.heading';
 
         return view(
             'pages-plugin::admin.pages.create',
@@ -83,7 +83,7 @@ class AdminPagesPluginController extends AdminController
     public function edit(Page $page)
     {
         // 見出し
-        $this->viewParams['heading'] = 'admin.features.contents.pages.edit.heading';
+        $this->viewParams['heading'] = 'pages-plugin::admin.features.pages.edit.heading';
 
         // 内容を取得
         $this->viewParams['page'] = $page;
@@ -92,7 +92,7 @@ class AdminPagesPluginController extends AdminController
 
         // ビューにデータを渡す
         return view(
-            'pages-plugin::admin::contents.pages.edit',
+            'pages-plugin::admin.pages.edit',
             $this->viewParams
         );
     }
@@ -108,7 +108,7 @@ class AdminPagesPluginController extends AdminController
         // ページを作成し、作成したページのインスタンスを取得
         $page = Page::create($validated);
 
-        return redirect()->route('pages-plugin::admin.contents.pages.edit', ['page' => $page->id])->with('success', 'Page created successfully!');
+        return redirect()->route('pages-plugin::admin.pages.edit', ['page' => $page->id])->with('success', 'Page created successfully!');
     }
 
     /**
@@ -121,7 +121,7 @@ class AdminPagesPluginController extends AdminController
         // ページを更新
         $page->update($validated);
 
-        return redirect()->route('pages-plugin::admin.contents.pages.edit', ['page' => $page->id])->with('success', 'Page updated successfully!');
+        return redirect()->route('pages-plugin::admin.pages.edit', ['page' => $page->id])->with('success', 'Page updated successfully!');
     }
 
     /**
@@ -131,6 +131,6 @@ class AdminPagesPluginController extends AdminController
     {
         $page->delete();
 
-        return redirect()->route('pages-plugin::admin.contents.ages.index', $this->viewParams)->with('success', 'Page deleted successfully!');
+        return redirect()->route('pages-plugin::admin.pages.index', $this->viewParams)->with('success', 'Page deleted successfully!');
     }
 }

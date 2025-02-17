@@ -21,7 +21,6 @@
  */
 
 
-
 return [
     'nav' => [
         'pages' => [
@@ -33,6 +32,10 @@ return [
 
     'features' => [
         'pages' => [
+            'title' => 'ページタイトル',
+            'slug' => 'スラッグ',
+            'content' => 'コンテンツ',
+            'status' => 'ステータス',
             'index' => [
                 'heading' => 'ページマスター',
             ],
@@ -42,6 +45,6 @@ return [
             'edit' => [
                 'heading' => 'ページ編集',
             ],
-        ],
+        ]
     ],
 ];
