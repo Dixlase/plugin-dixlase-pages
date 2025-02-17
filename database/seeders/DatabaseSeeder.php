@@ -21,26 +21,21 @@
  */
 
 
-return [
-    'nav' => [
-        'pages' => [
-            'text' => 'Pages',
-            'index' => 'Pages List',
-            'create' => 'Page Create',
-        ],
-    ],
+namespace Plugins\PagesPlugin\Database\Seeders;
 
-    'features' => [
-        'events' => [
-            'index' => [
-                'heading' => 'Pages',
-            ],
-            'create' => [
-                'heading' => 'Page Create',
-            ],
-            'edit' => [
-                'heading' => 'Page Edit',
-            ],
-        ],
-    ],
-];
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        if (app()->environment('local', 'development')) {
+            $this->call(\Plugins\PagesPlugin\Database\Seeders\Dev\DevelopmentSeeder::class);
+        } else {
+            $this->call(\Plugins\PagesPlugin\Database\Seeders\Pro\ProductionSeeder::class);
+        }
+    }
+}

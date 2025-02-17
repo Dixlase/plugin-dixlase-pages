@@ -20,9 +20,55 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 namespace Plugins\PagesPlugin\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Page extends Model {}
+class Page extends Model
+{
+    use HasFactory, Notifiable, SoftDeletes; // MustVerifyEmailを追加
+
+    /**
+     * テーブル名
+     *
+     * @var string
+     */
+    protected $table = 'pages_plugin_pages';
+
+    /**
+     * ホワイトリスト
+     * @var array
+     */
+
+    protected $fillable = [
+        'title',
+        'slug',
+        'content',
+        'status',
+        //'meta_title',
+        //'meta_description',
+        //'meta_keywords',
+    ];
+
+    protected static function booted()
+    {
+        static::creating(function ($page) {
+            if (empty($page->slug)) {
+                $page->slug = Str::slug($page->title);
+            }
+        });
+    }
+
+    /**
+     * このモデル用のファクトリを返す。
+     */
+    protected static function newFactory()
+    {
+        // 「Plugins\PagesPlugin\Database\Factories\PageFactory」が存在する前提
+        return \Plugins\PagesPlugin\Database\Factories\PageFactory::new();
+    }
+}
