@@ -24,6 +24,7 @@
 return [
     'nav' => [
         'pages' => [
+            '_insert_after' => 'front', // または '_insert_before' => 'media'
             'text' => 'pages-plugin::admin.nav.pages.text',
             'icon' => 'fas fa-fw fa-calendar-alt',
             'can' => 'manager',

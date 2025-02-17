@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Config;
 use App\Traits\PluginLoaderTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 
 class PagesPluginServiceProvider extends ServiceProvider
 {
@@ -82,6 +83,14 @@ class PagesPluginServiceProvider extends ServiceProvider
     }
     public function boot()
     {
+        // ビューのネームスペースを追加
+        $this->loadPluginViews(
+            base_path('plugins/PagesPlugin/resources/views'),
+            base_path('custom/plugins/PagesPlugin/resources/views'),
+            'pages-plugins'
+        );
+
+        /*
         //プラグインのリソースファイルの読み込み
         //ルートのロード
         $this->loadPluginRoutes($this->customPluginBasePath . '/routes', $this->pluginBasePath . '/routes');
@@ -89,8 +98,19 @@ class PagesPluginServiceProvider extends ServiceProvider
         $this->loadPluginViews($this->customPluginBasePath . '/resources/views', $this->pluginBasePath . '/resources/views', $this->pluginAlias);
         // マイグレーションのロード
         $this->loadPluginMigrations($this->customPluginBasePath . '/migrations', $this->pluginBasePath . '/migrations');
-
         // 言語ファイルのロード
         $this->loadPluginTranslations($this->customPluginBasePath . '/lang', $this->pluginBasePath . '/lang', $this->pluginAlias);
+        */
+    }
+
+    protected function loadPluginViews($corePath, $customPath, $namespace)
+    {
+        if (is_dir($customPath)) {
+            View::addNamespace($namespace, $customPath);
+        }
+
+        if (is_dir($corePath)) {
+            View::addNamespace($namespace, $corePath);
+        }
     }
 }
