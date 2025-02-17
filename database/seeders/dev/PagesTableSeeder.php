@@ -21,26 +21,37 @@
  */
 
 
-return [
-    'nav' => [
-        'pages' => [
-            'text' => 'Pages',
-            'index' => 'Pages List',
-            'create' => 'Page Create',
-        ],
-    ],
+namespace Plugins\PagesPlugin\Database\Seeders\Dev;
 
-    'features' => [
-        'events' => [
-            'index' => [
-                'heading' => 'Pages',
+use Illuminate\Database\Seeder;
+use Plugins\PagesPlugin\App\Models\Page;
+
+class PagesTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $pages = [
+            [
+                'title' => 'About Us',
+                'slug' => 'about-us',
+                'content' => 'This is the about us page content.',
             ],
-            'create' => [
-                'heading' => 'Page Create',
+            [
+                'title' => 'Contact Us',
+                'slug' => 'contact-us',
+                'content' => 'This is the contact us page content.',
             ],
-            'edit' => [
-                'heading' => 'Page Edit',
-            ],
-        ],
-    ],
-];
+        ];
+
+        Page::truncate();
+
+        foreach ($pages as $pageData) {
+            Page::create($pageData);
+        }
+
+        Page::factory()->count(20)->create();
+    }
+}

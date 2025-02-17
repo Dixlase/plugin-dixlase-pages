@@ -20,27 +20,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace Plugins\PagesPlugin\Database\Seeders\Pro;
 
-return [
-    'nav' => [
-        'pages' => [
-            'text' => 'Pages',
-            'index' => 'Pages List',
-            'create' => 'Page Create',
-        ],
-    ],
+use Illuminate\Database\Seeder;
 
-    'features' => [
-        'events' => [
-            'index' => [
-                'heading' => 'Pages',
-            ],
-            'create' => [
-                'heading' => 'Page Create',
-            ],
-            'edit' => [
-                'heading' => 'Page Edit',
-            ],
-        ],
-    ],
-];
+class ProductionSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void {}
+}
