@@ -22,10 +22,10 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Plugins\PagesPlugin\app\Http\Controllers\Admin\AdminPagesPluginController;
-use App\Models\SettingSecurity;
+use Plugins\PagesPlugin\App\Http\Controllers\Admin\AdminPagesPluginController;
+use App\Models\SecuritySetting;
 
-$adminUrl = SettingSecurity::get('admin_url', config('security.admin_url'));
+$adminUrl = SecuritySetting::get('admin_url', config('security.admin_url'));
 Route::prefix($adminUrl)
     ->middleware('plugin')
     ->group(
@@ -42,9 +42,9 @@ Route::prefix($adminUrl)
                         // イベント保存
                         Route::post('/pages/store', [AdminPagesPluginController::class, 'store'])->name('pages.store');
                         // ページ編集
-                        Route::get('/pages/edit/{event}', [AdminPagesPluginController::class, 'edit'])->name('pages.edit');
+                        Route::get('/pages/edit/{page}', [AdminPagesPluginController::class, 'edit'])->name('pages.edit');
                         // ページ削除
-                        Route::delete('/pages/delete/{event}', [AdminPagesPluginController::class, 'destroy'])->name('pages.destroy');
+                        Route::delete('/pages/delete/{page}', [AdminPagesPluginController::class, 'destroy'])->name('pages.destroy');
                     }
                 );
         }
