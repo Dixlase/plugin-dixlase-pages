@@ -53,64 +53,6 @@ class PagesPluginServiceProvider extends ServiceProvider
         $this->customPluginBasePath =  "{$customFilesDir}/{$pluginsDir}/{$this->pluginName}";
     }
 
-    public function register()
-    {
-
-        // デフォルトおよびカスタムのコンフィグディレクトリを設定
-        $defaultConfigDir = "{$this->pluginBasePath}/config";
-        $customConfigDir = "{$this->customPluginBasePath}/config";
-
-        // コンフィグをロードしてnamespace `events-plugin` に登録
-        $this->loadPluginConfigs($defaultConfigDir, $customConfigDir, $this->pluginAlias);
-
-
-        //イベントプラグインのナビゲーションを追加
-        // 現在のナビゲーションを取得
-        $defaultNav = config('admin.nav', []);
-
-        // `dashboard` の次に挿入
-        $position = array_search('dashboard', array_keys($defaultNav)) + 1;
-
-        // プラグインのナビゲーションを取得して挿入
-        $pluginNav = config("{$this->pluginAlias}.admin.nav") ?? [];
-
-        $updatedNav = array_slice($defaultNav, 0, $position, true) +
-            $pluginNav +
-            array_slice($defaultNav, $position, null, true);
-
-        // 設定を更新
-        config(['admin.nav' => $updatedNav]);
-    }
-    public function boot()
-    {
-        // ビューのネームスペースを追加
-        $this->loadPluginViews(
-            base_path('plugins/PagesPlugin/resources/views'),
-            base_path('custom/plugins/PagesPlugin/resources/views'),
-            'pages-plugins'
-        );
-
-        /*
-        //プラグインのリソースファイルの読み込み
-        //ルートのロード
-        $this->loadPluginRoutes($this->customPluginBasePath . '/routes', $this->pluginBasePath . '/routes');
-        // ビューのロード
-        $this->loadPluginViews($this->customPluginBasePath . '/resources/views', $this->pluginBasePath . '/resources/views', $this->pluginAlias);
-        // マイグレーションのロード
-        $this->loadPluginMigrations($this->customPluginBasePath . '/migrations', $this->pluginBasePath . '/migrations');
-        // 言語ファイルのロード
-        $this->loadPluginTranslations($this->customPluginBasePath . '/lang', $this->pluginBasePath . '/lang', $this->pluginAlias);
-        */
-    }
-
-    protected function loadPluginViews($corePath, $customPath, $namespace)
-    {
-        if (is_dir($customPath)) {
-            View::addNamespace($namespace, $customPath);
-        }
-
-        if (is_dir($corePath)) {
-            View::addNamespace($namespace, $corePath);
-        }
-    }
+    public function register() {}
+    public function boot() {}
 }

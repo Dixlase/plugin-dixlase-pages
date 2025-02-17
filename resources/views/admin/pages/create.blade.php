@@ -26,11 +26,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <!-- Flash message for success or error -->
 @include('components::flash_message')
 
-<form action="{{ route('admin.contents.pages.store') }}" method="POST">
+<form action="{{ route('pages-plugin::admin.pages.store') }}" method="POST">
     @csrf
 
     <!-- フォーム -->
-    @include('admin::contents.pages.partials.form', [
+    @include('pages-plugin::admin.pages.partials.form', [
 
     ])
 
