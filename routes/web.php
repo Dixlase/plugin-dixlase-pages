@@ -22,30 +22,16 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Plugins\PagesPlugin\App\Http\Controllers\Admin\AdminPagesPluginController;
+use Plugins\PagesPlugin\App\Http\Controllers\Admin\PagesPluginAdminPagesController;
 use App\Models\SecuritySetting;
+use Plugins\PagesPlugin\App\Models\Page;
 
-$adminUrl = SecuritySetting::get('admin_url', config('security.admin_url'));
-Route::prefix($adminUrl)
-    ->middleware('plugin')
-    ->group(
-        function () {
-            // 管理画面ルートグループ
-            Route::middleware(['auth:member', 'admin.ip'])
-                ->name('pages-plugin::admin.')
-                ->group(
-                    function () {
-                        // イベント一覧
-                        Route::get('/pages', [AdminPagesPluginController::class, 'index'])->name('pages.index');
-                        // イベント作成
-                        Route::get('/pages/create', [AdminPagesPluginController::class, 'create'])->name('pages.create');
-                        // イベント保存
-                        Route::post('/pages/store', [AdminPagesPluginController::class, 'store'])->name('pages.store');
-                        // ページ編集
-                        Route::get('/pages/edit/{page}', [AdminPagesPluginController::class, 'edit'])->name('pages.edit');
-                        // ページ削除
-                        Route::delete('/pages/delete/{page}', [AdminPagesPluginController::class, 'destroy'])->name('pages.destroy');
-                    }
-                );
-        }
-    );
+//個別ページ
+Route::middleware(['front.ip'])->group(
+    function () {
+        Route::get(config('custom.pages_directory') . '/{slug}', function ($slug) {
+            $page = Page::where('slug', $slug)->firstOrFail();
+            return view('default/pages', compact('page'));
+        });
+    }
+);
