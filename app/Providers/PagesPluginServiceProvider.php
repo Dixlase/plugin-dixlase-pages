@@ -34,25 +34,12 @@ class PagesPluginServiceProvider extends ServiceProvider
 {
     use PluginLoaderTrait;
 
-    protected $pluginName = 'PagesPlugin';
-    protected $pluginAlias = 'pages-plugin';
-    protected $pluginBasePath = 'plugins/';
-    protected $customPluginBasePath = 'custom/plugins/';
+    public function __construct($app) {}
 
-
-
-    public function __construct($app)
+    public function register()
     {
-        parent::__construct($app);
-
-        // カスタムファイルのディレクトリを追加
-        $pluginsDir = base_path(config('plugins.plugins_directory', 'plugins'));
-        $customFilesDir = base_path(config('custom.custom_files_dir', 'custom'));
-
-        $this->pluginBasePath = "{$pluginsDir}/{$this->pluginName}";
-        $this->customPluginBasePath =  "{$customFilesDir}/{$pluginsDir}/{$this->pluginName}";
+        // `admin.nav` の設定をマージ
+        $this->mergeAdminNavConfig(__DIR__ . '/../../config/admin.php');
     }
-
-    public function register() {}
     public function boot() {}
 }

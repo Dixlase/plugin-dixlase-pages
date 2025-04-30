@@ -23,12 +23,13 @@
 
 namespace Plugins\PagesPlugin\App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\AdminLoggedinController;
 use Plugins\PagesPlugin\App\Http\Requests\Admin\StorePageRequest;
 use Plugins\PagesPlugin\App\Http\Requests\Admin\UpdatePageRequest;
 use Plugins\PagesPlugin\App\Models\Page;
-use App\Http\Controllers\Admin\AdminController;
 
-class AdminPagesPluginController extends AdminController
+
+class PagesPluginAdminPagesController extends AdminLoggedinController
 {
 
     protected $pagesDirectory;
