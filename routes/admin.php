@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MySoftware.
+ * This file is part of DixlasePages.
  *
  * Copyright (C) 2025 exc-D inc.
  * Website: https://exc-d.com
@@ -22,7 +22,7 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Plugins\PagesPlugin\App\Http\Controllers\Admin\PagesPluginAdminPagesController;
+use Plugins\PagesPlugin\App\Http\Controllers\Admin\AdminDixlasePagesController;
 use App\Models\SecuritySetting;
 use Plugins\PagesPlugin\App\Models\Page;
 
@@ -38,15 +38,15 @@ Route::prefix($adminUrl)
                 ->group(
                     function () {
                         // イベント一覧
-                        Route::get('/pages', [PagesPluginAdminPagesController::class, 'index'])->name('pages.index');
+                        Route::get('/pages', [AdminDixlasePagesController::class, 'index'])->name('pages.index');
                         // イベント作成
-                        Route::get('/pages/create', [PagesPluginAdminPagesController::class, 'create'])->name('pages.create');
+                        Route::get('/pages/create', [AdminDixlasePagesController::class, 'create'])->name('pages.create');
                         // イベント保存
-                        Route::post('/pages/store', [PagesPluginAdminPagesController::class, 'store'])->name('pages.store');
+                        Route::post('/pages/store', [AdminDixlasePagesController::class, 'store'])->name('pages.store');
                         // ページ編集
-                        Route::get('/pages/edit/{page}', [PagesPluginAdminPagesController::class, 'edit'])->name('pages.edit');
+                        Route::get('/pages/edit/{page}', [AdminDixlasePagesController::class, 'edit'])->name('pages.edit');
                         // ページ削除
-                        Route::delete('/pages/delete/{page}', [PagesPluginAdminPagesController::class, 'destroy'])->name('pages.destroy');
+                        Route::delete('/pages/delete/{page}', [AdminDixlasePagesController::class, 'destroy'])->name('pages.destroy');
                     }
                 );
         }

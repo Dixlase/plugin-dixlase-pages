@@ -1,5 +1,5 @@
 /**
- * This file is part of MySoftware.
+ * This file is part of DixlasePages.
  *
  * Copyright (C) 2025 {author}
  * Website: https://exc-d.com
