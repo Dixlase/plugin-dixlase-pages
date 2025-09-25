@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MySoftware.
+ * This file is part of DixlasePages.
  *
  * Copyright (C) 2025 exc-D inc.
  * Website: https://exc-d.com
@@ -21,7 +21,7 @@
  */
 
 
-namespace Plugins\PagesPlugin\App\Http\Requests\Admin;
+namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePageRequest extends FormRequest
