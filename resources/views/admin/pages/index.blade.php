@@ -1,5 +1,5 @@
 {{--
-This file is part of MySoftware.
+This file is part of DixlasePages.
 
 Copyright (C) 2025 exc-D inc.
 Website: https://exc-d.com
@@ -22,25 +22,23 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('admin::partials.layout')
 
 @section('content')
-        <!-- Flash message for success or error -->
-        @include('components::flash_message')
 
         <!-- デスクトップ用テーブル -->
         <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm text-left rtl:text-right">
-                <thead class="{{ config('admin.appearance_class.table.thead') }}">
+                <thead class="{{ config('appearance.appearance_class.table.thead') }}">
                     <tr>
-                        <th class="{{ config('admin.appearance_class.table.td') }}">{{ __('common.id') }}</th>
-                        <th class="{{ config('admin.appearance_class.table.td') }}">{{ __('common.title') }}</th>
-                        <th class="{{ config('admin.appearance_class.table.td') }}">{{ __('common.url') }}</th>
-                        <th class="{{ config('admin.appearance_class.table.td') }}">{{ __('common.created_at') }}</th>
-                        <th class="{{ config('admin.appearance_class.table.td') }}">{{ __('common.actions') }}</th>
+                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.id') }}</th>
+                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.title') }}</th>
+                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.url') }}</th>
+                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.created_at') }}</th>
+                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($pages as $page)
-                        <tr class="{{ config('admin.appearance_class.table.tr') }}">
-                            <td class="{{ config('admin.appearance_class.table.td') }}">{{ $page->id }}</td>
+                        <tr class="{{ config('appearance.appearance_class.table.tr') }}">
+                            <td class="{{ config('appearance.appearance_class.table.td') }}">{{ $page->id }}</td>
                             <td class="px-4 py-2">{{ $page->title }}</td>
                             <td class="px-4 py-2 text-blue-600 underline">
                                 <a href="{{ url($pages_directory . '/' . $page->slug) }}" target="_blank">

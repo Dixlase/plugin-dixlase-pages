@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MySoftware.
+ * This file is part of DixlasePages.
  *
  * Copyright (C) 2025 exc-D inc.
  * Website: https://exc-d.com
@@ -23,25 +23,27 @@
 
 namespace Plugins\PagesPlugin\App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Admin\AdminLoggedinController;
+use Illuminate\Routing\Controller;
 use Plugins\PagesPlugin\App\Http\Requests\Admin\StorePageRequest;
 use Plugins\PagesPlugin\App\Http\Requests\Admin\UpdatePageRequest;
 use Plugins\PagesPlugin\App\Models\Page;
+use App\Traits\AdminInterfaceTrait;
+use App\Traits\AdminLoggedInTrait;
 
 
-class PagesPluginAdminPagesController extends AdminLoggedinController
+
+class PagesPluginAdminPagesController extends Controller
 {
 
+    use AdminInterfaceTrait;
+    use AdminLoggedInTrait;
+
     protected $pagesDirectory;
-    //初期設定を行う
+
     public function __construct()
     {
-        // 親クラスのコンストラクタを呼び出す
-        parent::__construct();
-
-        // ページのマークダウンファイルを保存するディレクトリ
-        $this->pagesDirectory = config('custom.pages_directory');
-        $this->viewParams['pages_directory'] = $this->pagesDirectory;
+        $this->initialize();
+        $this->initializeAfterLogin();
     }
 
     /**
