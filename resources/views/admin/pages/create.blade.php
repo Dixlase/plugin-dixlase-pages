@@ -1,5 +1,5 @@
 {{--
-This file is part of MySoftware.
+This file is part of DixlasePages.
 
 Copyright (C) 2025 exc-D inc.
 Website: https://exc-d.com
@@ -22,9 +22,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('admin::partials.layout')
 
 @section('content')
-
-<!-- Flash message for success or error -->
-@include('components::flash_message')
 
 <form action="{{ route('pages-plugin::admin.pages.store') }}" method="POST">
     @csrf
