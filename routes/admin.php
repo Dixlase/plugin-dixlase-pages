@@ -20,34 +20,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 use Illuminate\Support\Facades\Route;
-use Plugins\PagesPlugin\App\Http\Controllers\Admin\AdminDixlasePagesController;
-use App\Models\SecuritySetting;
-use Plugins\PagesPlugin\App\Models\Page;
+use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesController;
 
-// 管理画面のルート。
-$adminUrl = SecuritySetting::get('admin_url', config('security.admin_url'));
+/*
+|--------------------------------------------------------------------------
+| DixlasePages Admin Routes
+|--------------------------------------------------------------------------
+|
+| 管理画面用のルートを定義します。
+| これらのルートは管理画面のミドルウェアが適用されます。
+|
+*/
 
-Route::prefix($adminUrl)
-    ->group(
-        function () {
-            // 管理画面
-            Route::middleware(['plugin', 'auth:member', 'admin.ip'])
-                ->name('pages-plugin::admin.')
-                ->group(
-                    function () {
-                        // イベント一覧
-                        Route::get('/pages', [AdminDixlasePagesController::class, 'index'])->name('pages.index');
-                        // イベント作成
-                        Route::get('/pages/create', [AdminDixlasePagesController::class, 'create'])->name('pages.create');
-                        // イベント保存
-                        Route::post('/pages/store', [AdminDixlasePagesController::class, 'store'])->name('pages.store');
-                        // ページ編集
-                        Route::get('/pages/edit/{page}', [AdminDixlasePagesController::class, 'edit'])->name('pages.edit');
-                        // ページ削除
-                        Route::delete('/pages/delete/{page}', [AdminDixlasePagesController::class, 'destroy'])->name('pages.destroy');
-                    }
-                );
-        }
-    );
+Route::prefix('pages')
+    ->name('pages-plugin::admin.pages.')
+    ->group(function () {
+        Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
+        Route::get('/create', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
+        Route::post('/', [DixlasePagesAdminPagesController::class, 'store'])->name('store');
+        Route::get('/{page}', [DixlasePagesAdminPagesController::class, 'show'])->name('show');
+        Route::get('/{page}/edit', [DixlasePagesAdminPagesController::class, 'edit'])->name('edit');
+        Route::patch('/{page}', [DixlasePagesAdminPagesController::class, 'update'])->name('update');
+        Route::delete('/{page}', [DixlasePagesAdminPagesController::class, 'destroy'])->name('destroy');
+    });
