@@ -24,9 +24,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @section('content')
 
 <!-- Flash message for success or error -->
-@include('components::flash_message')
+@include('components::flash-message')
 
-<form action="{{ route('pages-plugin::admin.pages.update', ['page' => $page->id] ) }}" method="POST">
+<form id="pageUpdateForm" action="{{ route('pages-plugin::admin.pages.update', ['page' => $page->id] ) }}" method="POST">
     @csrf
     @method('PATCH')
 
@@ -45,11 +45,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     @include('components::form.save', [
         'id' => 'confirmationModal',
         'onclick' => "openModal('confirmationModal')",
-        'title' => '保存の確認',
-        'label' => 'ページを作成',
-        'message' => 'この内容でページーを作成しますか？',
-        'confirm_label' => '作成',
-        'cancel_label' => '戻る',
+        'title' => __('admin.common.update_confirmation'),
+        'label' => __('admin.common.update'),
+        'message' => __('pages-plugin::admin.messages.update_confirmation_message'),
+        'confirm_label' => __('admin.common.update'),
+        'cancel_label' => __('admin.common.back'),
+        'form' => 'pageUpdateForm',
     ])
 
 </form>

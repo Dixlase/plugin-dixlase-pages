@@ -20,20 +20,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 return [
     'nav' => [
         'pages' => [
-            'text' => 'Pages',
-            'index' => 'Pages List',
-            'create' => 'Page Create',
+            'text' => 'Page Management',
+            'index' => 'Page List',
+            'create' => 'Create Page',
         ],
     ],
 
     'features' => [
-        'events' => [
+        'pages' => [
+            'title' => 'Page Title',
+            'slug' => 'Slug',
+            'content' => 'Content',
+            'status' => 'Status',
+            'published_at' => 'Published At',
             'index' => [
-                'heading' => 'Pages',
+                'heading' => 'Page Master',
             ],
             'create' => [
                 'heading' => 'Page Create',
@@ -42,5 +46,30 @@ return [
                 'heading' => 'Page Edit',
             ],
         ],
+    ],
+
+    'actions' => [
+        'edit' => 'Edit',
+        'delete' => 'Delete',
+        'delete_confirm' => 'Are you sure you want to delete this page?',
+    ],
+
+    'messages' => [
+        'no_pages_found' => 'No pages found.',
+        'total_pages' => 'Total: :total items',
+        'per_page' => 'Per Page',
+        'create_confirmation_message' => 'Do you want to create a page with this content?',
+        'update_confirmation_message' => 'Do you want to update the page with this content?',
+    ],
+
+    'validation' => [
+        'title_required' => 'Title is required.',
+        'title_max' => 'Title must not exceed 255 characters.',
+        'slug_format' => 'Slug may only contain lowercase letters, numbers, and hyphens.',
+        'slug_unique' => 'This slug is already taken.',
+        'content_required' => 'Content is required.',
+        'status_required' => 'Status is required.',
+        'published_at_date' => 'Published at must be a valid date.',
+        'published_at_future' => 'Published at must be a date in the future or present.',
     ],
 ];

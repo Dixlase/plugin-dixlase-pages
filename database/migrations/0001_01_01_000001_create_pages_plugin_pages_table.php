@@ -41,7 +41,8 @@ return new class extends Migration
             $table->id();
             $table->string('title'); // ページのタイトル
             $table->string('slug')->unique(); // ページのURL（スラッグ）
-            $table->integer('status')->default(0); // 公開設定（0:非公開, 1:公開）
+            $table->enum('status', ['draft', 'published', 'scheduled'])->default('draft'); // ステータス（下書き、公開、日付指定）
+            $table->timestamp('published_at')->nullable(); // 公開日時
             $table->text('content')->nullable(); // ページの内容
             $table->timestamps();
             $table->softDeletes();

@@ -21,17 +21,17 @@
  */
 
 
-namespace Plugins\PagesPlugin\Database\Factories;
+namespace Plugins\DixlasePages\Database\Factories;
 
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Plugins\PagesPlugin\App\Models\Page;
+use Plugins\DixlasePages\App\Models\Page;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Page>
  */
-class PageFactory extends Factory
+class PagesFactory extends Factory
 {
 
     protected $model = Page::class;

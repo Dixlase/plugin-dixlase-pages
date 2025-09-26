@@ -18,7 +18,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
-
 <!-- Title -->
 <div class="mb-4">
     @include('components::form.label', [
@@ -36,7 +35,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 </div>
 
-<!-- URL Slug -->
+<!-- Slug -->
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'slug',
@@ -46,12 +45,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         'id' => 'slug',
         'name' => 'slug',
         'value' => old('slug', $page->slug ?? ''),
-        'required' => true,
+        'placeholder' => '自動生成されます（空白の場合）',
     ])
     @include('components::form.error', [
         'messages' => $errors->get('slug')
     ])
-    <p class="text-sm text-gray-500 mt-1">例: "page1" → URL: https://example.com/page1</p>
 </div>
 
 <!-- Content -->
@@ -65,22 +63,79 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         'name' => 'content',
         'value' => old('content', $page->content ?? ''),
         'required' => true,
+        'class' => 'min-h-48',
+    ])
+    @include('components::form.error', [
+        'messages' => $errors->get('content')
     ])
 </div>
 
-<!-- Staus -->
+<!-- Status -->
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'status',
         'text' => 'pages-plugin::admin.features.pages.status',
     ])
-    @include('components::form.select', [
-        'id' => 'status',
+    @include('components::form.radio-group', [
         'name' => 'status',
-        'value' => old('status', $page->status ?? ''),
-        'options' => config('admin.status.pages'),
-        'required' => true,
-    ])
-    @include('components::form.error', [
+        'options' => [
+            'draft' => [
+                'label' => __('admin.common.status.draft'),
+                'description' => __('admin.common.status.draft_description'),
+            ],
+            'published' => [
+                'label' => __('admin.common.status.published'),
+                'description' => __('admin.common.status.published_description'),
+            ],
+            'scheduled' => [
+                'label' => __('admin.common.status.scheduled'),
+                'description' => __('admin.common.status.scheduled_description'),
+            ],
+        ],
+        'selected' => old('status', $page->status->value ?? 'draft'),
         'messages' => $errors->get('status')
     ])
+</div>
+
+<!-- Published At (日付指定時のみ表示) -->
+<div class="mb-4" id="published-at-field" style="display: none;">
+    @include('components::form.label', [
+        'for' => 'published_at',
+        'text' => 'pages-plugin::admin.features.pages.published_at',
+    ])
+    @include('components::form.text', [
+        'id' => 'published_at',
+        'name' => 'published_at',
+        'type' => 'datetime-local',
+        'value' => old('published_at', $page->published_at?->format('Y-m-d\TH:i') ?? ''),
+    ])
+    @include('components::form.error', [
+        'messages' => $errors->get('published_at')
+    ])
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusRadios = document.querySelectorAll('input[name="status"]');
+    const publishedAtField = document.getElementById('published-at-field');
+    
+    function togglePublishedAtField() {
+        const selectedStatus = document.querySelector('input[name="status"]:checked')?.value;
+        if (selectedStatus === 'scheduled') {
+            publishedAtField.style.display = 'block';
+        } else {
+            publishedAtField.style.display = 'none';
+        }
+    }
+    
+    // 初期表示
+    togglePublishedAtField();
+    
+    // ラジオボタン変更時
+    statusRadios.forEach(radio => {
+        radio.addEventListener('change', togglePublishedAtField);
+    });
+});
+</script>
+@endpush
