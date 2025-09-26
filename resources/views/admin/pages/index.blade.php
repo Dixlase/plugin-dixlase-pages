@@ -18,93 +18,114 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
-
 @extends('admin::partials.layout')
 
 @section('content')
+<div class="container mx-auto px-4">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">{{ __('pages-plugin::admin.features.pages.index.heading') }}</h1>
+        <a href="{{ route('pages-plugin::admin.pages.create') }}" 
+           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            {{ __('admin.common.create') }}
+        </a>
+    </div>
 
-        <!-- デスクトップ用テーブル -->
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-sm text-left rtl:text-right">
-                <thead class="{{ config('appearance.appearance_class.table.thead') }}">
+    <!-- 検索・フィルター -->
+    <div class="bg-white shadow rounded-lg p-4 mb-6">
+        <form method="GET" class="flex gap-4">
+            <div class="flex-1">
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="タイトル、内容、スラッグで検索..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+            </div>
+            <div>
+                <select name="status" class="px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="">全てのステータス</option>
+                    <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>
+                        {{ __('admin.common.status.draft') }}
+                    </option>
+                    <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>
+                        {{ __('admin.common.status.published') }}
+                    </option>
+                    <option value="scheduled" {{ request('status') === 'scheduled' ? 'selected' : '' }}>
+                        {{ __('admin.common.status.scheduled') }}
+                    </option>
+                </select>
+            </div>
+            <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                {{ __('admin.common.search') }}
+            </button>
+        </form>
+    </div>
+
+    <!-- ページ一覧テーブル -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        @if($pages->count() > 0)
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.id') }}</th>
-                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.title') }}</th>
-                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.url') }}</th>
-                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.created_at') }}</th>
-                        <th class="{{ config('appearance.appearance_class.table.td') }}">{{ __('common.actions') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ __('pages-plugin::admin.features.pages.title') }}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ __('pages-plugin::admin.features.pages.slug') }}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ __('pages-plugin::admin.features.pages.status') }}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ __('pages-plugin::admin.features.pages.published_at') }}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            操作
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($pages as $page)
-                        <tr class="{{ config('appearance.appearance_class.table.tr') }}">
-                            <td class="{{ config('appearance.appearance_class.table.td') }}">{{ $page->id }}</td>
-                            <td class="px-4 py-2">{{ $page->title }}</td>
-                            <td class="px-4 py-2 text-blue-600 underline">
-                                <a href="{{ url($pages_directory . '/' . $page->slug) }}" target="_blank">
-                                    {{ url($pages_directory . '/' . $page->slug) }}
-                                </a>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($pages as $page)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $page->title }}</div>
                             </td>
-                            <td class="px-4 py-2">{{ $page->created_at->format('Y-m-d') }}</td>
-                            <td class="px-4 py-2 flex items-center space-x-2">
-                                <a href="{{ route('pages-plugin::admin.pages.edit', ['page' => $page->id]) }}"
-                                   class="bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-bold py-1 px-3 rounded">
-                                    Edit
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500">{{ $page->slug }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $page->status->cssClass() }}">
+                                    {{ $page->status->label() }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $page->published_at ? $page->published_at->format('Y-m-d H:i') : '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="{{ route('pages-plugin::admin.pages.edit', $page) }}" 
+                                   class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    {{ __('pages-plugin::admin.actions.edit') }}
                                 </a>
-                                <form action="{{ route('pages-plugin::admin.pages.destroy', ['page' => $page->id]) }}" method="POST" class="inline-block">
+                                <form method="POST" action="{{ route('pages-plugin::admin.pages.destroy', $page) }}" 
+                                      class="inline" onsubmit="return confirm('{{ __('pages-plugin::admin.actions.delete_confirm') }}')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-3 rounded"
-                                            onclick="return confirm('Are you sure you want to delete this page?')">
-                                        Delete
+                                    <button type="submit" class="text-red-600 hover:text-red-900">
+                                        {{ __('pages-plugin::admin.actions.delete') }}
                                     </button>
                                 </form>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-4 py-4 text-center text-gray-500">No pages found.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
-        </div>
 
-        <!-- モバイル用カード -->
-        <div class="block md:hidden">
-            @forelse($pages as $page)
-                <div class="border rounded-lg p-4 mb-4 shadow">
-                    <p><strong>ID:</strong> {{ $page->id }}</p>
-                    <p><strong>Title:</strong> {{ $page->title }}</p>
-                    <p><strong>URL:</strong>
-                        <a href="{{ url($pages_directory . '/' . $page->slug) }}" target="_blank" class="text-blue-600 underline">
-                            {{ url($pages_directory . '/' . $page->slug) }}
-                        </a>
-                    </p>
-                    <p><strong>Created At:</strong> {{ $page->created_at->format('Y-m-d') }}</p>
-                    <div class="mt-2 flex space-x-2">
-                        <a href="{{ route('pages-plugin::admin.pages.edit', ['page' => $page->id]) }}"
-                           class="bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-bold py-1 px-3 rounded">
-                            Edit
-                        </a>
-                        <form action="{{ route('pages-plugin::admin.pages.destroy', ['page' => $page->id]) }}" method="POST" class="inline-block">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-3 rounded"
-                                    onclick="return confirm('Are you sure you want to delete this page?')">
-                                Delete
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            @empty
-                <p class="text-center text-gray-500">No pages found.</p>
-            @endforelse
-        </div>
-
-        <!-- Pagination links -->
-        <div class="mt-6">
-            {{ $pages->links('pagination::tailwind') }}
-        </div>
-
+            <!-- ページネーション -->
+            <div class="px-6 py-4 border-t border-gray-200">
+                {{ $pages->links() }}
+            </div>
+        @else
+            <div class="px-6 py-4 text-center text-gray-500">
+                {{ __('pages-plugin::admin.messages.no_pages_found') }}
+            </div>
+        @endif
+    </div>
+</div>
 @endsection

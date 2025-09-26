@@ -21,7 +21,7 @@
  */
 
 
-namespace Plugins\Pagesplugin\App\Providers;
+namespace Plugins\DixlasePages\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Config;
@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
-class PagesPluginServiceProvider extends ServiceProvider
+class DixlasePagesServiceProvider extends ServiceProvider
 {
     use PluginLoaderTrait;
 
@@ -41,5 +41,39 @@ class PagesPluginServiceProvider extends ServiceProvider
         // `admin.nav` の設定をマージ
         $this->mergeAdminNavConfig(__DIR__ . '/../../config/admin.php');
     }
-    public function boot() {}
+
+    public function boot()
+    {
+        // ビューの登録
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'pages-plugin');
+        
+        // 翻訳ファイルの登録
+        $this->loadTranslationsFrom(__DIR__ . '/../../lang', 'pages-plugin');
+        
+        // マイグレーションの登録
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+        
+        // ルートの登録
+        $this->loadRoutes();
+    }
+
+    /**
+     * ルートを読み込む
+     */
+    protected function loadRoutes()
+    {
+        // 管理画面ルート
+        if (file_exists(__DIR__ . '/../../routes/admin.php')) {
+            Route::middleware(['web', 'auth:member', 'admin.ip'])
+                ->prefix(config('security.admin_url', 'admin'))
+                ->name('admin.')
+                ->group(__DIR__ . '/../../routes/admin.php');
+        }
+
+        // フロントエンドルート
+        if (file_exists(__DIR__ . '/../../routes/web.php')) {
+            Route::middleware(['web'])
+                ->group(__DIR__ . '/../../routes/web.php');
+        }
+    }
 }

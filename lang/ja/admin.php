@@ -20,12 +20,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 return [
     'nav' => [
         'pages' => [
             'text' => 'ページ管理',
-            'index' => 'ページマスター',
+            'index' => 'ページ一覧',
             'create' => 'ページ作成',
         ],
     ],
@@ -36,6 +35,7 @@ return [
             'slug' => 'スラッグ',
             'content' => 'コンテンツ',
             'status' => 'ステータス',
+            'published_at' => '公開日時',
             'index' => [
                 'heading' => 'ページマスター',
             ],
@@ -46,5 +46,30 @@ return [
                 'heading' => 'ページ編集',
             ],
         ]
+    ],
+
+    'actions' => [
+        'edit' => '編集',
+        'delete' => '削除',
+        'delete_confirm' => 'このページを削除してもよろしいですか？',
+    ],
+
+    'messages' => [
+        'no_pages_found' => 'ページが見つかりません。',
+        'total_pages' => '全:total件',
+        'per_page' => '表示件数',
+        'create_confirmation_message' => 'この内容でページを作成しますか？',
+        'update_confirmation_message' => 'この内容でページを更新しますか？',
+    ],
+
+    'validation' => [
+        'title_required' => 'タイトルは必須です。',
+        'title_max' => 'タイトルは255文字以内で入力してください。',
+        'slug_format' => 'スラッグは半角英数字とハイフンのみ使用できます。',
+        'slug_unique' => 'このスラッグは既に使用されています。',
+        'content_required' => 'コンテンツは必須です。',
+        'status_required' => 'ステータスは必須です。',
+        'published_at_date' => '公開日時は正しい日付形式で入力してください。',
+        'published_at_future' => '公開日時は現在時刻以降を指定してください。',
     ],
 ];
