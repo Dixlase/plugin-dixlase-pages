@@ -20,84 +20,54 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
-namespace Plugins\PagesPlugin\App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller;
+use Plugins\DixlasePages\App\Models\Page;
+use Plugins\DixlasePages\App\Http\Requests\Admin\StorePageRequest;
+use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePageRequest;
+use Plugins\DixlasePages\App\Enums\PageStatus;
+use Illuminate\Http\Request;
 
-use Illuminate\Routing\Controller;
-use Plugins\PagesPlugin\App\Http\Requests\Admin\StorePageRequest;
-use Plugins\PagesPlugin\App\Http\Requests\Admin\UpdatePageRequest;
-use Plugins\PagesPlugin\App\Models\Page;
-use App\Traits\AdminInterfaceTrait;
-use App\Traits\AdminLoggedInTrait;
-
-
-
-class PagesPluginAdminPagesController extends Controller
+class DixlasePagesAdminPagesController extends Controller
 {
-
-    use AdminInterfaceTrait;
-    use AdminLoggedInTrait;
-
-    protected $pagesDirectory;
-
-    public function __construct()
-    {
-        $this->initialize();
-        $this->initializeAfterLogin();
-    }
-
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = Page::query();
 
-        $this->viewParams['heading'] = 'pages-plugin::admin.features.pages.index.heading';
+        // 検索機能
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
 
+        // ステータスフィルター
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
 
-        // ページネーションで取得
-        $pages = Page::paginate(10); // 1ページあたり10件表示
-        $this->viewParams['pages'] = $pages;
-        return view(
-            'pages-plugin::admin.pages.index',
-            $this->viewParams
-        );
-    }
+        // ページネーション
+        $pages = $query->orderBy('created_at', 'desc')
+                      ->paginate(10)
+                      ->withQueryString();
 
-    public function create()
-    {
-
-        $this->viewParams['heading'] = 'pages-plugin::admin.features.pages.create.heading';
-
-        return view(
-            'pages-plugin::admin.pages.create',
-            $this->viewParams
-        );
+        return view('pages-plugin::admin.pages.index', compact('pages'));
     }
 
     /**
-     * Display the specified resource.
+     * Show the form for creating a new resource.
      */
-    public function show(Page $page)
+    public function create()
     {
-        //
-    }
-
-    public function edit(Page $page)
-    {
-        // 見出し
-        $this->viewParams['heading'] = 'pages-plugin::admin.features.pages.edit.heading';
-
-        // 内容を取得
-        $this->viewParams['page'] = $page;
-
-
-
-        // ビューにデータを渡す
-        return view(
-            'pages-plugin::admin.pages.edit',
-            $this->viewParams
-        );
+        $page = new Page();
+        return view('pages-plugin::admin.pages.create', compact('page'));
     }
 
     /**
@@ -105,13 +75,27 @@ class PagesPluginAdminPagesController extends Controller
      */
     public function store(StorePageRequest $request)
     {
-        // バリデーションを通過したデータを取得
-        $validated = $request->validated();
+        $page = Page::create($request->validated());
 
-        // ページを作成し、作成したページのインスタンスを取得
-        $page = Page::create($validated);
+        return redirect()
+            ->route('pages-plugin::admin.pages.index')
+            ->with('success', 'ページが正常に作成されました。');
+    }
 
-        return redirect()->route('pages-plugin::admin.pages.edit', ['page' => $page->id])->with('success', 'Page created successfully!');
+    /**
+     * Display the specified resource.
+     */
+    public function show(Page $page)
+    {
+        return view('pages-plugin::admin.pages.show', compact('page'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Page $page)
+    {
+        return view('pages-plugin::admin.pages.edit', compact('page'));
     }
 
     /**
@@ -119,12 +103,11 @@ class PagesPluginAdminPagesController extends Controller
      */
     public function update(UpdatePageRequest $request, Page $page)
     {
-        $validated = $request->validated();
+        $page->update($request->validated());
 
-        // ページを更新
-        $page->update($validated);
-
-        return redirect()->route('pages-plugin::admin.pages.edit', ['page' => $page->id])->with('success', 'Page updated successfully!');
+        return redirect()
+            ->route('pages-plugin::admin.pages.index')
+            ->with('success', 'ページが正常に更新されました。');
     }
 
     /**
@@ -134,6 +117,8 @@ class PagesPluginAdminPagesController extends Controller
     {
         $page->delete();
 
-        return redirect()->route('pages-plugin::admin.pages.index', $this->viewParams)->with('success', 'Page deleted successfully!');
+        return redirect()
+            ->route('pages-plugin::admin.pages.index')
+            ->with('success', 'ページが正常に削除されました。');
     }
 }

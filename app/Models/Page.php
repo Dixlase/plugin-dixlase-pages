@@ -20,38 +20,46 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Plugins\PagesPlugin\App\Models;
+namespace Plugins\DixlasePages\App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
+use Plugins\DixlasePages\App\Enums\PageStatus;
 
 class Page extends Model
 {
-    use HasFactory, Notifiable, SoftDeletes; // MustVerifyEmailを追加
+    use HasFactory, SoftDeletes;
 
     /**
      * テーブル名
-     *
-     * @var string
      */
     protected $table = 'pages_plugin_pages';
 
     /**
-     * ホワイトリスト
-     * @var array
+     * 一括代入可能な属性
+     *
+     * @var array<int, string>
      */
-
     protected $fillable = [
         'title',
         'slug',
         'content',
         'status',
+        'published_at',
         //'meta_title',
         //'meta_description',
         //'meta_keywords',
+    ];
+
+    /**
+     * キャストする属性
+     *
+     * @var array
+     */
+    protected $casts = [
+        'published_at' => 'datetime',
     ];
 
     protected static function booted()
@@ -64,11 +72,71 @@ class Page extends Model
     }
 
     /**
-     * このモデル用のファクトリを返す。
+     * ステータスのアクセサー（安全な変換）
      */
-    protected static function newFactory()
+    public function getStatusAttribute($value): PageStatus
     {
-        // 「Plugins\PagesPlugin\Database\Factories\PageFactory」が存在する前提
-        return \Plugins\PagesPlugin\Database\Factories\PageFactory::new();
+        // 古いデータの変換
+        return match($value) {
+            '0', 0, 'draft', null => PageStatus::DRAFT,
+            '1', 1, 'published' => PageStatus::PUBLISHED,
+            '2', 2, 'scheduled' => PageStatus::SCHEDULED,
+            default => PageStatus::DRAFT,
+        };
+    }
+
+    /**
+     * ステータスのミューテーター
+     */
+    public function setStatusAttribute($value): void
+    {
+        if ($value instanceof PageStatus) {
+            $this->attributes['status'] = $value->value;
+        } else {
+            // 文字列の場合はそのまま保存
+            $this->attributes['status'] = $value;
+        }
+    }
+
+    /**
+     * 公開されているかどうかを判定
+     */
+    public function isPublished(): bool
+    {
+        return match($this->status) {
+            PageStatus::PUBLISHED => true,
+            PageStatus::SCHEDULED => $this->published_at && $this->published_at->isPast(),
+            PageStatus::DRAFT => false,
+        };
+    }
+
+    /**
+     * 公開可能なページのスコープ
+     */
+    public function scopePublished($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('status', PageStatus::PUBLISHED->value)
+              ->orWhere(function ($sq) {
+                  $sq->where('status', PageStatus::SCHEDULED->value)
+                     ->where('published_at', '<=', now());
+              });
+        });
+    }
+
+    /**
+     * 下書きページのスコープ
+     */
+    public function scopeDraft($query)
+    {
+        return $query->where('status', PageStatus::DRAFT->value);
+    }
+
+    /**
+     * 日付指定ページのスコープ
+     */
+    public function scopeScheduled($query)
+    {
+        return $query->where('status', PageStatus::SCHEDULED->value);
     }
 }
