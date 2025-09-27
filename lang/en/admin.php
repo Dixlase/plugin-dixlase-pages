@@ -30,21 +30,21 @@ return [
     ],
 
     'pages' => [
+        'index' => [
+            'heading' => 'Page Master',
+        ],
+        'create' => [
+            'heading' => 'Create Page',
+        ],
+        'edit' => [
+            'heading' => 'Edit Page',
+        ],
         'search_section' => 'Search & Filter',
         'search_placeholder' => 'Search by page title',
         'all_status' => 'All Status',
         'status_filter' => 'Status Filter',
         'list_section' => 'Page List',
         'table_label' => 'Page List Table',
-        'index' => [
-            'heading' => 'Page Master',
-        ],
-        'create' => [
-            'heading' => 'Page Create',
-        ],
-        'edit' => [
-            'heading' => 'Page Edit',
-        ],
     ],
 
     'actions' => [
