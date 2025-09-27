@@ -21,111 +21,225 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('admin::partials.layout')
 
 @section('content')
-<div class="container mx-auto px-4">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">{{ __('pages-plugin::admin.features.pages.index.heading') }}</h1>
-        <a href="{{ route('pages-plugin::admin.pages.create') }}" 
-           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            {{ __('admin.common.create') }}
-        </a>
-    </div>
+<main class="admin-main">
+    <!-- ページヘッダー -->
+    <header class="admin-header">
+        <div class="admin-header__content">
+            <h1 class="admin-title">{{ __('dixlase-pages::admin.features.pages.index.heading') }}</h1>
+            
+            @include('components::form.button', [
+                'type' => 'button',
+                'variant' => 'primary',
+                'label' => __('common.create'),
+                'icon' => 'fas fa-plus',
+                'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
+            ])
+        </div>
+    </header>
 
-    <!-- 検索・フィルター -->
-    <div class="bg-white shadow rounded-lg p-4 mb-6">
-        <form method="GET" class="flex gap-4">
-            <div class="flex-1">
-                <input type="text" name="search" value="{{ request('search') }}" 
-                       placeholder="タイトル、内容、スラッグで検索..." 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
-            </div>
-            <div>
-                <select name="status" class="px-3 py-2 border border-gray-300 rounded-md">
-                    <option value="">全てのステータス</option>
-                    <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>
-                        {{ __('admin.common.status.draft') }}
-                    </option>
-                    <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>
-                        {{ __('admin.common.status.published') }}
-                    </option>
-                    <option value="scheduled" {{ request('status') === 'scheduled' ? 'selected' : '' }}>
-                        {{ __('admin.common.status.scheduled') }}
-                    </option>
-                </select>
-            </div>
-            <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                {{ __('admin.common.search') }}
-            </button>
-        </form>
-    </div>
+    <!-- 検索・フィルターセクション -->
+    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.features.pages.search_section') }}">
+        <div class="admin-card">
+            <form method="GET" class="admin-form admin-form--horizontal" role="search">
+                <div class="admin-form__group admin-form__group--flex-1">
+                    @include('components::form.text', [
+                        'name' => 'search',
+                        'value' => request('search'),
+                        'placeholder' => __('dixlase-pages::admin.features.pages.search_placeholder'),
+                        'label' => __('dixlase-pages::admin.features.pages.search_label'),
+                        'hideLabel' => true,
+                        'aria-label' => __('dixlase-pages::admin.features.pages.search_label'),
+                    ])
+                </div>
+                
+                <div class="admin-form__group">
+                    @include('components::form.select', [
+                        'name' => 'status',
+                        'options' => [
+                            '' => __('dixlase-pages::admin.features.pages.all_status'),
+                            'draft' => __('admin.common.status.draft'),
+                            'published' => __('admin.common.status.published'),
+                            'scheduled' => __('admin.common.status.scheduled'),
+                        ],
+                        'value' => request('status'),
+                        'label' => __('dixlase-pages::admin.features.pages.status_filter'),
+                        'hideLabel' => true,
+                        'aria-label' => __('dixlase-pages::admin.features.pages.status_filter'),
+                    ])
+                </div>
+                
+                @include('components::form.button', [
+                    'type' => 'submit',
+                    'variant' => 'secondary',
+                    'label' => __('common.search'),
+                    'icon' => 'fas fa-search',
+                ])
+            </form>
+        </div>
+    </section>
 
-    <!-- ページ一覧テーブル -->
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        @if($pages->count() > 0)
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('pages-plugin::admin.features.pages.title') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('pages-plugin::admin.features.pages.slug') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('pages-plugin::admin.features.pages.status') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('pages-plugin::admin.features.pages.published_at') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            操作
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($pages as $page)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $page->title }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-500">{{ $page->slug }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $page->status->cssClass() }}">
-                                    {{ $page->status->label() }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $page->published_at ? $page->published_at->format('Y-m-d H:i') : '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('pages-plugin::admin.pages.edit', $page) }}" 
-                                   class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                    {{ __('pages-plugin::admin.actions.edit') }}
-                                </a>
-                                <form method="POST" action="{{ route('pages-plugin::admin.pages.destroy', $page) }}" 
-                                      class="inline" onsubmit="return confirm('{{ __('pages-plugin::admin.actions.delete_confirm') }}')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900">
-                                        {{ __('pages-plugin::admin.actions.delete') }}
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    <!-- ページネーションコントロール -->
+    @include('components::pagination-controls', [
+        'paginator' => $pages,
+        'currentPerPage' => request('per_page', 25),
+        'totalLabel' => 'components.pagination.total_pages',
+        'perPageLabel' => 'components.pagination.per_page_label',
+    ])
 
-            <!-- ページネーション -->
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $pages->links() }}
-            </div>
-        @else
-            <div class="px-6 py-4 text-center text-gray-500">
-                {{ __('pages-plugin::admin.messages.no_pages_found') }}
-            </div>
-        @endif
-    </div>
-</div>
+     <!-- ページネーション -->
+    @php
+        $paginationData = [
+            'current_page' => $pages->currentPage(),
+            'last_page' => $pages->lastPage(),
+            'prev_page' => $pages->previousPageUrl() ? $pages->currentPage() - 1 : null,
+            'next_page' => $pages->nextPageUrl() ? $pages->currentPage() + 1 : null,
+        ];
+        
+        $routeParams = array_filter([
+            'search' => request('search'),
+            'status' => request('status'),
+            'per_page' => request('per_page'),
+        ]);
+    @endphp
+    
+    @include('components::pagination', [
+        'pagination' => $paginationData,
+        'route' => 'dixlase-pages::admin.pages.index',
+        'routeParams' => $routeParams,
+    ])
+
+    <!-- ページ一覧セクション -->
+    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.features.pages.list_section') }}">
+        <div class="admin-card">
+            @if($pages->count() > 0)
+                <div class="admin-table-container">
+                    <table class="admin-table" role="table" aria-label="{{ __('dixlase-pages::admin.features.pages.table_label') }}">
+                        <thead class="admin-table__head">
+                            <tr class="admin-table__row">
+                                <th class="admin-table__header" scope="col">
+                                    {{ __('dixlase-pages::admin.features.pages.title') }}
+                                </th>
+                                <th class="admin-table__header" scope="col">
+                                    {{ __('dixlase-pages::admin.features.pages.slug') }}
+                                </th>
+                                <th class="admin-table__header" scope="col">
+                                    {{ __('dixlase-pages::admin.features.pages.status') }}
+                                </th>
+                                <th class="admin-table__header" scope="col">
+                                    {{ __('dixlase-pages::admin.features.pages.published_at') }}
+                                </th>
+                                <th class="admin-table__header admin-table__header--actions" scope="col">
+                                    {{ __('admin.common.actions') }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="admin-table__body">
+                            @foreach($pages as $page)
+                                <tr class="admin-table__row" role="row">
+                                    <td class="admin-table__cell admin-table__cell--primary" role="gridcell">
+                                        <div class="admin-table__primary-content">
+                                            {{ $page->title }}
+                                        </div>
+                                    </td>
+                                    <td class="admin-table__cell" role="gridcell">
+                                        <code class="admin-code">{{ $page->slug }}</code>
+                                    </td>
+                                    <td class="admin-table__cell" role="gridcell">
+                                        @include('components::status-badge', [
+                                            'status' => $page->status->value,
+                                            'label' => $page->status->label(),
+                                            'variant' => $page->status->cssClass(),
+                                        ])
+                                    </td>
+                                    <td class="admin-table__cell" role="gridcell">
+                                        <time datetime="{{ $page->published_at?->toISOString() }}" class="admin-datetime">
+                                            {{ $page->published_at ? $page->published_at->format('Y-m-d H:i') : '—' }}
+                                        </time>
+                                    </td>
+                                    <td class="admin-table__cell admin-table__cell--actions" role="gridcell">
+                                        <div class="admin-actions">
+                                            @include('components::form.button', [
+                                                'type' => 'button',
+                                                'variant' => 'secondary',
+                                                'size' => 'sm',
+                                                'label' => __('common.edit'),
+                                                'icon' => 'fas fa-edit',
+                                                'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.edit', $page) . "'",
+                                            ])
+                                            
+                                            @include('components::form.button', [
+                                                'type' => 'button',
+                                                'variant' => 'danger',
+                                                'size' => 'sm',
+                                                'label' => __('common.delete'),
+                                                'icon' => 'fas fa-trash',
+                                                'onclick' => "if(confirm('" . __('dixlase-pages::admin.actions.delete_confirm') . "')) { 
+                                                    var form = document.createElement('form');
+                                                    form.method = 'POST';
+                                                    form.action = '" . route('dixlase-pages::admin.pages.destroy', $page) . "';
+                                                    form.innerHTML = '<input type=\"hidden\" name=\"_token\" value=\"" . csrf_token() . "\"><input type=\"hidden\" name=\"_method\" value=\"DELETE\">';
+                                                    document.body.appendChild(form);
+                                                    form.submit();
+                                                }",
+                                            ])
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ページネーションコントロール -->
+                @include('components::pagination-controls', [
+                    'paginator' => $pages,
+                    'currentPerPage' => request('per_page', 25),
+                    'totalLabel' => 'components.pagination.total_pages',
+                    'perPageLabel' => 'components.pagination.per_page_label',
+                ])
+
+                <!-- ページネーション -->
+                @php
+                    $paginationData = [
+                        'current_page' => $pages->currentPage(),
+                        'last_page' => $pages->lastPage(),
+                        'prev_page' => $pages->previousPageUrl() ? $pages->currentPage() - 1 : null,
+                        'next_page' => $pages->nextPageUrl() ? $pages->currentPage() + 1 : null,
+                    ];
+                    
+                    $routeParams = array_filter([
+                        'search' => request('search'),
+                        'status' => request('status'),
+                        'per_page' => request('per_page'),
+                    ]);
+                @endphp
+                
+                @include('components::pagination', [
+                    'pagination' => $paginationData,
+                    'route' => 'dixlase-pages::admin.pages.index',
+                    'routeParams' => $routeParams,
+                ])
+            @else
+                <div class="admin-empty-state">
+                    <div class="admin-empty-state__icon">
+                        <i class="fas fa-file-alt" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="admin-empty-state__title">
+                        {{ __('dixlase-pages::admin.messages.no_pages_found') }}
+                    </h3>
+                    <p class="admin-empty-state__description">
+                        {{ __('dixlase-pages::admin.messages.no_pages_description') }}
+                    </p>
+                    @include('components::form.button', [
+                        'type' => 'button',
+                        'variant' => 'primary',
+                        'label' => __('common.create'),
+                        'icon' => 'fas fa-plus',
+                        'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
+                    ])
+                </div>
+            @endif
+        </div>
+    </section>
+</main>
 @endsection

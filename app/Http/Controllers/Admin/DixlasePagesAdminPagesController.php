@@ -22,7 +22,10 @@
 
 namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Traits\AdminInterfaceTrait;
+use App\Traits\AdminLoggedInTrait;
 use Plugins\DixlasePages\App\Models\Page;
 use Plugins\DixlasePages\App\Http\Requests\Admin\StorePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePageRequest;
@@ -31,6 +34,15 @@ use Illuminate\Http\Request;
 
 class DixlasePagesAdminPagesController extends Controller
 {
+    use AuthorizesRequests;
+    use AdminInterfaceTrait;
+    use AdminLoggedInTrait;
+
+    public function __construct()
+    {
+        $this->initialize();
+        $this->initializeAfterLogin();
+    }
     /**
      * Display a listing of the resource.
      */
@@ -53,12 +65,15 @@ class DixlasePagesAdminPagesController extends Controller
             $query->where('status', $request->get('status'));
         }
 
-        // ページネーション
+        // ページネーション（件数指定対応）
+        $perPage = $request->get('per_page', 25);
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
+        
         $pages = $query->orderBy('created_at', 'desc')
-                      ->paginate(10)
+                      ->paginate($perPage)
                       ->withQueryString();
 
-        return view('pages-plugin::admin.pages.index', compact('pages'));
+        return view('dixlase-pages::admin.pages.index', array_merge($this->viewParams, compact('pages')));
     }
 
     /**
@@ -67,7 +82,7 @@ class DixlasePagesAdminPagesController extends Controller
     public function create()
     {
         $page = new Page();
-        return view('pages-plugin::admin.pages.create', compact('page'));
+        return view('dixlase-pages::admin.pages.create', array_merge($this->viewParams, compact('page')));
     }
 
     /**
@@ -78,7 +93,7 @@ class DixlasePagesAdminPagesController extends Controller
         $page = Page::create($request->validated());
 
         return redirect()
-            ->route('pages-plugin::admin.pages.index')
+            ->route('dixlase-pages::admin.pages.index')
             ->with('success', 'ページが正常に作成されました。');
     }
 
@@ -87,7 +102,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function show(Page $page)
     {
-        return view('pages-plugin::admin.pages.show', compact('page'));
+        return view('dixlase-pages::admin.pages.show', array_merge($this->viewParams, compact('page')));
     }
 
     /**
@@ -95,7 +110,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function edit(Page $page)
     {
-        return view('pages-plugin::admin.pages.edit', compact('page'));
+        return view('dixlase-pages::admin.pages.edit', array_merge($this->viewParams, compact('page')));
     }
 
     /**
@@ -106,7 +121,7 @@ class DixlasePagesAdminPagesController extends Controller
         $page->update($request->validated());
 
         return redirect()
-            ->route('pages-plugin::admin.pages.index')
+            ->route('dixlase-pages::admin.pages.index')
             ->with('success', 'ページが正常に更新されました。');
     }
 
@@ -118,7 +133,7 @@ class DixlasePagesAdminPagesController extends Controller
         $page->delete();
 
         return redirect()
-            ->route('pages-plugin::admin.pages.index')
+            ->route('dixlase-pages::admin.pages.index')
             ->with('success', 'ページが正常に削除されました。');
     }
 }
