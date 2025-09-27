@@ -34,9 +34,9 @@ enum PageStatus: string
     public function label(): string
     {
         return match($this) {
-            self::DRAFT => __('admin.common.status.draft'),
-            self::PUBLISHED => __('admin.common.status.published'),
-            self::SCHEDULED => __('admin.common.status.scheduled'),
+            self::DRAFT => __('components.status.draft'),
+            self::PUBLISHED => __('components.status.published'),
+            self::SCHEDULED => __('components.status.scheduled'),
         };
     }
 
@@ -46,9 +46,9 @@ enum PageStatus: string
     public function description(): string
     {
         return match($this) {
-            self::DRAFT => __('admin.common.status.draft_description'),
-            self::PUBLISHED => __('admin.common.status.published_description'),
-            self::SCHEDULED => __('admin.common.status.scheduled_description'),
+            self::DRAFT => __('components.status.draft_description'),
+            self::PUBLISHED => __('components.status.published_description'),
+            self::SCHEDULED => __('components.status.scheduled_description'),
         };
     }
 

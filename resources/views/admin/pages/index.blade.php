@@ -25,8 +25,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     <!-- ページヘッダー -->
     <header class="admin-header">
         <div class="admin-header__content">
-            <h1 class="admin-title">{{ __('dixlase-pages::admin.features.pages.index.heading') }}</h1>
-            
+
             @include('components::form.button', [
                 'type' => 'button',
                 'variant' => 'primary',
@@ -38,17 +37,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     </header>
 
     <!-- 検索・フィルターセクション -->
-    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.features.pages.search_section') }}">
+    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.pages.search_section') }}">
         <div class="admin-card">
             <form method="GET" class="admin-form admin-form--horizontal" role="search">
                 <div class="admin-form__group admin-form__group--flex-1">
                     @include('components::form.text', [
                         'name' => 'search',
                         'value' => request('search'),
-                        'placeholder' => __('dixlase-pages::admin.features.pages.search_placeholder'),
-                        'label' => __('dixlase-pages::admin.features.pages.search_label'),
+                        'placeholder' => __('dixlase-pages::admin.pages.search_placeholder'),
+                        'label' => __('common.search'),
                         'hideLabel' => true,
-                        'aria-label' => __('dixlase-pages::admin.features.pages.search_label'),
+                        'aria-label' => __('common.search'),
                     ])
                 </div>
                 
@@ -56,15 +55,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     @include('components::form.select', [
                         'name' => 'status',
                         'options' => [
-                            '' => __('dixlase-pages::admin.features.pages.all_status'),
-                            'draft' => __('admin.common.status.draft'),
-                            'published' => __('admin.common.status.published'),
-                            'scheduled' => __('admin.common.status.scheduled'),
+                            '' => __('dixlase-pages::admin.pages.all_status'),
+                            'draft' => __('components.status.draft'),
+                            'published' => __('components.status.published'),
+                            'scheduled' => __('components.status.scheduled'),
                         ],
                         'value' => request('status'),
-                        'label' => __('dixlase-pages::admin.features.pages.status_filter'),
+                        'label' => __('dixlase-pages::admin.pages.status_filter'),
                         'hideLabel' => true,
-                        'aria-label' => __('dixlase-pages::admin.features.pages.status_filter'),
+                        'aria-label' => __('dixlase-pages::admin.pages.status_filter'),
                     ])
                 </div>
                 
@@ -82,7 +81,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     @include('components::pagination-controls', [
         'paginator' => $pages,
         'currentPerPage' => request('per_page', 25),
-        'totalLabel' => 'components.pagination.total_pages',
+        'totalLabel' => 'components.pagination.total_count',
         'perPageLabel' => 'components.pagination.per_page_label',
     ])
 
@@ -109,27 +108,27 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 
     <!-- ページ一覧セクション -->
-    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.features.pages.list_section') }}">
+    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.pages.list_section') }}">
         <div class="admin-card">
             @if($pages->count() > 0)
                 <div class="admin-table-container">
-                    <table class="admin-table" role="table" aria-label="{{ __('dixlase-pages::admin.features.pages.table_label') }}">
+                    <table class="admin-table" role="table" aria-label="{{ __('dixlase-pages::admin.pages.table_label') }}">
                         <thead class="admin-table__head">
                             <tr class="admin-table__row">
                                 <th class="admin-table__header" scope="col">
-                                    {{ __('dixlase-pages::admin.features.pages.title') }}
+                                    {{ __('common.title') }}
                                 </th>
                                 <th class="admin-table__header" scope="col">
-                                    {{ __('dixlase-pages::admin.features.pages.slug') }}
+                                    {{ __('common.slug') }}
                                 </th>
                                 <th class="admin-table__header" scope="col">
-                                    {{ __('dixlase-pages::admin.features.pages.status') }}
+                                    {{ __('common.status') }}
                                 </th>
                                 <th class="admin-table__header" scope="col">
-                                    {{ __('dixlase-pages::admin.features.pages.published_at') }}
+                                    {{ __('common.published_at') }}
                                 </th>
                                 <th class="admin-table__header admin-table__header--actions" scope="col">
-                                    {{ __('admin.common.actions') }}
+                                    {{ __('common.actions') }}
                                 </th>
                             </tr>
                         </thead>
@@ -153,7 +152,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                     </td>
                                     <td class="admin-table__cell" role="gridcell">
                                         <time datetime="{{ $page->published_at?->toISOString() }}" class="admin-datetime">
-                                            {{ $page->published_at ? $page->published_at->format('Y-m-d H:i') : '—' }}
+                                            @if($page->published_at)
+                                                @if(app()->getLocale() === 'ja')
+                                                    {{ $page->published_at->format('Y年m月d日 H:i') }}
+                                                @else
+                                                    {{ $page->published_at->format('Y-m-d H:i') }}
+                                                @endif
+                                            @else
+                                                —
+                                            @endif
                                         </time>
                                     </td>
                                     <td class="admin-table__cell admin-table__cell--actions" role="gridcell">
@@ -189,14 +196,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         </tbody>
                     </table>
                 </div>
-
-                <!-- ページネーションコントロール -->
-                @include('components::pagination-controls', [
-                    'paginator' => $pages,
-                    'currentPerPage' => request('per_page', 25),
-                    'totalLabel' => 'components.pagination.total_pages',
-                    'perPageLabel' => 'components.pagination.per_page_label',
-                ])
 
                 <!-- ページネーション -->
                 @php

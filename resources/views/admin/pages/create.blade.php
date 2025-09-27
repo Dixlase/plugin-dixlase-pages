@@ -32,14 +32,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 
     <!-- 保存ボタンとモーダル -->
-    @include('components::form.save', [
+    @include('components.save', [
         'id' => 'confirmationModal',
         'onclick' => "openModal('confirmationModal')",
-        'title' => __('admin.common.create_confirmation'),
-        'label' => __('admin.common.create'),
+        'title' => __('common.form.save_confirmation_title'),
+        'label' => __('common.create'),
         'message' => __('dixlase-pages::admin.messages.create_confirmation_message'),
-        'confirm_label' => __('admin.common.create'),
-        'cancel_label' => __('admin.common.back'),
+        'confirm_label' => __('common.create'),
+        'cancel_label' => __('common.back'),
         'form' => 'pageCreateForm',
     ])
 
