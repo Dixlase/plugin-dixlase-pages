@@ -30,21 +30,21 @@ return [
     ],
 
     'pages' => [
+        'index' => [
+            'heading' => 'ページマスター',
+        ],
+        'create' => [
+            'heading' => 'ページ作成',
+        ],
+        'edit' => [
+            'heading' => 'ページ編集',
+        ],
         'search_section' => '検索・フィルター',
         'search_placeholder' => 'ページタイトルで検索',
         'all_status' => 'すべてのステータス',
         'status_filter' => 'ステータスフィルター',
         'list_section' => 'ページ一覧',
         'table_label' => 'ページ一覧テーブル',
-        'index' => [
-            'heading' => 'ページマスター',
-        ],
-        'create' => [
-            'heading' => '新規ページ作成',
-        ],
-        'edit' => [
-            'heading' => 'ページ編集',
-        ],
     ],
 
     'actions' => [
