@@ -22,7 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'title',
-        'text' => 'dixlase-pages::admin.features.pages.title',
+        'text' => __('common.title'),
     ])
     @include('components::form.text', [
         'id' => 'title',
@@ -39,7 +39,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'slug',
-        'text' => 'dixlase-pages::admin.features.pages.slug',
+        'text' => __('common.slug'),
     ])
     @include('components::form.text', [
         'id' => 'slug',
@@ -56,7 +56,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'content',
-        'text' => 'dixlase-pages::admin.features.pages.content',
+        'text' => __('common.content'),
     ])
     @include('components::form.textarea', [
         'id' => 'content',
@@ -74,14 +74,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'status',
-        'text' => 'dixlase-pages::admin.features.pages.status',
+        'text' => __('common.status'),
     ])
     @include('components::form.radio-group', [
         'name' => 'status',
         'options' => [
-            'draft' => __('admin.common.status.draft'),
-            'published' => __('admin.common.status.published'),
-            'scheduled' => __('admin.common.status.scheduled'),
+            'draft' => __('components.status.draft'),
+            'published' => __('components.status.published'),
+            'scheduled' => __('components.status.scheduled'),
         ],
         'value' => old('status', $page->status->value ?? 'draft'),
     ])
@@ -94,7 +94,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4" id="published-at-field" style="display: none;">
     @include('components::form.label', [
         'for' => 'published_at',
-        'text' => 'dixlase-pages::admin.features.pages.published_at',
+        'text' => __('common.published_at'),
     ])
     @include('components::form.text', [
         'id' => 'published_at',

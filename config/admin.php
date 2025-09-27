@@ -31,13 +31,13 @@ return [
             'children' => [
                 'index' => [
                     'text' => 'dixlase-pages::admin.nav.pages.index',
-                    'route' => 'dixlase-pages::admin.pages.index',
+                    'route' => 'admin.dixlase-pages::admin.pages.index',
                     'icon' => 'fas fa-fw fa-file', // ページ一覧
                     'can' => 'admin',
                 ],
                 'create' => [
                     'text' => 'dixlase-pages::admin.nav.pages.create',
-                    'route' => 'dixlase-pages::admin.pages.create',
+                    'route' => 'admin.dixlase-pages::admin.pages.create',
                     'icon' => 'fas fa-fw fa-file-circle-plus', // ページ作成
                     'can' => 'admin',
                 ],
