@@ -24,38 +24,36 @@ return [
     'nav' => [
         'pages' => [
             'text' => 'Page Management',
-            'index' => 'Page List',
+            'index' => 'Page Master',
             'create' => 'Create Page',
         ],
     ],
 
-    'features' => [
-        'pages' => [
-            'title' => 'Page Title',
-            'slug' => 'Slug',
-            'content' => 'Content',
-            'status' => 'Status',
-            'published_at' => 'Published At',
-            'index' => [
-                'heading' => 'Page Master',
-            ],
-            'create' => [
-                'heading' => 'Page Create',
-            ],
-            'edit' => [
-                'heading' => 'Page Edit',
-            ],
+    'pages' => [
+        'search_section' => 'Search & Filter',
+        'search_placeholder' => 'Search by page title',
+        'all_status' => 'All Status',
+        'status_filter' => 'Status Filter',
+        'list_section' => 'Page List',
+        'table_label' => 'Page List Table',
+        'index' => [
+            'heading' => 'Page Master',
+        ],
+        'create' => [
+            'heading' => 'Page Create',
+        ],
+        'edit' => [
+            'heading' => 'Page Edit',
         ],
     ],
 
     'actions' => [
-        'edit' => 'Edit',
-        'delete' => 'Delete',
         'delete_confirm' => 'Are you sure you want to delete this page?',
     ],
 
     'messages' => [
         'no_pages_found' => 'No pages found.',
+        'no_pages_description' => 'Please create a new page.',
         'total_pages' => 'Total: :total items',
         'per_page' => 'Per Page',
         'create_confirmation_message' => 'Do you want to create a page with this content?',

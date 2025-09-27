@@ -35,12 +35,16 @@ use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesContro
 
 Route::prefix('pages')
     ->name('dixlase-pages::admin.pages.')
+    ->middleware(['admin.ip']) // IPアドレスフィルタを適用
     ->group(function () {
-        Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
-        Route::get('/create', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
-        Route::post('/', [DixlasePagesAdminPagesController::class, 'store'])->name('store');
-        Route::get('/{page}', [DixlasePagesAdminPagesController::class, 'show'])->name('show');
-        Route::get('/{page}/edit', [DixlasePagesAdminPagesController::class, 'edit'])->name('edit');
-        Route::patch('/{page}', [DixlasePagesAdminPagesController::class, 'update'])->name('update');
-        Route::delete('/{page}', [DixlasePagesAdminPagesController::class, 'destroy'])->name('destroy');
+        // 認証チェックを各ルートで実行
+        Route::middleware(['auth:member'])->group(function () {
+            Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
+            Route::get('/create', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
+            Route::post('/', [DixlasePagesAdminPagesController::class, 'store'])->name('store');
+            Route::get('/{page}', [DixlasePagesAdminPagesController::class, 'show'])->name('show');
+            Route::get('/{page}/edit', [DixlasePagesAdminPagesController::class, 'edit'])->name('edit');
+            Route::patch('/{page}', [DixlasePagesAdminPagesController::class, 'update'])->name('update');
+            Route::delete('/{page}', [DixlasePagesAdminPagesController::class, 'destroy'])->name('destroy');
+        });
     });

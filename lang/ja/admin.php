@@ -24,38 +24,36 @@ return [
     'nav' => [
         'pages' => [
             'text' => 'ページ管理',
-            'index' => 'ページ一覧',
+            'index' => 'ページマスター',
             'create' => 'ページ作成',
         ],
     ],
 
-    'features' => [
-        'pages' => [
-            'title' => 'ページタイトル',
-            'slug' => 'スラッグ',
-            'content' => 'コンテンツ',
-            'status' => 'ステータス',
-            'published_at' => '公開日時',
-            'index' => [
-                'heading' => 'ページマスター',
-            ],
-            'create' => [
-                'heading' => '新規ページ作成',
-            ],
-            'edit' => [
-                'heading' => 'ページ編集',
-            ],
-        ]
+    'pages' => [
+        'search_section' => '検索・フィルター',
+        'search_placeholder' => 'ページタイトルで検索',
+        'all_status' => 'すべてのステータス',
+        'status_filter' => 'ステータスフィルター',
+        'list_section' => 'ページ一覧',
+        'table_label' => 'ページ一覧テーブル',
+        'index' => [
+            'heading' => 'ページマスター',
+        ],
+        'create' => [
+            'heading' => '新規ページ作成',
+        ],
+        'edit' => [
+            'heading' => 'ページ編集',
+        ],
     ],
 
     'actions' => [
-        'edit' => '編集',
-        'delete' => '削除',
         'delete_confirm' => 'このページを削除してもよろしいですか？',
     ],
 
     'messages' => [
         'no_pages_found' => 'ページが見つかりません。',
+        'no_pages_description' => '新しいページを作成してください。',
         'total_pages' => '全:total件',
         'per_page' => '表示件数',
         'create_confirmation_message' => 'この内容でページを作成しますか？',
