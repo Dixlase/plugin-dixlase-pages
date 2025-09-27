@@ -26,7 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <!-- Flash message for success or error -->
 @include('components::flash-message')
 
-<form id="pageUpdateForm" action="{{ route('pages-plugin::admin.pages.update', ['page' => $page->id] ) }}" method="POST">
+<form id="pageUpdateForm" action="{{ route('dixlase-pages::admin.pages.update', ['page' => $page->id] ) }}" method="POST">
     @csrf
     @method('PATCH')
 
@@ -37,7 +37,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 
     <!-- フォーム -->
-    @include('pages-plugin::admin.pages.partials.form', [
+    @include('dixlase-pages::admin.pages.partials.form', [
 
     ])
 
@@ -47,7 +47,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         'onclick' => "openModal('confirmationModal')",
         'title' => __('admin.common.update_confirmation'),
         'label' => __('admin.common.update'),
-        'message' => __('pages-plugin::admin.messages.update_confirmation_message'),
+        'message' => __('dixlase-pages::admin.messages.update_confirmation_message'),
         'confirm_label' => __('admin.common.update'),
         'cancel_label' => __('admin.common.back'),
         'form' => 'pageUpdateForm',

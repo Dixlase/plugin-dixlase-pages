@@ -22,7 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'title',
-        'text' => 'pages-plugin::admin.features.pages.title',
+        'text' => 'dixlase-pages::admin.features.pages.title',
     ])
     @include('components::form.text', [
         'id' => 'title',
@@ -39,7 +39,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'slug',
-        'text' => 'pages-plugin::admin.features.pages.slug',
+        'text' => 'dixlase-pages::admin.features.pages.slug',
     ])
     @include('components::form.text', [
         'id' => 'slug',
@@ -56,7 +56,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'content',
-        'text' => 'pages-plugin::admin.features.pages.content',
+        'text' => 'dixlase-pages::admin.features.pages.content',
     ])
     @include('components::form.textarea', [
         'id' => 'content',
@@ -74,25 +74,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4">
     @include('components::form.label', [
         'for' => 'status',
-        'text' => 'pages-plugin::admin.features.pages.status',
+        'text' => 'dixlase-pages::admin.features.pages.status',
     ])
     @include('components::form.radio-group', [
         'name' => 'status',
         'options' => [
-            'draft' => [
-                'label' => __('admin.common.status.draft'),
-                'description' => __('admin.common.status.draft_description'),
-            ],
-            'published' => [
-                'label' => __('admin.common.status.published'),
-                'description' => __('admin.common.status.published_description'),
-            ],
-            'scheduled' => [
-                'label' => __('admin.common.status.scheduled'),
-                'description' => __('admin.common.status.scheduled_description'),
-            ],
+            'draft' => __('admin.common.status.draft'),
+            'published' => __('admin.common.status.published'),
+            'scheduled' => __('admin.common.status.scheduled'),
         ],
-        'selected' => old('status', $page->status->value ?? 'draft'),
+        'value' => old('status', $page->status->value ?? 'draft'),
+    ])
+    @include('components::form.error', [
         'messages' => $errors->get('status')
     ])
 </div>
@@ -101,7 +94,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mb-4" id="published-at-field" style="display: none;">
     @include('components::form.label', [
         'for' => 'published_at',
-        'text' => 'pages-plugin::admin.features.pages.published_at',
+        'text' => 'dixlase-pages::admin.features.pages.published_at',
     ])
     @include('components::form.text', [
         'id' => 'published_at',
