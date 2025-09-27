@@ -34,7 +34,7 @@ use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesContro
 */
 
 Route::prefix('pages')
-    ->name('pages-plugin::admin.pages.')
+    ->name('dixlase-pages::admin.pages.')
     ->group(function () {
         Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
         Route::get('/create', [DixlasePagesAdminPagesController::class, 'create'])->name('create');

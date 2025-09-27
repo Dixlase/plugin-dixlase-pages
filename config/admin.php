@@ -25,19 +25,19 @@ return [
     'nav' => [
         'pages' => [
             '_insert_after' => 'front', // フロントページ管理のあとに追加、または '_insert_before' => 'media'
-            'text' => 'pages-plugin::admin.nav.pages.text',
+            'text' => 'dixlase-pages::admin.nav.pages.text',
             'icon' => 'fas fa-fw fa-file-alt', // ページ管理
             'can' => 'admin',
             'children' => [
                 'index' => [
-                    'text' => 'pages-plugin::admin.nav.pages.index',
-                    'route' => 'pages-plugin::admin.pages.index',
+                    'text' => 'dixlase-pages::admin.nav.pages.index',
+                    'route' => 'dixlase-pages::admin.pages.index',
                     'icon' => 'fas fa-fw fa-file', // ページ一覧
                     'can' => 'admin',
                 ],
                 'create' => [
-                    'text' => 'pages-plugin::admin.nav.pages.create',
-                    'route' => 'pages-plugin::admin.pages.create',
+                    'text' => 'dixlase-pages::admin.nav.pages.create',
+                    'route' => 'dixlase-pages::admin.pages.create',
                     'icon' => 'fas fa-fw fa-file-circle-plus', // ページ作成
                     'can' => 'admin',
                 ],

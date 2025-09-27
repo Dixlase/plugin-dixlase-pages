@@ -23,11 +23,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
-<form id="pageCreateForm" action="{{ route('pages-plugin::admin.pages.store') }}" method="POST">
+<form id="pageCreateForm" action="{{ route('dixlase-pages::admin.pages.store') }}" method="POST">
     @csrf
 
     <!-- フォーム -->
-    @include('pages-plugin::admin.pages.partials.form', [
+    @include('dixlase-pages::admin.pages.partials.form', [
 
     ])
 
@@ -37,7 +37,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         'onclick' => "openModal('confirmationModal')",
         'title' => __('admin.common.create_confirmation'),
         'label' => __('admin.common.create'),
-        'message' => __('pages-plugin::admin.messages.create_confirmation_message'),
+        'message' => __('dixlase-pages::admin.messages.create_confirmation_message'),
         'confirm_label' => __('admin.common.create'),
         'cancel_label' => __('admin.common.back'),
         'form' => 'pageCreateForm',

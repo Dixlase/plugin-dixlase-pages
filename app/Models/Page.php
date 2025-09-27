@@ -35,7 +35,7 @@ class Page extends Model
     /**
      * テーブル名
      */
-    protected $table = 'pages_plugin_pages';
+    protected $table = 'dxl_plg_dixlase_pages';
 
     /**
      * 一括代入可能な属性
@@ -138,5 +138,13 @@ class Page extends Model
     public function scopeScheduled($query)
     {
         return $query->where('status', PageStatus::SCHEDULED->value);
+    }
+
+    /**
+     * ファクトリーの場所を指定
+     */
+    protected static function newFactory()
+    {
+        return \Plugins\DixlasePages\Database\Factories\PageFactory::new();
     }
 }

@@ -24,31 +24,54 @@
 namespace Plugins\DixlasePages\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Config;
-use App\Traits\PluginLoaderTrait;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
 
 class DixlasePagesServiceProvider extends ServiceProvider
 {
-    use PluginLoaderTrait;
-
-    public function __construct($app) {}
-
     public function register()
     {
-        // `admin.nav` の設定をマージ
-        $this->mergeAdminNavConfig(__DIR__ . '/../../config/admin.php');
+        // プラグイン設定の登録
+        $this->mergeAdminNavigation();
+    }
+
+    /**
+     * 管理画面ナビゲーションをマージ
+     */
+    protected function mergeAdminNavigation()
+    {
+        $configFile = __DIR__ . '/../../config/admin.php';
+        
+        if (!file_exists($configFile)) {
+            return;
+        }
+
+        $pluginConfig = require $configFile;
+        
+        if (!isset($pluginConfig['nav']) || !is_array($pluginConfig['nav'])) {
+            return;
+        }
+
+        // 既存のナビゲーション設定を取得
+        $existingNav = config('admin.nav', []);
+        
+        // プラグインのナビゲーション設定をマージ
+        foreach ($pluginConfig['nav'] as $key => $value) {
+            // _insert_after や _insert_before は無視して直接追加
+            unset($value['_insert_after'], $value['_insert_before']);
+            $existingNav[$key] = $value;
+        }
+        
+        // 設定を更新
+        config(['admin.nav' => $existingNav]);
     }
 
     public function boot()
     {
         // ビューの登録
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'pages-plugin');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'dixlase-pages');
         
         // 翻訳ファイルの登録
-        $this->loadTranslationsFrom(__DIR__ . '/../../lang', 'pages-plugin');
+        $this->loadTranslationsFrom(__DIR__ . '/../../lang', 'dixlase-pages');
         
         // マイグレーションの登録
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
@@ -65,7 +88,7 @@ class DixlasePagesServiceProvider extends ServiceProvider
         // 管理画面ルート
         if (file_exists(__DIR__ . '/../../routes/admin.php')) {
             Route::middleware(['web', 'auth:member', 'admin.ip'])
-                ->prefix(config('security.admin_url', 'admin'))
+                ->prefix('admin')
                 ->name('admin.')
                 ->group(__DIR__ . '/../../routes/admin.php');
         }
