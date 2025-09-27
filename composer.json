@@ -1,8 +1,8 @@
 {
-    "name": "my-software/plugins-pages-plugin",
-    "description": "This is the PagesPlugin plugin.",
+    "name": "dixlase/dixlase-pages",
+    "description": "This is the Dixlase Pages plugin.",
     "version": "1.0.0",
-    "license": "AGPL-3.0",
+    "license": "GPL-3.0",
     "authors": [
         {
             "name": "exc-D inc.",
@@ -16,21 +16,23 @@
     },
     "autoload": {
         "psr-4": {
-            "Plugins\\PagesPlugin\\App\\": "app/",
-            "Plugins\\PagesPlugin\\Database\\": "database/"
-
+            "Plugins\\DixlasePages\\App\\": "app/",
+            "Plugins\\DixlasePages\\Database\\": "database/"
         }
     },
     "extra": {
-        "display-name": "Pages Plugin",
-        "keywords": ["laravel", "plugin", "custom"],
-        "slug": "pages-plugin",
+        "display-name": "Dixlase Pages",
+        "keywords": [
+            "laravel",
+            "plugin",
+            "custom"
+        ],
+        "slug": "dixlase-pages",
         "category": "plugin",
         "laravel": {
             "providers": [
-                "Plugins\\PagesPlugin\\App\\Providers\\MyPluginServiceProvider"
+                "Plugins\\DixlasePages\\App\\Providers\\DixlasePagesServiceProvider"
             ]
         }
     }
 }
-

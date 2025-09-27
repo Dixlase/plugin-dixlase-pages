@@ -21,7 +21,7 @@
  */
 
 
-namespace Plugins\PagesPlugin\Database\Seeders;
+namespace Plugins\DixlasePages\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -32,10 +32,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        if (app()->environment('local', 'development')) {
-            $this->call(\Plugins\PagesPlugin\Database\Seeders\Dev\DevelopmentSeeder::class);
-        } else {
-            $this->call(\Plugins\PagesPlugin\Database\Seeders\Pro\ProductionSeeder::class);
-        }
+        $this->call([
+            PagesTableSeeder::class
+        ]);
     }
 }
