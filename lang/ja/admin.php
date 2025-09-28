@@ -21,11 +21,17 @@
  */
 
 return [
+    'plugin' => [
+        'name' => 'Dixlase ページ管理',
+        'description' => 'ウェブサイトに静的ページ管理機能を追加します。固定ページの作成・編集・削除、SEO設定、公開/非公開制御など、コンテンツ管理に必要な機能を提供します。',
+    ],
+    
     'nav' => [
         'pages' => [
             'text' => 'ページ管理',
             'index' => 'ページマスター',
             'create' => 'ページ作成',
+            'settings' => 'ページ設定',
         ],
     ],
 
@@ -39,6 +45,9 @@ return [
         'edit' => [
             'heading' => 'ページ編集',
         ],
+        'settings' => [
+            'heading' => 'ページ設定',
+        ],
         'search_section' => '検索・フィルター',
         'search_placeholder' => 'ページタイトルで検索',
         'all_status' => 'すべてのステータス',
@@ -49,6 +58,26 @@ return [
 
     'actions' => [
         'delete_confirm' => 'このページを削除してもよろしいですか？',
+    ],
+
+    'settings' => [
+        'basic' => [
+            'title' => '基本設定',
+            'pages_directory' => 'ページディレクトリ',
+            'pages_directory_help' => 'ページのURLに使用するディレクトリ名',
+            'default_status' => 'デフォルトステータス',
+            'status_published' => '公開',
+            'status_draft' => '下書き',
+        ],
+        'features' => [
+            'title' => '機能設定',
+            'enable_comments' => 'コメント機能を有効にする',
+            'enable_comments_help' => 'ページにコメント機能を表示します',
+            'seo_enabled' => 'SEO機能を有効にする',
+            'seo_enabled_help' => 'メタタグやSEO最適化機能を有効にします',
+        ],
+        'confirm_title' => 'ページ設定の保存',
+        'confirm_message' => 'ページ設定を保存してもよろしいですか？',
     ],
 
     'messages' => [

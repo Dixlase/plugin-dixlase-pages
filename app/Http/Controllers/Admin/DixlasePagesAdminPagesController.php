@@ -136,4 +136,43 @@ class DixlasePagesAdminPagesController extends Controller
             ->route('dixlase-pages::admin.pages.index')
             ->with('success', 'ページが正常に削除されました。');
     }
+
+    /**
+     * Show the settings page.
+     */
+    public function settings()
+    {
+        // 設定データを取得（将来的にはPagesSettingモデルを作成）
+        $settings = [
+            'pages_directory' => config('custom.pages_directory', 'pages'),
+            'default_status' => 'published',
+            'enable_comments' => false,
+            'seo_enabled' => true,
+        ];
+        
+        $this->viewParams['settings'] = $settings;
+        
+        return view('dixlase-pages::admin.settings', $this->viewParams);
+    }
+
+    /**
+     * Update the settings.
+     */
+    public function updateSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'pages_directory' => 'required|string|max:255',
+            'default_status' => 'required|in:published,draft',
+            'enable_comments' => 'boolean',
+            'seo_enabled' => 'boolean',
+        ]);
+
+        // 将来的にはPagesSettingモデルで保存
+        // 現在は一時的にセッションに保存
+        session(['pages_settings' => $validated]);
+
+        return redirect()
+            ->route('admin.dixlase-pages::admin.pages.settings')
+            ->with('success', 'ページ設定が更新されました。');
+    }
 }

@@ -22,6 +22,9 @@
 
 
 return [
+    // プラグイン設定画面のルート名
+    'settings_route' => 'admin.dixlase-pages::admin.pages.settings',
+    
     'nav' => [
         'pages' => [
             '_insert_after' => 'front', // フロントページ管理のあとに追加、または '_insert_before' => 'media'
@@ -39,6 +42,12 @@ return [
                     'text' => 'dixlase-pages::admin.nav.pages.create',
                     'route' => 'admin.dixlase-pages::admin.pages.create',
                     'icon' => 'fas fa-fw fa-file-circle-plus', // ページ作成
+                    'can' => 'admin',
+                ],
+                'settings' => [
+                    'text' => 'dixlase-pages::admin.nav.pages.settings',
+                    'route' => 'admin.dixlase-pages::admin.pages.settings',
+                    'icon' => 'fas fa-fw fa-cog', // 設定
                     'can' => 'admin',
                 ],
             ],
