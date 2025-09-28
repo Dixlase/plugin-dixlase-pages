@@ -21,11 +21,17 @@
  */
 
 return [
+    'plugin' => [
+        'name' => 'Dixlase Page Management',
+        'description' => 'Adds static page management functionality to your website. Features page creation, editing, deletion, SEO settings, publish/draft control, and comprehensive content management tools.',
+    ],
+    
     'nav' => [
         'pages' => [
             'text' => 'Page Management',
             'index' => 'Page Master',
             'create' => 'Create Page',
+            'settings' => 'Page Settings',
         ],
     ],
 
@@ -39,6 +45,9 @@ return [
         'edit' => [
             'heading' => 'Edit Page',
         ],
+        'settings' => [
+            'heading' => 'Page Settings',
+        ],
         'search_section' => 'Search & Filter',
         'search_placeholder' => 'Search by page title',
         'all_status' => 'All Status',
@@ -49,6 +58,26 @@ return [
 
     'actions' => [
         'delete_confirm' => 'Are you sure you want to delete this page?',
+    ],
+
+    'settings' => [
+        'basic' => [
+            'title' => 'Basic Settings',
+            'pages_directory' => 'Pages Directory',
+            'pages_directory_help' => 'Directory name used in page URLs',
+            'default_status' => 'Default Status',
+            'status_published' => 'Published',
+            'status_draft' => 'Draft',
+        ],
+        'features' => [
+            'title' => 'Feature Settings',
+            'enable_comments' => 'Enable Comments',
+            'enable_comments_help' => 'Display comment functionality on pages',
+            'seo_enabled' => 'Enable SEO Features',
+            'seo_enabled_help' => 'Enable meta tags and SEO optimization features',
+        ],
+        'confirm_title' => 'Save Page Settings',
+        'confirm_message' => 'Are you sure you want to save the page settings?',
     ],
 
     'messages' => [
