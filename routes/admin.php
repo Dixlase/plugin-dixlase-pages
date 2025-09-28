@@ -41,6 +41,8 @@ Route::prefix('pages')
         Route::middleware(['auth:member'])->group(function () {
             Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
             Route::get('/create', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
+            Route::get('/settings', [DixlasePagesAdminPagesController::class, 'settings'])->name('settings');
+            Route::post('/settings', [DixlasePagesAdminPagesController::class, 'updateSettings'])->name('settings.update');
             Route::post('/', [DixlasePagesAdminPagesController::class, 'store'])->name('store');
             Route::get('/{page}', [DixlasePagesAdminPagesController::class, 'show'])->name('show');
             Route::get('/{page}/edit', [DixlasePagesAdminPagesController::class, 'edit'])->name('edit');

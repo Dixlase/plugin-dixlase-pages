@@ -25,44 +25,16 @@ namespace Plugins\DixlasePages\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use App\Traits\PluginLoaderTrait;
 
 class DixlasePagesServiceProvider extends ServiceProvider
 {
+    use PluginLoaderTrait;
+    
     public function register()
     {
-        // プラグイン設定の登録
-        $this->mergeAdminNavigation();
-    }
-
-    /**
-     * 管理画面ナビゲーションをマージ
-     */
-    protected function mergeAdminNavigation()
-    {
-        $configFile = __DIR__ . '/../../config/admin.php';
-        
-        if (!file_exists($configFile)) {
-            return;
-        }
-
-        $pluginConfig = require $configFile;
-        
-        if (!isset($pluginConfig['nav']) || !is_array($pluginConfig['nav'])) {
-            return;
-        }
-
-        // 既存のナビゲーション設定を取得
-        $existingNav = config('admin.nav', []);
-        
-        // プラグインのナビゲーション設定をマージ
-        foreach ($pluginConfig['nav'] as $key => $value) {
-            // _insert_after や _insert_before は無視して直接追加
-            unset($value['_insert_after'], $value['_insert_before']);
-            $existingNav[$key] = $value;
-        }
-        
-        // 設定を更新
-        config(['admin.nav' => $existingNav]);
+        // Merge admin navigation
+        $this->mergeAdminNavigation('DixlasePages', __DIR__ . '/../../config/admin.php');
     }
 
     public function boot()
