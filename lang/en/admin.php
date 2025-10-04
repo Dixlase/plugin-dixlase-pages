@@ -56,6 +56,13 @@ return [
         'table_label' => 'Page List Table',
     ],
 
+    'form' => [
+        'meta_description' => 'Meta Description',
+        'meta_description_help' => 'Description text displayed in search engine results. Recommended length: 120-160 characters.',
+        'ogp_image' => 'OGP Image',
+        'ogp_image_help' => 'Enter the path to the image displayed when shared on social media. (e.g., /images/ogp/page-image.jpg)',
+    ],
+
     'actions' => [
         'delete_confirm' => 'Are you sure you want to delete this page?',
     ],
