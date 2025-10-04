@@ -22,6 +22,7 @@
 
 namespace Plugins\DixlasePages\App\Models;
 
+use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -50,6 +51,7 @@ class Page extends Model
         'published_at',
         'meta_description',
         'ogp_image',
+        'ogp_image_id',
     ];
 
     /**
@@ -137,6 +139,14 @@ class Page extends Model
     public function scopeScheduled($query)
     {
         return $query->where('status', PageStatus::SCHEDULED->value);
+    }
+
+    /**
+     * OGP画像とのリレーション
+     */
+    public function ogpImage()
+    {
+        return $this->belongsTo(Media::class, 'ogp_image_id');
     }
 
     /**

@@ -89,22 +89,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 </div>
 
 <!-- OGP Image -->
-<div class="mb-4">
-    @include('components::form.label', [
-        'for' => 'ogp_image',
-        'text' => __('dixlase-pages::admin.form.ogp_image'),
-    ])
-    @include('components::form.text', [
-        'id' => 'ogp_image',
-        'name' => 'ogp_image',
-        'value' => old('ogp_image', $page->ogp_image ?? ''),
-        'placeholder' => '/images/ogp/page-image.jpg',
-        'help' => __('dixlase-pages::admin.form.ogp_image_help'),
-    ])
-    @include('components::form.error', [
-        'messages' => $errors->get('ogp_image')
-    ])
-</div>
+@include('components.media-picker', [
+    'name' => 'ogp_image_id',
+    'label' => __('dixlase-pages::admin.form.ogp_image'),
+    'value' => old('ogp_image_id', $page->ogp_image_id ?? ''),
+    'media' => $page->ogpImage ?? null,
+    'help' => __('dixlase-pages::admin.form.ogp_image_help'),
+    'error' => $errors->first('ogp_image_id'),
+    'aspectRatio' => 'ogp'
+])
 
 <!-- Status -->
 <div class="mb-4">

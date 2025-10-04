@@ -49,7 +49,7 @@ return [
             'heading' => 'ページ設定',
         ],
         'search_section' => '検索・フィルター',
-        'search_placeholder' => 'ページタイトルで検索',
+        'search_placeholder' => 'タイトル、コンテンツ、スラッグ、説明文で検索',
         'all_status' => 'すべてのステータス',
         'status_filter' => 'ステータスフィルター',
         'list_section' => 'ページ一覧',
@@ -57,10 +57,10 @@ return [
     ],
 
     'form' => [
-        'meta_description' => 'メタディスクリプション',
+        'meta_description' => '説明文',
         'meta_description_help' => '検索エンジンの検索結果に表示される説明文です。120-160文字程度を推奨します。',
         'ogp_image' => 'OGP画像',
-        'ogp_image_help' => 'SNSでシェアされた際に表示される画像のパスを入力してください。（例: /images/ogp/page-image.jpg）',
+        'ogp_image_help' => 'SNSでシェアされた際に表示される画像のパスをアップロードされたメディアから選択してください。',
     ],
 
     'actions' => [

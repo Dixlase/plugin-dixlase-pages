@@ -21,60 +21,52 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('admin::partials.layout')
 
 @section('content')
-<main class="admin-main">
     <!-- ページヘッダー -->
-    <header class="admin-header">
-        <div class="admin-header__content">
-
-            @include('components::form.button', [
-                'type' => 'button',
-                'variant' => 'primary',
-                'label' => __('common.create'),
-                'icon' => 'fas fa-plus',
-                'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
-            ])
-        </div>
-    </header>
+    <div class="flex justify-end mb-4">
+        @include('components::form.button', [
+            'type' => 'button',
+            'variant' => 'primary',
+            'label' => __('common.create'),
+            'icon' => 'fas fa-plus',
+            'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
+        ])
+    </div>
 
     <!-- 検索・フィルターセクション -->
-    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.pages.search_section') }}">
-        <div class="admin-card">
-            <form method="GET" class="admin-form admin-form--horizontal" role="search">
-                <div class="admin-form__group admin-form__group--flex-1">
-                    @include('components::form.text', [
-                        'name' => 'search',
-                        'value' => request('search'),
-                        'placeholder' => __('dixlase-pages::admin.pages.search_placeholder'),
-                        'label' => __('common.search'),
-                        'hideLabel' => true,
-                        'aria-label' => __('common.search'),
-                    ])
-                </div>
-                
-                <div class="admin-form__group">
-                    @include('components::form.select', [
-                        'name' => 'status',
-                        'options' => [
-                            '' => __('dixlase-pages::admin.pages.all_status'),
-                            'draft' => __('components.status.draft'),
-                            'published' => __('components.status.published'),
-                            'scheduled' => __('components.status.scheduled'),
-                        ],
-                        'value' => request('status'),
-                        'label' => __('dixlase-pages::admin.pages.status_filter'),
-                        'hideLabel' => true,
-                        'aria-label' => __('dixlase-pages::admin.pages.status_filter'),
-                    ])
-                </div>
-                
+    <section>
+        <form method="GET" role="search">
+            <fieldset>
+                <legend>{{ __('common.search') }}</legend>
+                @include('components::form.text', [
+                    'name' => 'search',
+                    'value' => request('search'),
+                    'placeholder' => __('dixlase-pages::admin.pages.search_placeholder'),
+                ])
+            </fieldset>
+            
+            <fieldset>
+                <legend>{{ __('dixlase-pages::admin.pages.status_filter') }}</legend>
+                @include('components::form.select', [
+                    'name' => 'status',
+                    'options' => [
+                        '' => 'dixlase-pages::admin.pages.all_status',
+                        'draft' => 'components.status.draft',
+                        'published' => 'components.status.published',
+                        'scheduled' => 'components.status.scheduled',
+                    ],
+                    'value' => request('status'),
+                ])
+            </fieldset>
+            
+            <div class="flex gap-2 mt-4">
                 @include('components::form.button', [
                     'type' => 'submit',
-                    'variant' => 'secondary',
+                    'variant' => 'primary',
                     'label' => __('common.search'),
                     'icon' => 'fas fa-search',
                 ])
-            </form>
-        </div>
+            </div>
+        </form>
     </section>
 
     <!-- ページネーションコントロール -->
@@ -251,5 +243,4 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             @endif
         </div>
     </section>
-</main>
 @endsection
