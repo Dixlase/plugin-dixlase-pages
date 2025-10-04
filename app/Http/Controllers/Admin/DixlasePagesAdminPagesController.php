@@ -51,13 +51,14 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $query = Page::query();
 
-        // 検索機能
+        // 検索機能（タイトル、コンテンツ、スラッグ、説明文）
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('content', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('meta_description', 'like', "%{$search}%");
             });
         }
 
