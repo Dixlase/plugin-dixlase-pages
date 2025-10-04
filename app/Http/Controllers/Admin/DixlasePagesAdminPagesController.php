@@ -43,6 +43,7 @@ class DixlasePagesAdminPagesController extends Controller
         $this->initialize();
         $this->initializeAfterLogin();
     }
+    
     /**
      * Display a listing of the resource.
      */
@@ -65,15 +66,34 @@ class DixlasePagesAdminPagesController extends Controller
             $query->where('status', $request->get('status'));
         }
 
+        // ソート設定を取得
+        $sort = $request->get('sort', 'created_at');
+        $order = $request->get('order', 'desc');
+        
+        // 有効なソートフィールドのみ許可
+        $allowedSorts = ['title', 'slug', 'status', 'created_at', 'updated_at', 'published_at'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'created_at';
+        }
+        
+        // 有効なソート順序のみ許可
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'desc';
+        }
+
         // ページネーション（件数指定対応）
         $perPage = $request->get('per_page', 25);
         $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
         
-        $pages = $query->orderBy('created_at', 'desc')
+        $pages = $query->orderBy($sort, $order)
                       ->paginate($perPage)
                       ->withQueryString();
 
-        return view('dixlase-pages::admin.pages.index', array_merge($this->viewParams, compact('pages')));
+        return view('dixlase-pages::admin.pages.index', array_merge($this->viewParams, [
+            'pages' => $pages,
+            'currentSort' => $sort,
+            'currentOrder' => $order,
+        ]));
     }
 
     /**
