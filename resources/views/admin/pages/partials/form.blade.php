@@ -70,6 +70,42 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 </div>
 
+<!-- Meta Description -->
+<div class="mb-4">
+    @include('components::form.label', [
+        'for' => 'meta_description',
+        'text' => __('dixlase-pages::admin.form.meta_description'),
+    ])
+    @include('components::form.textarea', [
+        'id' => 'meta_description',
+        'name' => 'meta_description',
+        'value' => old('meta_description', $page->meta_description ?? ''),
+        'rows' => 3,
+        'help' => __('dixlase-pages::admin.form.meta_description_help'),
+    ])
+    @include('components::form.error', [
+        'messages' => $errors->get('meta_description')
+    ])
+</div>
+
+<!-- OGP Image -->
+<div class="mb-4">
+    @include('components::form.label', [
+        'for' => 'ogp_image',
+        'text' => __('dixlase-pages::admin.form.ogp_image'),
+    ])
+    @include('components::form.text', [
+        'id' => 'ogp_image',
+        'name' => 'ogp_image',
+        'value' => old('ogp_image', $page->ogp_image ?? ''),
+        'placeholder' => '/images/ogp/page-image.jpg',
+        'help' => __('dixlase-pages::admin.form.ogp_image_help'),
+    ])
+    @include('components::form.error', [
+        'messages' => $errors->get('ogp_image')
+    ])
+</div>
+
 <!-- Status -->
 <div class="mb-4">
     @include('components::form.label', [
