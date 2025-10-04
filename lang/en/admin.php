@@ -13,7 +13,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURdPOSE. See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
@@ -48,8 +48,8 @@ return [
         'settings' => [
             'heading' => 'Page Settings',
         ],
-        'search_section' => 'Search & Filter',
-        'search_placeholder' => 'Search by page title',
+        'search_section' => 'Search & Filter',  
+        'search_placeholder' => 'Search by title, content, slug, description',
         'all_status' => 'All Status',
         'status_filter' => 'Status Filter',
         'list_section' => 'Page List',
@@ -57,7 +57,7 @@ return [
     ],
 
     'form' => [
-        'meta_description' => 'Meta Description',
+        'meta_description' => 'Description text',
         'meta_description_help' => 'Description text displayed in search engine results. Recommended length: 120-160 characters.',
         'ogp_image' => 'OGP Image',
         'ogp_image_help' => 'Enter the path to the image displayed when shared on social media. (e.g., /images/ogp/page-image.jpg)',

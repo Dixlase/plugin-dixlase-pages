@@ -20,21 +20,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 namespace Plugins\DixlasePages\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Plugins\DixlasePages\App\Models\PageSetting;
 
-class DatabaseSeeder extends Seeder
+class PageSettingsSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        $this->call([
-            PageSettingsSeeder::class,
-            PagesTableSeeder::class
-        ]);
+        $settings = [
+            ['name' => 'pages_directory', 'value' => 'pages'],
+            ['name' => 'default_status', 'value' => 'published'],
+            ['name' => 'seo_enabled', 'value' => '1'],
+        ];
+
+        foreach ($settings as $setting) {
+            PageSetting::updateOrCreate(
+                ['name' => $setting['name']],
+                ['value' => $setting['value'], 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
     }
 }
