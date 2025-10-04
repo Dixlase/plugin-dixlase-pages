@@ -47,6 +47,8 @@ class UpdatePageRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9\-]+$/'],
             'content' => ['required', 'string'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
+            'ogp_image' => ['nullable', 'string', 'max:255'],
             'status' => ['required', Rule::enum(PageStatus::class)],
             'published_at' => ['nullable', 'date', 'after_or_equal:now'],
         ];

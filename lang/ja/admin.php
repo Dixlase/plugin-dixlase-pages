@@ -56,6 +56,13 @@ return [
         'table_label' => 'ページ一覧テーブル',
     ],
 
+    'form' => [
+        'meta_description' => 'メタディスクリプション',
+        'meta_description_help' => '検索エンジンの検索結果に表示される説明文です。120-160文字程度を推奨します。',
+        'ogp_image' => 'OGP画像',
+        'ogp_image_help' => 'SNSでシェアされた際に表示される画像のパスを入力してください。（例: /images/ogp/page-image.jpg）',
+    ],
+
     'actions' => [
         'delete_confirm' => 'このページを削除してもよろしいですか？',
     ],

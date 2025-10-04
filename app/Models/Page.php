@@ -48,9 +48,8 @@ class Page extends Model
         'content',
         'status',
         'published_at',
-        //'meta_title',
-        //'meta_description',
-        //'meta_keywords',
+        'meta_description',
+        'ogp_image',
     ];
 
     /**

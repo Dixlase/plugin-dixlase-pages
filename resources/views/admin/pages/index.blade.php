@@ -83,6 +83,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         'currentPerPage' => request('per_page', 25),
         'totalLabel' => 'components.pagination.total_count',
         'perPageLabel' => 'components.pagination.per_page_label',
+        'showSort' => true,
+        'sortOptions' => [
+            'title' => __('common.title'),
+            'slug' => __('common.slug'),
+            'status' => __('common.status'),
+            'created_at' => __('common.created_at'),
+            'updated_at' => __('common.updated_at'),
+            'published_at' => __('common.published_at'),
+        ],
+        'currentSort' => $currentSort ?? 'created_at',
+        'currentOrder' => $currentOrder ?? 'desc',
     ])
 
      <!-- ページネーション -->
