@@ -61,17 +61,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin.settings.features.title') }}</h2>
             
             <fieldset>
-                <legend>{{ __('dixlase-pages::admin.settings.features.enable_comments') }}</legend>
+                <legend>{{ __('dixlase-pages::admin.settings.features.seo_enabled') }}</legend>
                 
                 <div class="grid grid-cols-1 gap-6">
-                    <!-- コメント機能 -->
-                    @include('components::form.checkbox', [
-                        'name' => 'enable_comments',
-                        'label' => __('dixlase-pages::admin.settings.features.enable_comments'),
-                        'checked' => old('enable_comments', $settings['enable_comments'] ?? false),
-                        'help' => __('dixlase-pages::admin.settings.features.enable_comments_help')
-                    ])
-
                     <!-- SEO機能 -->
                     @include('components::form.checkbox', [
                         'name' => 'seo_enabled',

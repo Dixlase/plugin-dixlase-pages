@@ -25,23 +25,23 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <form id="pageCreateForm" action="{{ route('dixlase-pages::admin.pages.store') }}" method="POST">
     @csrf
-
     <!-- フォーム -->
     @include('dixlase-pages::admin.pages.partials.form', [
 
     ])
+</form>
+@endsection
 
-    <!-- 保存ボタンとモーダル -->
+<!-- 保存ボタンとモーダル -->
+@section('save')
     @include('components.save', [
         'id' => 'confirmationModal',
         'onclick' => "openModal('confirmationModal')",
-        'title' => __('common.form.save_confirmation_title'),
+        'title' => __('common.save_confirmation_title'),
         'label' => __('common.create'),
         'message' => __('dixlase-pages::admin.messages.create_confirmation_message'),
         'confirm_label' => __('common.create'),
         'cancel_label' => __('common.back'),
         'form' => 'pageCreateForm',
     ])
-
-</form>
 @endsection

@@ -20,7 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,28 +31,18 @@ return new class extends Migration
      *
      * @return void
      */
-
-    protected $table = 'dxl_plg_dixlase_pages';
+    protected $table = 'dxl_plg_dixlase_pages_settings';
 
     public function up()
     {
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->string('title'); // ページのタイトル
-            $table->string('slug')->unique(); // ページのURL（スラッグ）
-            $table->enum('status', ['draft', 'published', 'scheduled'])->default('draft'); // ステータス（下書き、公開、日付指定）
-            $table->timestamp('published_at')->nullable(); // 公開日時
-            $table->text('content')->nullable(); // ページの内容
-            $table->text('meta_description')->nullable(); // メタディスクリプション
-            $table->string('ogp_image')->nullable(); // OGP画像のパス（旧）
-            $table->unsignedBigInteger('ogp_image_id')->nullable(); // OGP画像ID（メディア）
+            $table->string('name')->unique();
+            $table->text('value')->nullable();
             $table->timestamps();
-            $table->softDeletes();
-            
-            // 外部キー制約
-            $table->foreign('ogp_image_id')->references('id')->on('media')->onDelete('set null');
         });
     }
+
     /**
      * Reverse the migrations.
      *
