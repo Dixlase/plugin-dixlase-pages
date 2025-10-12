@@ -105,5 +105,9 @@ return [
         'status_required' => 'ステータスは必須です。',
         'published_at_date' => '公開日時は正しい日付形式で入力してください。',
         'published_at_future' => '公開日時は現在時刻以降を指定してください。',
+        'pages_directory_required' => 'ページディレクトリは必須です。',
+        'pages_directory_alpha_dash' => 'ページディレクトリは半角英数字とハイフン、アンダースコアのみ使用できます。',
+        'default_status_required' => 'デフォルトステータスは必須です。',
+        'default_status_in' => 'デフォルトステータスは公開または下書きを選択してください。',
     ],
 ];
