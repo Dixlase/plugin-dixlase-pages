@@ -22,16 +22,46 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Plugins\PagesPlugin\App\Http\Controllers\Admin\PagesPluginAdminPagesController;
-use App\Models\SecuritySetting;
-use Plugins\PagesPlugin\App\Models\Page;
+use Plugins\DixlasePages\App\Models\Page;
+use Plugins\DixlasePages\App\Models\PageSetting;
 
 //個別ページ
 Route::middleware(['front.ip'])->group(
     function () {
-        Route::get(config('custom.pages_directory') . '/{slug}', function ($slug) {
-            $page = Page::where('slug', $slug)->firstOrFail();
-            return view('default/pages', compact('page'));
-        });
+        // データベースから設定を取得、なければデフォルト値を使用
+        $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        
+        \Log::info('DixlasePages: Route registered', [
+            'pages_directory' => $pagesDirectory,
+            'route_uri' => $pagesDirectory . '/{slug}'
+        ]);
+        
+        Route::get($pagesDirectory . '/{slug}', function ($slug) {
+            \Log::info('DixlasePages: Route accessed', [
+                'slug' => $slug,
+                'request_uri' => request()->getRequestUri()
+            ]);
+            
+            // 管理画面にログインしている場合は全てのページを表示（プレビュー機能）
+            if (auth('member')->check()) {
+                $page = Page::where('slug', $slug)->firstOrFail();
+                \Log::info('DixlasePages: Admin preview mode', [
+                    'page_id' => $page->id,
+                    'page_status' => $page->status->value
+                ]);
+            } else {
+                // ログインしていない場合は公開済みページのみ
+                // (published または scheduled で公開日時が過去のもの)
+                $page = Page::where('slug', $slug)
+                    ->published()
+                    ->firstOrFail();
+                \Log::info('DixlasePages: Public view mode', [
+                    'page_id' => $page->id,
+                    'page_status' => $page->status->value
+                ]);
+            }
+            
+            return view('dixlase-pages::front.page', compact('page'));
+        })->name('dixlase-pages::page.show');
     }
 );
