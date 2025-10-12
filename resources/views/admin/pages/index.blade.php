@@ -119,6 +119,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         <thead class="admin-table__head">
                             <tr class="admin-table__row">
                                 <th class="admin-table__header" scope="col">
+                                    ID
+                                </th>
+                                <th class="admin-table__header" scope="col">
                                     {{ __('common.title') }}
                                 </th>
                                 <th class="admin-table__header" scope="col">
@@ -137,10 +140,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         </thead>
                         <tbody class="admin-table__body">
                             @foreach($pages as $page)
+                                <!-- 1行目: ID、タイトル、スラッグ、ステータス、公開日時、アクション -->
                                 <tr class="admin-table__row" role="row">
+                                    <td class="admin-table__cell" role="gridcell">
+                                        <span class="text-gray-600 font-mono text-sm">{{ $page->id }}</span>
+                                    </td>
                                     <td class="admin-table__cell admin-table__cell--primary" role="gridcell">
                                         <div class="admin-table__primary-content">
-                                            {{ $page->title }}
+                                            <a href="{{ route('dixlase-pages::admin.pages.edit', $page) }}" class="hover:underline">
+                                                {{ $page->title }}
+                                            </a>
                                         </div>
                                     </td>
                                     <td class="admin-table__cell" role="gridcell">
@@ -192,6 +201,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                     form.submit();
                                                 }",
                                             ])
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 2行目: URL -->
+                                <tr class="admin-table__row admin-table__row--secondary" role="row">
+                                    <td colspan="6" class="p-0 admin-table__cell admin-table__cell--secondary" role="gridcell">
+                                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                                            <a href="{{ $page->page_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 min-w-0">
+                                                <span class="truncate" title="{{ $page->page_url }}">{{ $page->page_url }}</span>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

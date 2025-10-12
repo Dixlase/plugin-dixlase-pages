@@ -27,8 +27,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Traits\AdminInterfaceTrait;
 use App\Traits\AdminLoggedInTrait;
 use Plugins\DixlasePages\App\Models\Page;
+use Plugins\DixlasePages\App\Models\PageSetting;
 use Plugins\DixlasePages\App\Http\Requests\Admin\StorePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePageRequest;
+use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePagesSettingsRequest;
 use Plugins\DixlasePages\App\Enums\PageStatus;
 use Illuminate\Http\Request;
 
@@ -89,6 +91,15 @@ class DixlasePagesAdminPagesController extends Controller
         $pages = $query->orderBy($sort, $order)
                       ->paginate($perPage)
                       ->withQueryString();
+
+        // ページディレクトリ設定をデータベースから取得
+        $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        
+        // 各ページにURLを追加
+        $pages->getCollection()->transform(function ($page) use ($pagesDirectory) {
+            $page->page_url = config('app.url') . '/' . $pagesDirectory . '/' . $page->slug;
+            return $page;
+        });
 
         return view('dixlase-pages::admin.pages.index', array_merge($this->viewParams, [
             'pages' => $pages,
@@ -163,34 +174,28 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function settings()
     {
-        // 設定データを取得（将来的にはPagesSettingモデルを作成）
+        // 設定データを取得
         $settings = [
-            'pages_directory' => config('custom.pages_directory', 'pages'),
-            'default_status' => 'published',
-            'enable_comments' => false,
-            'seo_enabled' => true,
+            'pages_directory' => PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages')),
+            'default_status' => PageSetting::getValue('default_status', 'published'),
+            'enable_comments' => PageSetting::getValue('enable_comments', false),
+            'seo_enabled' => PageSetting::getValue('seo_enabled', true),
         ];
         
         $this->viewParams['settings'] = $settings;
         
-        return view('dixlase-pages::admin.settings', $this->viewParams);
+        return view('dixlase-pages::admin.pages.settings', $this->viewParams);
     }
 
     /**
      * Update the settings.
      */
-    public function updateSettings(Request $request)
+    public function updateSettings(UpdatePagesSettingsRequest $request)
     {
-        $validated = $request->validate([
-            'pages_directory' => 'required|string|max:255',
-            'default_status' => 'required|in:published,draft',
-            'enable_comments' => 'boolean',
-            'seo_enabled' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
-        // 将来的にはPagesSettingモデルで保存
-        // 現在は一時的にセッションに保存
-        session(['pages_settings' => $validated]);
+        // 設定をデータベースに保存
+        PageSetting::setMany($validated);
 
         return redirect()
             ->route('admin.dixlase-pages::admin.pages.settings')
