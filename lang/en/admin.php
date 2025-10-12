@@ -105,5 +105,9 @@ return [
         'status_required' => 'Status is required.',
         'published_at_date' => 'Published at must be a valid date.',
         'published_at_future' => 'Published at must be a date in the future or present.',
+        'pages_directory_required' => 'Pages directory is required.',
+        'pages_directory_alpha_dash' => 'Pages directory may only contain letters, numbers, hyphens, and underscores.',
+        'default_status_required' => 'Default status is required.',
+        'default_status_in' => 'Default status must be either published or draft.',
     ],
 ];
