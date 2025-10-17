@@ -18,7 +18,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
-@extends('admin::partials.layout')
+@extends('layouts.admin')
 
 @section('content')
     <form id="pages-settings-form" action="{{ route('admin.dixlase-pages::admin.pages.settings.update') }}" method="POST">
@@ -80,9 +80,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('save')
     @include('components.save', [
-        'id' => 'confirmationModal',
+        'id_confirmation' => 'confirmPagesSettingsModal',
         'label' => __('common.save'),
-        'onclick' => "openModal('confirmPagesSettingsModal')",
         'title' => __('dixlase-pages::admin.settings.confirm_title'),
         'message' => __('dixlase-pages::admin.settings.confirm_message'),
         'confirm_label' => __('common.save'),
