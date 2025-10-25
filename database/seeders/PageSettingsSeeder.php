@@ -33,7 +33,7 @@ class PageSettingsSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            ['name' => 'pages_directory', 'value' => 'pages'],
+            ['name' => 'pages_directory', 'value' => 'content'],
             ['name' => 'default_status', 'value' => 'published'],
             ['name' => 'seo_enabled', 'value' => '1'],
         ];
