@@ -48,27 +48,6 @@ class DixlasePagesServiceProvider extends ServiceProvider
         // マイグレーションの登録
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         
-        // ルートの登録
-        $this->loadRoutes();
-    }
-
-    /**
-     * ルートを読み込む
-     */
-    protected function loadRoutes()
-    {
-        // 管理画面ルート
-        if (file_exists(__DIR__ . '/../../routes/admin.php')) {
-            Route::middleware(['web', 'auth:member', 'admin.ip'])
-                ->prefix('admin')
-                ->name('admin.')
-                ->group(__DIR__ . '/../../routes/admin.php');
-        }
-
-        // フロントエンドルート
-        if (file_exists(__DIR__ . '/../../routes/web.php')) {
-            Route::middleware(['web'])
-                ->group(__DIR__ . '/../../routes/web.php');
-        }
+        // 注: ルート（routes/web.php, routes/admin.php）はPluginServiceProviderが自動読み込み
     }
 }
