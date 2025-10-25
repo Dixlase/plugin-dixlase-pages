@@ -34,7 +34,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PageSettingsSeeder::class,
-            PagesTableSeeder::class
+            PagesTableSeeder::class,
+            PagesRolePermissionSeeder::class,
         ]);
     }
 }

@@ -21,6 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('layouts.admin')
 
 @section('content')
+<div class="max-w-4xl mx-auto">
     <!-- ページヘッダー -->
     <div class="flex justify-end mb-4">
         @include('components::form.button', [
@@ -111,10 +112,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 
     <!-- ページ一覧セクション -->
-    <section class="admin-section" aria-label="{{ __('dixlase-pages::admin.pages.list_section') }}">
+    <section class="admin-section !p-0 !border-0 !bg-transparent !dark:bg-transparent" aria-label="{{ __('dixlase-pages::admin.pages.list_section') }}">
         <div class="admin-card">
             @if($pages->count() > 0)
-                <div class="admin-table-container">
+                <div class="responsive-table mb-6">
                     <table class="admin-table" role="table" aria-label="{{ __('dixlase-pages::admin.pages.table_label') }}">
                         <thead class="admin-table__head">
                             <tr class="admin-table__row">
@@ -140,29 +141,35 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         </thead>
                         <tbody class="admin-table__body">
                             @foreach($pages as $page)
-                                <!-- 1行目: ID、タイトル、スラッグ、ステータス、公開日時、アクション -->
                                 <tr class="admin-table__row" role="row">
-                                    <td class="admin-table__cell" role="gridcell">
-                                        <span class="text-gray-600 font-mono text-sm">{{ $page->id }}</span>
+                                    <td class="admin-table__cell" data-label="ID" role="gridcell">
+                                        <span class="font-mono text-sm">{{ $page->id }}</span>
                                     </td>
-                                    <td class="admin-table__cell admin-table__cell--primary" role="gridcell">
-                                        <div class="admin-table__primary-content">
-                                            <a href="{{ route('dixlase-pages::admin.pages.edit', $page) }}" class="hover:underline">
-                                                {{ $page->title }}
-                                            </a>
+                                    <td class="admin-table__cell admin-table__cell--primary" data-label="{{ __('common.title') }}" role="gridcell">
+                                        <div class="flex flex-col gap-1">
+                                            <div class="admin-table__primary-content">
+                                                <a href="{{ route('dixlase-pages::admin.pages.edit', $page) }}" class="hover:underline font-medium">
+                                                    {{ $page->title }}
+                                                </a>
+                                            </div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                <a href="{{ $page->page_url }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all">
+                                                    {{ $page->page_url }}
+                                                </a>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td class="admin-table__cell" role="gridcell">
+                                    <td class="admin-table__cell" data-label="{{ __('common.slug') }}" role="gridcell">
                                         <code class="admin-code">{{ $page->slug }}</code>
                                     </td>
-                                    <td class="admin-table__cell" role="gridcell">
+                                    <td class="admin-table__cell" data-label="{{ __('common.status') }}" role="gridcell">
                                         @include('components::status-badge', [
                                             'status' => $page->status->value,
                                             'label' => $page->status->label(),
                                             'variant' => $page->status->cssClass(),
                                         ])
                                     </td>
-                                    <td class="admin-table__cell" role="gridcell">
+                                    <td class="admin-table__cell" data-label="{{ __('common.published_at') }}" role="gridcell">
                                         <time datetime="{{ $page->published_at?->toISOString() }}" class="admin-datetime">
                                             @if($page->published_at)
                                                 @if(app()->getLocale() === 'ja')
@@ -175,14 +182,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                             @endif
                                         </time>
                                     </td>
-                                    <td class="admin-table__cell admin-table__cell--actions" role="gridcell">
-                                        <div class="admin-actions">
+                                    <td class="admin-table__cell admin-table__cell--actions" data-label="{{ __('common.actions') }}" role="gridcell">
+                                        <div class="flex flex-wrap gap-1">
                                             @include('components::form.button', [
                                                 'type' => 'button',
                                                 'variant' => 'secondary',
                                                 'size' => 'sm',
                                                 'label' => __('common.edit'),
                                                 'icon' => 'fas fa-edit',
+                                                'class' => 'my-1',
                                                 'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.edit', $page) . "'",
                                             ])
                                             
@@ -192,6 +200,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                 'size' => 'sm',
                                                 'label' => __('common.delete'),
                                                 'icon' => 'fas fa-trash',
+                                                'class' => 'my-1',
                                                 'onclick' => "if(confirm('" . __('dixlase-pages::admin.actions.delete_confirm') . "')) { 
                                                     var form = document.createElement('form');
                                                     form.method = 'POST';
@@ -201,16 +210,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                     form.submit();
                                                 }",
                                             ])
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- 2行目: URL -->
-                                <tr class="admin-table__row admin-table__row--secondary" role="row">
-                                    <td colspan="6" class="p-0 admin-table__cell admin-table__cell--secondary" role="gridcell">
-                                        <div class="flex items-center gap-2 text-sm text-gray-600">
-                                            <a href="{{ $page->page_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 min-w-0">
-                                                <span class="truncate" title="{{ $page->page_url }}">{{ $page->page_url }}</span>
-                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -262,4 +261,5 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             @endif
         </div>
     </section>
+</div>
 @endsection
