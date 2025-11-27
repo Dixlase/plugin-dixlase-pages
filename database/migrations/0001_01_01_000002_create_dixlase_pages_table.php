@@ -33,7 +33,7 @@ return new class extends Migration
      * @return void
      */
 
-    protected $table = 'dxl_plg_dixlase_pages';
+    protected $table = 'plg_dixlase_pages';
 
     public function up()
     {

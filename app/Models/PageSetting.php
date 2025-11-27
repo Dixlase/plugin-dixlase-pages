@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PageSetting extends Model
 {
-    protected $table = 'dxl_plg_dixlase_pages_settings';
+    protected $table = 'plg_dixlase_pages_settings';
     
     protected $fillable = [
         'name',
