@@ -22,6 +22,9 @@
 
 
 namespace Plugins\DixlasePages\App\Http\Requests\Admin;
+
+use App\Enums\ContentEditorType;
+use App\Enums\ContentStorageType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Plugins\DixlasePages\App\Enums\PageStatus;
@@ -43,15 +46,54 @@ class UpdatePageRequest extends FormRequest
      */
     public function rules(): array
     {
+        $pageId = $this->route('page')->id ?? null;
+        
         return [
-            'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9\-]+$/'],
-            'content' => ['required', 'string'],
-            'meta_description' => ['nullable', 'string', 'max:500'],
-            'ogp_image' => ['nullable', 'string', 'max:255'],
+            // スラッグは必須（更新時は既存のスラッグがあるため）
+            // ソフトデリートされたレコードは除外してユニークチェック
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-z0-9\-]+$/',
+                Rule::unique('plg_dixlase_pages', 'slug')->ignore($pageId)->whereNull('deleted_at'),
+            ],
+            'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
+            'editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'status' => ['required', Rule::enum(PageStatus::class)],
             'published_at' => ['nullable', 'date', 'after_or_equal:now'],
+            
+            // 翻訳データ
+            'translations' => ['required', 'array'],
+            // タイトルは各言語で任意だが、少なくとも1つは必須（カスタムバリデーションで対応）
+            'translations.*.title' => ['nullable', 'string', 'max:255'],
+            'translations.*.content' => ['nullable', 'string'],
+            'translations.*.meta_description' => ['nullable', 'string', 'max:500'],
+            'translations.*.ogp_image_id' => ['nullable', 'exists:media,id'],
         ];
+    }
+    
+    /**
+     * バリデーション後の追加チェック
+     */
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            // 少なくとも1つの言語でタイトルが入力されているかチェック
+            $translations = $this->translations ?? [];
+            $hasTitle = false;
+            
+            foreach ($translations as $locale => $data) {
+                if (!empty($data['title'])) {
+                    $hasTitle = true;
+                    break;
+                }
+            }
+            
+            if (!$hasTitle) {
+                $validator->errors()->add('translations', __('dixlase-pages::admin.validation.at_least_one_title_required'));
+            }
+        });
     }
 
     /**

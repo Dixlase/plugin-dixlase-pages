@@ -20,14 +20,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $table = 'plg_dixlase_pages';
+    protected $table = 'plg_dixlase_page_translations';
 
     /**
      * Run the migrations.
@@ -36,20 +35,32 @@ return new class extends Migration
      */
     public function up()
     {
-        // pagesテーブル（多言語対応版）
+        // page_translationsテーブルを作成
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->string('slug'); // ページのURL（スラッグ）
-            $table->string('storage_type', 20)->default('database'); // 保存方法（database/file）
-            $table->string('editor_type', 20)->default('html'); // エディタタイプ（gui/markdown/html/blade）
-            $table->enum('status', ['draft', 'published', 'scheduled'])->default('draft'); // ステータス
-            $table->timestamp('published_at')->nullable(); // 公開日時
+            $table->unsignedBigInteger('page_id');
+            $table->string('locale', 10);
+            $table->string('title')->nullable(); // タイトル（少なくとも1言語は必須）
+            $table->text('content')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->string('ogp_image')->nullable(); // 旧形式（互換性のため残す）
+            $table->unsignedBigInteger('ogp_image_id')->nullable();
             $table->timestamps();
-            $table->softDeletes();
-            
-            // ソフトデリート対応のユニーク制約
-            // deleted_atがNULLの場合のみslugがユニークになる
-            $table->unique(['slug', 'deleted_at'], 'plg_dixlase_pages_slug_deleted_at_unique');
+
+            // インデックス
+            $table->unique(['page_id', 'locale']);
+            $table->index('locale');
+
+            // 外部キー制約
+            $table->foreign('page_id')
+                ->references('id')
+                ->on('plg_dixlase_pages')
+                ->onDelete('cascade');
+                
+            $table->foreign('ogp_image_id')
+                ->references('id')
+                ->on('media')
+                ->onDelete('set null');
         });
     }
 

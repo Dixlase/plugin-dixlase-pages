@@ -26,6 +26,11 @@ return [
         'description' => 'Adds static page management functionality to your website. Features page creation, editing, deletion, SEO settings, publish/draft control, and comprehensive content management tools.',
     ],
     
+    // Menu plugin integration
+    'provider' => [
+        'label' => 'Pages',
+    ],
+    
     'nav' => [
         'pages' => [
             'text' => 'Page Management',
@@ -109,5 +114,6 @@ return [
         'pages_directory_alpha_dash' => 'Pages directory may only contain letters, numbers, hyphens, and underscores.',
         'default_status_required' => 'Default status is required.',
         'default_status_in' => 'Default status must be either published or draft.',
+        'at_least_one_title_required' => 'Please enter a title in at least one language.',
     ],
 ];
