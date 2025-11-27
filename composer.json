@@ -1,6 +1,7 @@
 {
     "name": "dixlase/dixlase-pages",
     "description": "This is the Dixlase Pages plugin.",
+    "type": "dixlase-plugin",
     "version": "1.0.0",
     "license": "GPL-3.0",
     "authors": [

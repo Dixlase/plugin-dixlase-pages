@@ -36,7 +36,7 @@ class Page extends Model
     /**
      * テーブル名
      */
-    protected $table = 'dxl_plg_dixlase_pages';
+    protected $table = 'plg_dixlase_pages';
 
     /**
      * 一括代入可能な属性
