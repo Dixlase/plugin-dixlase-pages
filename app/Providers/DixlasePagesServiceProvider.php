@@ -26,6 +26,7 @@ namespace Plugins\DixlasePages\App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use App\Traits\PluginLoaderTrait;
+use Plugins\DixlasePages\App\Services\PageLinkableProvider;
 
 class DixlasePagesServiceProvider extends ServiceProvider
 {
@@ -35,6 +36,12 @@ class DixlasePagesServiceProvider extends ServiceProvider
     {
         // Merge admin navigation
         $this->mergeAdminNavigation('DixlasePages', __DIR__ . '/../../config/admin.php');
+        
+        // LinkableProviderを登録
+        $this->app->singleton(PageLinkableProvider::class);
+        
+        // タグ付けして、メニュープラグインから取得できるようにする
+        $this->app->tag([PageLinkableProvider::class], 'linkable.providers');
     }
 
     public function boot()

@@ -34,19 +34,19 @@ return [
             'children' => [
                 'index' => [
                     'text' => 'dixlase-pages::admin.nav.pages.index',
-                    'route' => 'admin.dixlase-pages::admin.pages.index',
+                    'route' => 'admin.pages.index',
                     'icon' => 'fas fa-fw fa-file', // ページ一覧
                     'can' => 'admin',
                 ],
                 'create' => [
                     'text' => 'dixlase-pages::admin.nav.pages.create',
-                    'route' => 'admin.dixlase-pages::admin.pages.create',
+                    'route' => 'admin.pages.create',
                     'icon' => 'fas fa-fw fa-file-circle-plus', // ページ作成
                     'can' => 'admin',
                 ],
                 'settings' => [
                     'text' => 'dixlase-pages::admin.nav.pages.settings',
-                    'route' => 'admin.dixlase-pages::admin.pages.settings',
+                    'route' => 'admin.pages.settings',
                     'icon' => 'fas fa-fw fa-cog', // 設定
                     'can' => 'admin',
                 ],

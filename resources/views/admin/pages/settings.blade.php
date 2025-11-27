@@ -21,7 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('layouts.admin')
 
 @section('content')
-    <form id="pages-settings-form" action="{{ route('admin.dixlase-pages::admin.pages.settings.update') }}" method="POST">
+    <form id="pages-settings-form" action="{{ route('admin.pages.settings.update') }}" method="POST">
         @csrf
         
         <!-- 基本設定 -->

@@ -23,10 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
-<!-- Flash message for success or error -->
-@include('components::flash-message')
-
-<form id="pageUpdateForm" action="{{ route('dixlase-pages::admin.pages.update', ['page' => $page->id] ) }}" method="POST">
+<form id="pageUpdateForm" action="{{ route('admin.pages.update', ['page' => $page->id] ) }}" method="POST">
     @csrf
     @method('PATCH')
 

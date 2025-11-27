@@ -29,7 +29,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             'variant' => 'primary',
             'label' => __('common.create'),
             'icon' => 'fas fa-plus',
-            'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
+            'onclick' => "window.location.href='" . route('admin.pages.create') . "'",
         ])
     </div>
 
@@ -107,7 +107,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     
     @include('components::pagination', [
         'pagination' => $paginationData,
-        'route' => 'dixlase-pages::admin.pages.index',
+        'route' => 'admin.pages.index',
         'routeParams' => $routeParams,
     ])
 
@@ -148,7 +148,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                     <td class="admin-table__cell admin-table__cell--primary" data-label="{{ __('common.title') }}" role="gridcell">
                                         <div class="flex flex-col gap-1">
                                             <div class="admin-table__primary-content">
-                                                <a href="{{ route('dixlase-pages::admin.pages.edit', $page) }}" class="hover:underline font-medium">
+                                                <a href="{{ route('admin.pages.edit', $page) }}" class="hover:underline font-medium">
                                                     {{ $page->title }}
                                                 </a>
                                             </div>
@@ -191,7 +191,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                 'label' => __('common.edit'),
                                                 'icon' => 'fas fa-edit',
                                                 'class' => 'my-1',
-                                                'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.edit', $page) . "'",
+                                                'onclick' => "window.location.href='" . route('admin.pages.edit', $page) . "'",
                                             ])
                                             
                                             @include('components::form.button', [
@@ -204,7 +204,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                 'onclick' => "if(confirm('" . __('dixlase-pages::admin.actions.delete_confirm') . "')) { 
                                                     var form = document.createElement('form');
                                                     form.method = 'POST';
-                                                    form.action = '" . route('dixlase-pages::admin.pages.destroy', $page) . "';
+                                                    form.action = '" . route('admin.pages.destroy', $page) . "';
                                                     form.innerHTML = '<input type=\"hidden\" name=\"_token\" value=\"" . csrf_token() . "\"><input type=\"hidden\" name=\"_method\" value=\"DELETE\">';
                                                     document.body.appendChild(form);
                                                     form.submit();
@@ -236,7 +236,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 
                 @include('components::pagination', [
                     'pagination' => $paginationData,
-                    'route' => 'dixlase-pages::admin.pages.index',
+                    'route' => 'admin.pages.index',
                     'routeParams' => $routeParams,
                 ])
             @else
@@ -255,7 +255,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         'variant' => 'primary',
                         'label' => __('common.create'),
                         'icon' => 'fas fa-plus',
-                        'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
+                        'onclick' => "window.location.href='" . route('admin.pages.create') . "'",
                     ])
                 </div>
             @endif
