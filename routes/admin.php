@@ -25,27 +25,23 @@ use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesContro
 
 /*
 |--------------------------------------------------------------------------
-| プラグイン管理画面ルート（自動読み込み）
+| プラグイン管理画面ルート
 |--------------------------------------------------------------------------
 |
-| このファイルはプラグインが有効化されている場合、PluginServiceProviderによって
-| 自動的に読み込まれます。以下のミドルウェアが自動適用されます：
+| このファイルは routes/admin.php から読み込まれます。
+| 親ルートグループから以下が継承されます：
 |
-| - admin.ip: IPアドレスフィルタリング
-| - auth:member: 管理メンバー認証
-| - verified: メール認証済みチェック
-| - log.admin.activity: 管理画面操作ログ
-|
-| ルートプレフィックス: /admin（動的に取得）
-| ルート名プレフィックス: admin.
+| - プレフィックス: /admin（動的に取得）
+| - ルート名プレフィックス: admin.
+| - ミドルウェア: admin.ip, auth:member, verified, log.admin.activity
 |
 */
 
 Route::prefix('pages')
-    ->name('dixlase-pages::admin.pages.')
+    ->name('pages.')
     ->group(function () {
         Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
-        Route::get('/create', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
+        Route::get('/new', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
         Route::get('/settings', [DixlasePagesAdminPagesController::class, 'settings'])->name('settings');
         Route::post('/settings', [DixlasePagesAdminPagesController::class, 'updateSettings'])->name('settings.update');
         Route::post('/', [DixlasePagesAdminPagesController::class, 'store'])->name('store');

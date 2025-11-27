@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
-<form id="pageCreateForm" action="{{ route('dixlase-pages::admin.pages.store') }}" method="POST">
+<form id="pageCreateForm" action="{{ route('admin.pages.store') }}" method="POST">
     @csrf
     <!-- フォーム -->
     @include('dixlase-pages::admin.pages.partials.form', [

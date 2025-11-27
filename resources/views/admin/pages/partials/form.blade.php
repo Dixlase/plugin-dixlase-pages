@@ -18,146 +18,84 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
-<!-- Title -->
-<div class="mb-4">
-    @include('components::form.label', [
-        'for' => 'title',
-        'text' => __('common.title'),
-    ])
-    @include('components::form.text', [
-        'id' => 'title',
-        'name' => 'title',
-        'value' => old('title', $page->title ?? ''),
-        'required' => true,
-    ])
-    @include('components::form.error', [
-        'messages' => $errors->get('title')
-    ])
-</div>
+@php
+use App\Helpers\LocaleHelper;
+use Plugins\DixlasePages\App\Models\PageSetting;
 
-<!-- Slug -->
-<div class="mb-4">
-    @include('components::form.label', [
-        'for' => 'slug',
-        'text' => __('common.slug'),
-    ])
-    @include('components::form.text', [
-        'id' => 'slug',
-        'name' => 'slug',
-        'value' => old('slug', $page->slug ?? ''),
-        'placeholder' => '自動生成されます（空白の場合）',
-    ])
-    @include('components::form.error', [
-        'messages' => $errors->get('slug')
-    ])
-</div>
-
-<!-- Content -->
-<div class="mb-4">
-    @include('components::form.label', [
-        'for' => 'content',
-        'text' => __('common.content'),
-    ])
-    @include('components::form.textarea', [
-        'id' => 'content',
-        'name' => 'content',
-        'value' => old('content', $page->content ?? ''),
-        'required' => true,
-        'class' => 'min-h-48',
-    ])
-    @include('components::form.error', [
-        'messages' => $errors->get('content')
-    ])
-</div>
-
-<!-- Meta Description -->
-<div class="mb-4">
-    @include('components::form.label', [
-        'for' => 'meta_description',
-        'text' => __('dixlase-pages::admin.form.meta_description'),
-    ])
-    @include('components::form.textarea', [
-        'id' => 'meta_description',
-        'name' => 'meta_description',
-        'value' => old('meta_description', $page->meta_description ?? ''),
-        'rows' => 3,
-        'help' => __('dixlase-pages::admin.form.meta_description_help'),
-    ])
-    @include('components::form.error', [
-        'messages' => $errors->get('meta_description')
-    ])
-</div>
-
-<!-- OGP Image -->
-@include('components.media-picker', [
-    'name' => 'ogp_image_id',
-    'label' => __('dixlase-pages::admin.form.ogp_image'),
-    'value' => old('ogp_image_id', $page->ogp_image_id ?? ''),
-    'media' => $page->ogpImage ?? null,
-    'help' => __('dixlase-pages::admin.form.ogp_image_help'),
-    'error' => $errors->first('ogp_image_id'),
-    'aspectRatio' => 'ogp'
-])
-
-<!-- Status -->
-<div class="mb-4">
-    @include('components::form.label', [
-        'for' => 'status',
-        'text' => __('common.status'),
-    ])
-    @include('components::form.radio-group', [
-        'name' => 'status',
-        'options' => [
-            'draft' => __('components.status.draft'),
-            'published' => __('components.status.published'),
-            'scheduled' => __('components.status.scheduled'),
-        ],
-        'value' => old('status', $page->status->value ?? 'draft'),
-    ])
-    @include('components::form.error', [
-        'messages' => $errors->get('status')
-    ])
-</div>
-
-<!-- Published At (日付指定時のみ表示) -->
-<div class="mb-4" id="published-at-field" style="display: none;">
-    @include('components::form.label', [
-        'for' => 'published_at',
-        'text' => __('common.published_at'),
-    ])
-    @include('components::form.text', [
-        'id' => 'published_at',
-        'name' => 'published_at',
-        'type' => 'datetime-local',
-        'value' => old('published_at', $page->published_at?->format('Y-m-d\TH:i') ?? ''),
-    ])
-    @include('components::form.error', [
-        'messages' => $errors->get('published_at')
-    ])
-</div>
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const statusRadios = document.querySelectorAll('input[name="status"]');
-    const publishedAtField = document.getElementById('published-at-field');
-    
-    function togglePublishedAtField() {
-        const selectedStatus = document.querySelector('input[name="status"]:checked')?.value;
-        if (selectedStatus === 'scheduled') {
-            publishedAtField.style.display = 'block';
-        } else {
-            publishedAtField.style.display = 'none';
-        }
+// 翻訳データの準備
+$translations = [];
+if (isset($page) && $page->exists) {
+    foreach (LocaleHelper::supportedLocales() as $locale) {
+        $translation = $page->translate($locale);
+        $translations[$locale] = [
+            'title' => old("translations.{$locale}.title", $translation->title ?? ''),
+            'content' => old("translations.{$locale}.content", $translation->content ?? ''),
+            'meta_description' => old("translations.{$locale}.meta_description", $translation->meta_description ?? ''),
+            'ogp_image_id' => old("translations.{$locale}.ogp_image_id", $translation->ogp_image_id ?? ''),
+        ];
     }
-    
-    // 初期表示
-    togglePublishedAtField();
-    
-    // ラジオボタン変更時
-    statusRadios.forEach(radio => {
-        radio.addEventListener('change', togglePublishedAtField);
-    });
-});
-</script>
-@endpush
+} else {
+    // 新規作成時は空の配列
+    foreach (LocaleHelper::supportedLocales() as $locale) {
+        $translations[$locale] = [
+            'title' => old("translations.{$locale}.title", ''),
+            'content' => old("translations.{$locale}.content", ''),
+            'meta_description' => old("translations.{$locale}.meta_description", ''),
+            'ogp_image_id' => old("translations.{$locale}.ogp_image_id", ''),
+        ];
+    }
+}
+
+// ステータス値の取得
+$statusValue = old('status', isset($page) && $page->exists ? $page->status->value : 'draft');
+$publishedAtValue = old('published_at', isset($page) && $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '');
+
+// ページディレクトリ設定を取得
+$pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+@endphp
+
+{{-- 
+フォーム順序:
+1. 言語タブ
+2. タイトル
+3. エディタータイプ
+4. コンテンツ
+5. スラッグ
+6. 保存方法
+7. OGP
+8. 状態
+--}}
+
+<!-- 多言語コンテンツエディタ（すべてのフィールドを含む） -->
+<x-multilingual-content-editor
+    :storageType="old('storage_type', $page->storage_type ?? 'database')"
+    :editorType="old('editor_type', $page->editor_type ?? 'html')"
+    :translations="$translations"
+    :identifier="$page->slug ?? ''"
+    :showMetaDescription="true"
+    :showOgpImage="true"
+    :showSlug="true"
+    :slugValue="old('slug', $page->slug ?? '')"
+    :showStatus="true"
+    :statusValue="$statusValue"
+    :publishedAtValue="$publishedAtValue"
+    :pagesDirectory="$pagesDirectory"
+/>
+
+<!-- バリデーションエラー表示 -->
+@if($errors->any())
+<div class="mt-4">
+    @foreach(['slug', 'storage_type', 'editor_type', 'status', 'published_at'] as $field)
+        @if($errors->has($field))
+            @include('components::form.error', ['messages' => $errors->get($field)])
+        @endif
+    @endforeach
+    @foreach(LocaleHelper::supportedLocales() as $locale)
+        @foreach(['title', 'content', 'meta_description', 'ogp_image_id'] as $field)
+            @if($errors->has("translations.{$locale}.{$field}"))
+                @include('components::form.error', ['messages' => $errors->get("translations.{$locale}.{$field}")])
+            @endif
+        @endforeach
+    @endforeach
+</div>
+@endif

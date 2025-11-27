@@ -22,16 +22,20 @@
 
 namespace Plugins\DixlasePages\App\Models;
 
+use App\Enums\ContentEditorType;
+use App\Enums\ContentStorageType;
 use App\Models\Media;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Plugins\DixlasePages\App\Enums\PageStatus;
 
 class Page extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasTranslations;
 
     /**
      * テーブル名
@@ -44,14 +48,11 @@ class Page extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title',
         'slug',
-        'content',
+        'storage_type',
+        'editor_type',
         'status',
         'published_at',
-        'meta_description',
-        'ogp_image',
-        'ogp_image_id',
     ];
 
     /**
@@ -61,6 +62,8 @@ class Page extends Model
      */
     protected $casts = [
         'published_at' => 'datetime',
+        'storage_type' => ContentStorageType::class,
+        'editor_type' => ContentEditorType::class,
     ];
 
     protected static function booted()
@@ -142,11 +145,11 @@ class Page extends Model
     }
 
     /**
-     * OGP画像とのリレーション
+     * 翻訳とのリレーション
      */
-    public function ogpImage()
+    public function translations(): HasMany
     {
-        return $this->belongsTo(Media::class, 'ogp_image_id');
+        return $this->hasMany(PageTranslation::class, 'page_id');
     }
 
     /**
