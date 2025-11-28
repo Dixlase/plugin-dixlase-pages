@@ -77,6 +77,7 @@ $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_
     :editorType="old('editor_type', $page->editor_type ?? 'html')"
     :translations="$translations"
     :identifier="$page->slug ?? ''"
+    :pageId="$page->id ?? null"
     :showMetaDescription="true"
     :showOgpImage="true"
     :showSlug="true"

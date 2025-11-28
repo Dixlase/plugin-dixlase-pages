@@ -329,4 +329,29 @@ class DixlasePagesAdminPagesController extends Controller
             ->route('admin.pages.settings')
             ->with('success', 'ページ設定が更新されました。');
     }
+
+    /**
+     * Get file content for a specific editor type (API endpoint).
+     */
+    public function getFileContent(Page $page, string $editorType)
+    {
+        // ファイル保存でない場合は空を返す
+        if ($page->storage_type->value !== 'file') {
+            return response()->json(['contents' => []]);
+        }
+
+        $locales = LocaleHelper::supportedLocales();
+        $contents = [];
+
+        foreach ($locales as $locale) {
+            $fileContent = $this->contentService->loadFromFile(
+                $page->slug,
+                $locale,
+                $editorType
+            );
+            $contents[$locale] = $fileContent ?? '';
+        }
+
+        return response()->json(['contents' => $contents]);
+    }
 }
