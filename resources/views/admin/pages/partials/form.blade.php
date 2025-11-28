@@ -24,12 +24,17 @@ use Plugins\DixlasePages\App\Models\PageSetting;
 
 // 翻訳データの準備
 $translations = [];
+// ファイルコンテンツがコントローラーから渡されていない場合は空配列
+$fileContents = $fileContents ?? [];
+
 if (isset($page) && $page->exists) {
     foreach (LocaleHelper::supportedLocales() as $locale) {
         $translation = $page->translate($locale);
+        // ファイル保存の場合はファイルコンテンツを優先、なければ翻訳データを使用
+        $content = $fileContents[$locale] ?? ($translation->content ?? '');
         $translations[$locale] = [
             'title' => old("translations.{$locale}.title", $translation->title ?? ''),
-            'content' => old("translations.{$locale}.content", $translation->content ?? ''),
+            'content' => old("translations.{$locale}.content", $content),
             'meta_description' => old("translations.{$locale}.meta_description", $translation->meta_description ?? ''),
             'ogp_image_id' => old("translations.{$locale}.ogp_image_id", $translation->ogp_image_id ?? ''),
         ];

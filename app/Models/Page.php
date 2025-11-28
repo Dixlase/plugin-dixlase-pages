@@ -153,6 +153,39 @@ class Page extends Model
     }
 
     /**
+     * タイトルのアクセサー（現在の言語またはフォールバック）
+     */
+    public function getTitleAttribute(): ?string
+    {
+        return $this->getTranslatedAttribute('title');
+    }
+
+    /**
+     * コンテンツのアクセサー（現在の言語またはフォールバック）
+     */
+    public function getContentAttribute(): ?string
+    {
+        return $this->getTranslatedAttribute('content');
+    }
+
+    /**
+     * メタディスクリプションのアクセサー（現在の言語またはフォールバック）
+     */
+    public function getMetaDescriptionAttribute(): ?string
+    {
+        return $this->getTranslatedAttribute('meta_description');
+    }
+
+    /**
+     * ページURLのアクセサー
+     */
+    public function getPageUrlAttribute(): string
+    {
+        $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        return url($pagesDirectory . '/' . $this->slug);
+    }
+
+    /**
      * ファクトリーの場所を指定
      */
     protected static function newFactory()

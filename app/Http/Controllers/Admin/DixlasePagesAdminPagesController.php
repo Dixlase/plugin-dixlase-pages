@@ -145,18 +145,29 @@ class DixlasePagesAdminPagesController extends Controller
         ]);
 
         // 翻訳データを保存
+        \Log::info('store: translations debug', [
+            'storageType' => $storageType,
+            'editorType' => $validated['editor_type'],
+            'translations' => $validated['translations'] ?? 'not set',
+        ]);
+        
         if (isset($validated['translations'])) {
             foreach ($validated['translations'] as $locale => $data) {
+                \Log::info("store: processing locale {$locale}", [
+                    'hasContent' => isset($data['content']),
+                    'contentLength' => isset($data['content']) ? strlen($data['content']) : 0,
+                ]);
+                
                 // ファイル保存の場合はコンテンツをファイルに保存
-                if ($storageType === 'file' && !empty($data['content'])) {
+                if ($storageType === 'file' && isset($data['content'])) {
                     $this->contentService->saveToFile(
                         $page->slug,
                         $locale,
                         $validated['editor_type'],
-                        $data['content']
+                        $data['content'] ?? ''
                     );
                     // DBにはコンテンツを保存しない（ファイルパスの参照のみ）
-                    $data['content'] = null;
+                    $validated['translations'][$locale]['content'] = null;
                 }
             }
             $page->setTranslations($validated['translations']);
@@ -180,26 +191,23 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function edit(Page $page)
     {
-        // ファイル保存の場合、ファイルからコンテンツを読み込んで翻訳データにセット
-        if ($page->storage_type === 'file') {
+        // ファイル保存の場合、ファイルからコンテンツを読み込む
+        $fileContents = [];
+        if ($page->storage_type->value === 'file') {
             $locales = LocaleHelper::supportedLocales();
             foreach ($locales as $locale) {
                 $fileContent = $this->contentService->loadFromFile(
                     $page->slug,
                     $locale,
-                    $page->editor_type
+                    $page->editor_type->value
                 );
                 if ($fileContent !== null) {
-                    // 翻訳モデルにファイルの内容を一時的にセット
-                    $translation = $page->translate($locale);
-                    if ($translation) {
-                        $translation->content = $fileContent;
-                    }
+                    $fileContents[$locale] = $fileContent;
                 }
             }
         }
         
-        return view('dixlase-pages::admin.pages.edit', array_merge($this->viewParams, compact('page')));
+        return view('dixlase-pages::admin.pages.edit', array_merge($this->viewParams, compact('page', 'fileContents')));
     }
 
     /**
@@ -216,8 +224,8 @@ class DixlasePagesAdminPagesController extends Controller
         }
         
         $oldSlug = $page->slug;
-        $oldStorageType = $page->storage_type;
-        $oldEditorType = $page->editor_type;
+        $oldStorageType = $page->storage_type->value;
+        $oldEditorType = $page->editor_type->value;
         $locales = LocaleHelper::supportedLocales();
         
         // スラッグが変更された場合、ファイルをリネーム
@@ -277,9 +285,9 @@ class DixlasePagesAdminPagesController extends Controller
     public function destroy(Page $page)
     {
         // ファイル保存の場合、関連ファイルも削除
-        if ($page->storage_type === 'file') {
+        if ($page->storage_type->value === 'file') {
             $locales = LocaleHelper::supportedLocales();
-            $this->contentService->deleteAllFiles($page->slug, $page->editor_type, $locales);
+            $this->contentService->deleteAllFiles($page->slug, $page->editor_type->value, $locales);
         }
         
         $page->delete();
