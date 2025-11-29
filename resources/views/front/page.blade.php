@@ -87,7 +87,24 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 <!-- ページコンテンツ -->
                 <div class="px-6 py-8">
                     <div class="prose prose-lg dark:prose-invert max-w-none">
-                        {!! nl2br(e($page->content)) !!}
+                        @php
+                            $editorType = $page->editor_type->value ?? 'html';
+                            $content = $page->content ?? '';
+                        @endphp
+                        
+                        @if($editorType === 'markdown')
+                            {{-- Markdownの場合はパースして出力 --}}
+                            {!! \Illuminate\Support\Str::markdown($content) !!}
+                        @elseif($editorType === 'html')
+                            {{-- HTMLの場合はそのまま出力 --}}
+                            {!! $content !!}
+                        @elseif($editorType === 'blade')
+                            {{-- Bladeの場合はBladeとしてレンダリング --}}
+                            {!! \Illuminate\Support\Facades\Blade::render($content, ['page' => $page]) !!}
+                        @else
+                            {{-- その他の場合はエスケープして出力 --}}
+                            {!! nl2br(e($content)) !!}
+                        @endif
                     </div>
                 </div>
             </article>

@@ -22,46 +22,43 @@
 
 namespace Plugins\DixlasePages\App\Enums;
 
-enum PageStatus: string
+use App\Enums\ContentStatus;
+
+/**
+ * ページステータス
+ * コアのContentStatusのエイリアス（後方互換性のため）
+ * 
+ * @deprecated 新規コードではApp\Enums\ContentStatusを直接使用してください
+ */
+class PageStatus
 {
-    case DRAFT = 'draft';           // 下書き
-    case PUBLISHED = 'published';   // 公開
-    case SCHEDULED = 'scheduled';   // 日付指定
+    // ContentStatusの定数をエイリアス
+    public const DRAFT = ContentStatus::DRAFT;
+    public const PUBLISHED = ContentStatus::PUBLISHED;
+    public const SCHEDULED = ContentStatus::SCHEDULED;
 
     /**
-     * ステータスの表示名を取得
+     * ContentStatusインスタンスを取得
      */
-    public function label(): string
+    public static function from(string $value): ContentStatus
     {
-        return match($this) {
-            self::DRAFT => __('components.status.draft'),
-            self::PUBLISHED => __('components.status.published'),
-            self::SCHEDULED => __('components.status.scheduled'),
-        };
+        return ContentStatus::from($value);
     }
 
     /**
-     * ステータスの説明を取得
+     * ContentStatusインスタンスを取得（失敗時はnull）
      */
-    public function description(): string
+    public static function tryFrom(string $value): ?ContentStatus
     {
-        return match($this) {
-            self::DRAFT => __('components.status.draft_description'),
-            self::PUBLISHED => __('components.status.published_description'),
-            self::SCHEDULED => __('components.status.scheduled_description'),
-        };
+        return ContentStatus::tryFrom($value);
     }
 
     /**
-     * CSSクラスを取得（ステータスバッジ用）
+     * 全てのケースを取得
      */
-    public function cssClass(): string
+    public static function cases(): array
     {
-        return match($this) {
-            self::DRAFT => 'gray',
-            self::PUBLISHED => 'green',
-            self::SCHEDULED => 'yellow',
-        };
+        return ContentStatus::cases();
     }
 
     /**
@@ -69,21 +66,6 @@ enum PageStatus: string
      */
     public static function toArray(): array
     {
-        return [
-            self::DRAFT->value => self::DRAFT->label(),
-            self::PUBLISHED->value => self::PUBLISHED->label(),
-            self::SCHEDULED->value => self::SCHEDULED->label(),
-        ];
-    }
-
-    /**
-     * 公開可能なステータスかどうか
-     */
-    public function isPublishable(): bool
-    {
-        return match($this) {
-            self::PUBLISHED, self::SCHEDULED => true,
-            self::DRAFT => false,
-        };
+        return ContentStatus::toArray();
     }
 }

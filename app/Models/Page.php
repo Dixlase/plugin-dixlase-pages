@@ -23,6 +23,7 @@
 namespace Plugins\DixlasePages\App\Models;
 
 use App\Enums\ContentEditorType;
+use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Models\Media;
 use App\Traits\HasTranslations;
@@ -31,7 +32,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Plugins\DixlasePages\App\Enums\PageStatus;
 
 class Page extends Model
 {
@@ -78,14 +78,14 @@ class Page extends Model
     /**
      * ステータスのアクセサー（安全な変換）
      */
-    public function getStatusAttribute($value): PageStatus
+    public function getStatusAttribute($value): ContentStatus
     {
         // 古いデータの変換
         return match($value) {
-            '0', 0, 'draft', null => PageStatus::DRAFT,
-            '1', 1, 'published' => PageStatus::PUBLISHED,
-            '2', 2, 'scheduled' => PageStatus::SCHEDULED,
-            default => PageStatus::DRAFT,
+            '0', 0, 'draft', null => ContentStatus::DRAFT,
+            '1', 1, 'published' => ContentStatus::PUBLISHED,
+            '2', 2, 'scheduled' => ContentStatus::SCHEDULED,
+            default => ContentStatus::DRAFT,
         };
     }
 
@@ -94,7 +94,7 @@ class Page extends Model
      */
     public function setStatusAttribute($value): void
     {
-        if ($value instanceof PageStatus) {
+        if ($value instanceof ContentStatus) {
             $this->attributes['status'] = $value->value;
         } else {
             // 文字列の場合はそのまま保存
@@ -108,9 +108,9 @@ class Page extends Model
     public function isPublished(): bool
     {
         return match($this->status) {
-            PageStatus::PUBLISHED => true,
-            PageStatus::SCHEDULED => $this->published_at && $this->published_at->isPast(),
-            PageStatus::DRAFT => false,
+            ContentStatus::PUBLISHED => true,
+            ContentStatus::SCHEDULED => $this->published_at && $this->published_at->isPast(),
+            ContentStatus::DRAFT => false,
         };
     }
 
@@ -120,9 +120,9 @@ class Page extends Model
     public function scopePublished($query)
     {
         return $query->where(function ($q) {
-            $q->where('status', PageStatus::PUBLISHED->value)
+            $q->where('status', ContentStatus::PUBLISHED->value)
               ->orWhere(function ($sq) {
-                  $sq->where('status', PageStatus::SCHEDULED->value)
+                  $sq->where('status', ContentStatus::SCHEDULED->value)
                      ->where('published_at', '<=', now());
               });
         });
@@ -133,7 +133,7 @@ class Page extends Model
      */
     public function scopeDraft($query)
     {
-        return $query->where('status', PageStatus::DRAFT->value);
+        return $query->where('status', ContentStatus::DRAFT->value);
     }
 
     /**
@@ -141,7 +141,7 @@ class Page extends Model
      */
     public function scopeScheduled($query)
     {
-        return $query->where('status', PageStatus::SCHEDULED->value);
+        return $query->where('status', ContentStatus::SCHEDULED->value);
     }
 
     /**
@@ -162,10 +162,58 @@ class Page extends Model
 
     /**
      * コンテンツのアクセサー（現在の言語またはフォールバック）
+     * ファイル保存の場合はファイルからコンテンツを読み込む
+     * DB保存の場合はエディタータイプ別のカラムから読み込む
      */
     public function getContentAttribute(): ?string
     {
-        return $this->getTranslatedAttribute('content');
+        $locale = app()->getLocale();
+        $editorType = $this->editor_type->value ?? 'html';
+        
+        // ファイル保存の場合
+        if ($this->storage_type && $this->storage_type->value === 'file') {
+            $contentService = app(\Plugins\DixlasePages\App\Services\PageContentService::class);
+            $content = $contentService->loadFromFile(
+                $this->slug,
+                $locale,
+                $editorType
+            );
+            
+            // 現在の言語のファイルがない場合はフォールバック
+            if ($content === null) {
+                // フォールバック言語を試す（ja > en）
+                $fallbackLocales = $locale === 'ja' ? ['en'] : ['ja', 'en'];
+                foreach ($fallbackLocales as $fallbackLocale) {
+                    if ($fallbackLocale === $locale) continue;
+                    $content = $contentService->loadFromFile(
+                        $this->slug,
+                        $fallbackLocale,
+                        $editorType
+                    );
+                    if ($content !== null) break;
+                }
+            }
+            
+            return $content;
+        }
+        
+        // DB保存の場合はエディタータイプ別のカラムから読み込む
+        $contentColumn = 'content_' . $editorType;
+        $translation = $this->translateOrFallback($locale);
+        
+        if ($translation) {
+            // エディタータイプ別のカラムを優先
+            $content = $translation->{$contentColumn} ?? null;
+            
+            // エディタータイプ別カラムがnullの場合は旧contentカラムを試す（後方互換性）
+            if ($content === null) {
+                $content = $translation->content ?? null;
+            }
+            
+            return $content;
+        }
+        
+        return null;
     }
 
     /**
