@@ -49,6 +49,4 @@ Route::prefix('pages')
         Route::get('/{page}/edit', [DixlasePagesAdminPagesController::class, 'edit'])->name('edit');
         Route::patch('/{page}', [DixlasePagesAdminPagesController::class, 'update'])->name('update');
         Route::delete('/{page}', [DixlasePagesAdminPagesController::class, 'destroy'])->name('destroy');
-        // API: エディタータイプ別のファイルコンテンツ取得
-        Route::get('/{page}/content/{editorType}', [DixlasePagesAdminPagesController::class, 'getFileContent'])->name('content');
     });

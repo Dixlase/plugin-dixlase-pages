@@ -24,10 +24,10 @@
 namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
 use App\Enums\ContentEditorType;
+use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Plugins\DixlasePages\App\Enums\PageStatus;
 
 class UpdatePageRequest extends FormRequest
 {
@@ -60,7 +60,7 @@ class UpdatePageRequest extends FormRequest
             ],
             'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
             'editor_type' => ['required', Rule::enum(ContentEditorType::class)],
-            'status' => ['required', Rule::enum(PageStatus::class)],
+            'status' => ['required', Rule::enum(ContentStatus::class)],
             'published_at' => ['nullable', 'date', 'after_or_equal:now'],
             
             // 翻訳データ
@@ -102,12 +102,12 @@ class UpdatePageRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // 日付指定以外の場合はpublished_atをクリア
-        if ($this->status !== PageStatus::SCHEDULED->value) {
+        if ($this->status !== ContentStatus::SCHEDULED->value) {
             $this->merge(['published_at' => null]);
         }
 
         // 公開ステータスの場合は現在時刻を設定
-        if ($this->status === PageStatus::PUBLISHED->value) {
+        if ($this->status === ContentStatus::PUBLISHED->value) {
             $this->merge(['published_at' => now()]);
         }
     }
