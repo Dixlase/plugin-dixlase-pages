@@ -41,7 +41,10 @@ return new class extends Migration
             $table->unsignedBigInteger('page_id');
             $table->string('locale', 10);
             $table->string('title')->nullable(); // タイトル（少なくとも1言語は必須）
-            $table->text('content')->nullable();
+            $table->text('content')->nullable(); // 旧形式（後方互換性のため残す）
+            $table->text('content_markdown')->nullable(); // Markdownエディタ用
+            $table->text('content_html')->nullable(); // HTMLエディタ用
+            $table->text('content_blade')->nullable(); // Bladeエディタ用
             $table->text('meta_description')->nullable();
             $table->string('ogp_image')->nullable(); // 旧形式（互換性のため残す）
             $table->unsignedBigInteger('ogp_image_id')->nullable();
