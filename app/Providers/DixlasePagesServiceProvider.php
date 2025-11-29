@@ -55,6 +55,6 @@ class DixlasePagesServiceProvider extends ServiceProvider
         // マイグレーションの登録
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         
-        // 注: ルート（routes/web.php, routes/admin.php）はPluginServiceProviderが自動読み込み
+        // 注: ルート（routes/web.php, routes/admin.php, routes/api.php）はPluginServiceProviderが自動読み込み
     }
 }
