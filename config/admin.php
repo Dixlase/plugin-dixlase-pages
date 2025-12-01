@@ -23,7 +23,7 @@
 
 return [
     // プラグイン設定画面のルート名
-    'settings_route' => 'admin.dixlase-pages::admin.pages.settings',
+    'settings_route' => 'admin.pages.settings',
     
     'nav' => [
         'pages' => [

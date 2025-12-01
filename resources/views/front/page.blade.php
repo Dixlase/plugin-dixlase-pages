@@ -93,14 +93,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         @endphp
                         
                         @if($editorType === 'markdown')
-                            {{-- Markdownの場合はパースして出力 --}}
-                            {!! \Illuminate\Support\Str::markdown($content) !!}
+                            {{-- Markdownの場合はパースして出力（ショートコード処理付き） --}}
+                            {!! shortcode_parse(\Illuminate\Support\Str::markdown($content)) !!}
                         @elseif($editorType === 'html')
-                            {{-- HTMLの場合はそのまま出力 --}}
-                            {!! $content !!}
+                            {{-- HTMLの場合はショートコード処理して出力 --}}
+                            {!! shortcode_parse($content) !!}
                         @elseif($editorType === 'blade')
-                            {{-- Bladeの場合はBladeとしてレンダリング --}}
-                            {!! \Illuminate\Support\Facades\Blade::render($content, ['page' => $page]) !!}
+                            {{-- Bladeの場合はBladeとしてレンダリング（ショートコード処理付き） --}}
+                            {!! shortcode_parse(\Illuminate\Support\Facades\Blade::render($content, ['page' => $page])) !!}
                         @else
                             {{-- その他の場合はエスケープして出力 --}}
                             {!! nl2br(e($content)) !!}
