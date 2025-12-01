@@ -32,11 +32,17 @@ use Plugins\DixlasePages\App\Models\Page;
 class PageContentService extends ContentFileService
 {
     /**
+     * プラグインスラッグ
+     */
+    protected const PLUGIN_SLUG = 'dixlase-pages';
+
+    /**
      * コンストラクタ
      */
     public function __construct()
     {
-        parent::__construct('pages', 'local', 'en');
+        // storage/app/private/plugins/dixlase-pages/{page-slug}/
+        parent::__construct('plugins/' . self::PLUGIN_SLUG, 'local', 'en');
     }
 
     /**

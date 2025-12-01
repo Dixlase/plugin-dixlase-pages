@@ -21,9 +21,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('layouts.admin')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="mx-auto">
     <!-- ページヘッダー -->
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-start mb-4">
         @include('components::form.button', [
             'type' => 'button',
             'variant' => 'primary',

@@ -303,10 +303,9 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function destroy(Page $page)
     {
-        // ファイル保存の場合、関連ファイルも削除
+        // ファイル保存の場合、関連ディレクトリも削除
         if ($page->storage_type->value === 'file') {
-            $locales = LocaleHelper::supportedLocales();
-            $this->contentService->deleteAllFiles($page->slug, $page->editor_type->value, $locales);
+            $this->contentService->deleteDirectory($page->slug);
         }
         
         $page->delete();
