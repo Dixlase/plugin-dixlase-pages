@@ -23,9 +23,9 @@
 namespace Plugins\DixlasePages\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Plugins\DixlasePages\App\Models\Page;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 
-class PagesTableSeeder extends Seeder
+class DixlasePagesPagesTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -39,10 +39,10 @@ class PagesTableSeeder extends Seeder
         // 言語に応じた固定ページを定義
         $pages = $isJapaneseLocale ? $this->getJapanesePages() : $this->getEnglishPages();
 
-        Page::truncate();
+        DixlasePagesPage::truncate();
 
         foreach ($pages as $pageData) {
-            Page::create(array_merge($pageData, [
+            DixlasePagesPage::create(array_merge($pageData, [
                 'status' => 'published',
                 'published_at' => now(),
                 'created_at' => now(),
@@ -52,7 +52,7 @@ class PagesTableSeeder extends Seeder
 
         // 開発環境でのみファクトリーデータを生成
         if (app()->environment('local', 'development')) {
-            Page::factory()->count(20)->create();
+            DixlasePagesPage::factory()->count(20)->create();
         }
     }
 

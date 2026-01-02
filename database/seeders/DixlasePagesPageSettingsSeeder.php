@@ -23,9 +23,9 @@
 namespace Plugins\DixlasePages\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Plugins\DixlasePages\App\Models\PageSetting;
+use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 
-class PageSettingsSeeder extends Seeder
+class DixlasePagesPageSettingsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -39,7 +39,7 @@ class PageSettingsSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            PageSetting::updateOrCreate(
+            DixlasePagesPageSetting::updateOrCreate(
                 ['name' => $setting['name']],
                 ['value' => $setting['value'], 'created_at' => now(), 'updated_at' => now()]
             );

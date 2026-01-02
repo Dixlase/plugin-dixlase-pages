@@ -26,15 +26,15 @@ namespace Plugins\DixlasePages\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Plugins\DixlasePages\App\Models\Page;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Page>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Plugins\DixlasePages\App\Models\DixlasePagesPage>
  */
-class PageFactory extends Factory
+class DixlasePagesPageFactory extends Factory
 {
 
-    protected $model = Page::class;
+    protected $model = DixlasePagesPage::class;
 
     /**
      * Define the model's default state.

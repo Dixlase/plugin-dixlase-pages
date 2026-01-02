@@ -23,13 +23,13 @@
 namespace Plugins\DixlasePages\App\Services;
 
 use App\Services\ContentFileService;
-use Plugins\DixlasePages\App\Models\Page;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 
 /**
  * ページコンテンツサービス
  * コアのContentFileServiceを継承し、ページ固有の機能を追加
  */
-class PageContentService extends ContentFileService
+class DixlasePagesPageContentService extends ContentFileService
 {
     /**
      * プラグインスラッグ

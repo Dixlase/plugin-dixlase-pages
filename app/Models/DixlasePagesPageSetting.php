@@ -24,7 +24,7 @@ namespace Plugins\DixlasePages\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PageSetting extends Model
+class DixlasePagesPageSetting extends Model
 {
     protected $table = 'plg_dixlase_pages_settings';
     

@@ -19,14 +19,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
 @php
-use Plugins\DixlasePages\App\Models\PageSetting;
+use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 
 // ステータス値の取得
 $statusValue = old('status', isset($page) && $page->exists ? $page->status->value : 'draft');
 $publishedAtValue = old('published_at', isset($page) && $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '');
 
 // ページディレクトリ設定を取得
-$pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+$pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
 
 // コンテンツ取得（ファイル保存の場合はファイルから）
 $content = $fileContents ?? ($page->getContentByEditorType() ?? '');
