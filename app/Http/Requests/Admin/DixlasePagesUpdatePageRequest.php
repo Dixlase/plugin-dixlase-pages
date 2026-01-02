@@ -29,7 +29,7 @@ use App\Enums\ContentStorageType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdatePageRequest extends FormRequest
+class DixlasePagesUpdatePageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

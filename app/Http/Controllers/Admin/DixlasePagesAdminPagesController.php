@@ -26,13 +26,13 @@ use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Traits\AdminInterfaceTrait;
 use App\Traits\AdminLoggedInTrait;
-use Plugins\DixlasePages\App\Models\Page;
-use Plugins\DixlasePages\App\Models\PageSetting;
-use Plugins\DixlasePages\App\Http\Requests\Admin\StorePageRequest;
-use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePageRequest;
-use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePagesSettingsRequest;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
+use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
+use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesStorePageRequest;
+use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePageRequest;
+use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePagesSettingsRequest;
 use Plugins\DixlasePages\App\Enums\PageStatus;
-use Plugins\DixlasePages\App\Services\PageContentService;
+use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
 use Illuminate\Http\Request;
 
 class DixlasePagesAdminPagesController extends Controller
@@ -41,9 +41,9 @@ class DixlasePagesAdminPagesController extends Controller
     use AdminInterfaceTrait;
     use AdminLoggedInTrait;
 
-    protected PageContentService $contentService;
+    protected DixlasePagesPageContentService $contentService;
 
-    public function __construct(PageContentService $contentService)
+    public function __construct(DixlasePagesPageContentService $contentService)
     {
         $this->contentService = $contentService;
         $this->initialize();
@@ -55,12 +55,12 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Page::query();
+        $pages = DixlasePagesPage::query();
 
         // 検索機能（タイトル、コンテンツ、スラッグ、説明文）
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
+            $pages->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('content', 'like', "%{$search}%")
                   ->orWhere('slug', 'like', "%{$search}%")
@@ -70,7 +70,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         // ステータスフィルター
         if ($request->filled('status')) {
-            $query->where('status', $request->get('status'));
+            $pages->where('status', $request->get('status'));
         }
 
         // ソート設定を取得
@@ -92,12 +92,12 @@ class DixlasePagesAdminPagesController extends Controller
         $perPage = $request->get('per_page', 25);
         $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
         
-        $pages = $query->orderBy($sort, $order)
+        $pages = $pages->orderBy($sort, $order)
                       ->paginate($perPage)
                       ->withQueryString();
 
         // ページディレクトリ設定をデータベースから取得
-        $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
         
         // 各ページにURLを追加
         $pages->getCollection()->transform(function ($page) use ($pagesDirectory) {
@@ -117,14 +117,14 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function create()
     {
-        $page = new Page();
+        $page = new DixlasePagesPage();
         return view('dixlase-pages::admin.pages.create', array_merge($this->viewParams, compact('page')));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePageRequest $request)
+    public function store(DixlasePagesStorePageRequest $request)
     {
         $validated = $request->validated();
         
@@ -159,7 +159,7 @@ class DixlasePagesAdminPagesController extends Controller
         }
         
         // ページを作成
-        $page = Page::create([
+        $page = DixlasePagesPage::create([
             'slug' => $validated['slug'],
             'title' => $validated['title'] ?? null,
             'meta_description' => $validated['meta_description'] ?? null,
@@ -179,7 +179,7 @@ class DixlasePagesAdminPagesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Page $page)
+    public function show(DixlasePagesPage $page)
     {
         return view('dixlase-pages::admin.pages.show', array_merge($this->viewParams, compact('page')));
     }
@@ -187,7 +187,7 @@ class DixlasePagesAdminPagesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Page $page)
+    public function edit(DixlasePagesPage $page)
     {
         // ファイル保存の場合、ファイルからコンテンツを読み込む
         $fileContents = null;
@@ -205,7 +205,7 @@ class DixlasePagesAdminPagesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePageRequest $request, Page $page)
+    public function update(DixlasePagesUpdatePageRequest $request, DixlasePagesPage $page)
     {
         $validated = $request->validated();
         
@@ -282,7 +282,7 @@ class DixlasePagesAdminPagesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Page $page)
+    public function destroy(DixlasePagesPage $page)
     {
         // ファイル保存の場合、関連ディレクトリも削除
         if ($page->storage_type->value === 'file') {
@@ -302,12 +302,7 @@ class DixlasePagesAdminPagesController extends Controller
     public function settings()
     {
         // 設定データを取得
-        $settings = [
-            'pages_directory' => PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages')),
-            'default_status' => PageSetting::getValue('default_status', 'published'),
-            'enable_comments' => PageSetting::getValue('enable_comments', false),
-            'seo_enabled' => PageSetting::getValue('seo_enabled', true),
-        ];
+        $settings = DixlasePagesPageSetting::pluck('value', 'name')->toArray();
         
         $this->viewParams['settings'] = $settings;
         
@@ -317,12 +312,12 @@ class DixlasePagesAdminPagesController extends Controller
     /**
      * Update the settings.
      */
-    public function updateSettings(UpdatePagesSettingsRequest $request)
+    public function updateSettings(DixlasePagesUpdatePagesSettingsRequest $request)
     {
         $validated = $request->validated();
 
         // 設定をデータベースに保存
-        PageSetting::setMany($validated);
+        DixlasePagesPageSetting::updateOrCreate($validated);
 
         return redirect()
             ->route('admin.pages.settings')
@@ -332,7 +327,7 @@ class DixlasePagesAdminPagesController extends Controller
     /**
      * Get file content for a specific editor type (API endpoint).
      */
-    public function getFileContent(Page $page, string $editorType)
+    public function getFileContent(DixlasePagesPage $page, string $editorType)
     {
         // ファイル保存でない場合は空を返す
         if ($page->storage_type->value !== 'file') {
@@ -352,7 +347,7 @@ class DixlasePagesAdminPagesController extends Controller
      * Get content for a specific storage type and editor type (API endpoint).
      * Used when switching storage type or editor type.
      */
-    public function getContent(Page $page, string $storageType, string $editorType)
+    public function getContent(DixlasePagesPage $page, string $storageType, string $editorType)
     {
         $content = '';
 
