@@ -16,7 +16,7 @@ Dixlase Pages is a plugin for Dixlase (and also composer-ready for future distri
 
 This file is part of Dixlase Pages.
 
-Copyright (C) 2025 exc-D inc.
+Copyright (C) 2026 exc-D inc.
 https://exc-d.com
 
 This program is free software: you can redistribute it and/or modify
@@ -33,4 +33,4 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ---
-(C) exc-D inc. - 2025
+(C) exc-D inc. - 2026
