@@ -19,37 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
 @php
-use App\Helpers\LocaleHelper;
 use Plugins\DixlasePages\App\Models\PageSetting;
-
-// 翻訳データの準備
-$translations = [];
-// ファイルコンテンツがコントローラーから渡されていない場合は空配列
-$fileContents = $fileContents ?? [];
-
-if (isset($page) && $page->exists) {
-    foreach (LocaleHelper::supportedLocales() as $locale) {
-        $translation = $page->translate($locale);
-        // ファイル保存の場合はファイルコンテンツを優先、なければ翻訳データを使用
-        $content = $fileContents[$locale] ?? ($translation->content ?? '');
-        $translations[$locale] = [
-            'title' => old("translations.{$locale}.title", $translation->title ?? ''),
-            'content' => old("translations.{$locale}.content", $content),
-            'meta_description' => old("translations.{$locale}.meta_description", $translation->meta_description ?? ''),
-            'ogp_image_id' => old("translations.{$locale}.ogp_image_id", $translation->ogp_image_id ?? ''),
-        ];
-    }
-} else {
-    // 新規作成時は空の配列
-    foreach (LocaleHelper::supportedLocales() as $locale) {
-        $translations[$locale] = [
-            'title' => old("translations.{$locale}.title", ''),
-            'content' => old("translations.{$locale}.content", ''),
-            'meta_description' => old("translations.{$locale}.meta_description", ''),
-            'ogp_image_id' => old("translations.{$locale}.ogp_image_id", ''),
-        ];
-    }
-}
 
 // ステータス値の取得
 $statusValue = old('status', isset($page) && $page->exists ? $page->status->value : 'draft');
@@ -57,25 +27,30 @@ $publishedAtValue = old('published_at', isset($page) && $page->published_at ? $p
 
 // ページディレクトリ設定を取得
 $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+
+// コンテンツ取得（ファイル保存の場合はファイルから）
+$content = $fileContents ?? ($page->getContentByEditorType() ?? '');
 @endphp
 
 {{-- 
 フォーム順序:
-1. 言語タブ
-2. タイトル
-3. エディタータイプ
-4. コンテンツ
-5. スラッグ
-6. 保存方法
-7. OGP
-8. 状態
+1. タイトル
+2. エディタータイプ
+3. コンテンツ
+4. スラッグ
+5. 保存方法
+6. OGP
+7. 状態
 --}}
 
-<!-- 多言語コンテンツエディタ（すべてのフィールドを含む） -->
-<x-multilingual-content-editor
+<!-- コンテンツエディタ（単一言語） -->
+<x-content-editor
     :storageType="old('storage_type', $page->storage_type ?? 'database')"
     :editorType="old('editor_type', $page->editor_type ?? 'html')"
-    :translations="$translations"
+    :title="old('title', $page->title ?? '')"
+    :content="old('content', $content)"
+    :metaDescription="old('meta_description', $page->meta_description ?? '')"
+    :ogpImageId="old('ogp_image_id', $page->ogp_image_id ?? '')"
     :identifier="$page->slug ?? ''"
     :pageId="$page->id ?? null"
     :showMetaDescription="true"
@@ -91,17 +66,10 @@ $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_
 <!-- バリデーションエラー表示 -->
 @if($errors->any())
 <div class="mt-4">
-    @foreach(['slug', 'storage_type', 'editor_type', 'status', 'published_at'] as $field)
+    @foreach(['title', 'content', 'slug', 'storage_type', 'editor_type', 'status', 'published_at', 'meta_description', 'ogp_image_id'] as $field)
         @if($errors->has($field))
             @include('components::form.error', ['messages' => $errors->get($field)])
         @endif
-    @endforeach
-    @foreach(LocaleHelper::supportedLocales() as $locale)
-        @foreach(['title', 'content', 'meta_description', 'ogp_image_id'] as $field)
-            @if($errors->has("translations.{$locale}.{$field}"))
-                @include('components::form.error', ['messages' => $errors->get("translations.{$locale}.{$field}")])
-            @endif
-        @endforeach
     @endforeach
 </div>
 @endif

@@ -26,16 +26,15 @@ use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Models\Media;
-use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Page extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, SoftDeletes;
 
     /**
      * テーブル名
@@ -49,6 +48,13 @@ class Page extends Model
      */
     protected $fillable = [
         'slug',
+        'title',
+        'content',
+        'content_markdown',
+        'content_html',
+        'content_blade',
+        'meta_description',
+        'ogp_image_id',
         'storage_type',
         'editor_type',
         'status',
@@ -145,83 +151,44 @@ class Page extends Model
     }
 
     /**
-     * 翻訳とのリレーション
+     * OGP画像とのリレーション
      */
-    public function translations(): HasMany
+    public function ogpImage(): BelongsTo
     {
-        return $this->hasMany(PageTranslation::class, 'page_id');
+        return $this->belongsTo(Media::class, 'ogp_image_id');
     }
 
     /**
-     * タイトルのアクセサー（現在の言語またはフォールバック）
-     */
-    public function getTitleAttribute(): ?string
-    {
-        return $this->getTranslatedAttribute('title');
-    }
-
-    /**
-     * コンテンツのアクセサー（現在の言語またはフォールバック）
+     * コンテンツを取得（エディタータイプに応じて）
      * ファイル保存の場合はファイルからコンテンツを読み込む
      * DB保存の場合はエディタータイプ別のカラムから読み込む
      */
-    public function getContentAttribute(): ?string
+    public function getContentByEditorType(): ?string
     {
-        $locale = app()->getLocale();
         $editorType = $this->editor_type->value ?? 'html';
         
         // ファイル保存の場合
         if ($this->storage_type && $this->storage_type->value === 'file') {
             $contentService = app(\Plugins\DixlasePages\App\Services\PageContentService::class);
-            $content = $contentService->loadFromFile(
+            return $contentService->loadFromFile(
                 $this->slug,
-                $locale,
+                app()->getLocale(),
                 $editorType
             );
-            
-            // 現在の言語のファイルがない場合はフォールバック
-            if ($content === null) {
-                // フォールバック言語を試す（ja > en）
-                $fallbackLocales = $locale === 'ja' ? ['en'] : ['ja', 'en'];
-                foreach ($fallbackLocales as $fallbackLocale) {
-                    if ($fallbackLocale === $locale) continue;
-                    $content = $contentService->loadFromFile(
-                        $this->slug,
-                        $fallbackLocale,
-                        $editorType
-                    );
-                    if ($content !== null) break;
-                }
-            }
-            
-            return $content;
         }
         
         // DB保存の場合はエディタータイプ別のカラムから読み込む
         $contentColumn = 'content_' . $editorType;
-        $translation = $this->translateOrFallback($locale);
         
-        if ($translation) {
-            // エディタータイプ別のカラムを優先
-            $content = $translation->{$contentColumn} ?? null;
-            
-            // エディタータイプ別カラムがnullの場合は旧contentカラムを試す（後方互換性）
-            if ($content === null) {
-                $content = $translation->content ?? null;
-            }
-            
-            return $content;
+        // エディタータイプ別のカラムを優先
+        $content = $this->{$contentColumn} ?? null;
+        
+        // エディタータイプ別カラムがnullの場合は旧contentカラムを試す（後方互換性）
+        if ($content === null) {
+            $content = $this->attributes['content'] ?? null;
         }
         
-        return null;
-    }
-
-    /**
-     * メタディスクリプションのアクセサー（現在の言語またはフォールバック）
-     */
-    public function getMetaDescriptionAttribute(): ?string
-    {
-        return $this->getTranslatedAttribute('meta_description');
+        return $content;
     }
 
     /**
