@@ -169,7 +169,7 @@ class DixlasePagesPage extends Model
         
         // ファイル保存の場合
         if ($this->storage_type && $this->storage_type->value === 'file') {
-            $contentService = app(\Plugins\DixlasePages\App\Services\PageContentService::class);
+            $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
             return $contentService->loadFromFile(
                 $this->slug,
                 app()->getLocale(),
