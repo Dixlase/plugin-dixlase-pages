@@ -36,10 +36,17 @@ return new class extends Migration
      */
     public function up()
     {
-        // pagesテーブル（多言語対応版）
+        // pagesテーブル
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
             $table->string('slug'); // ページのURL（スラッグ）
+            $table->string('title')->nullable(); // タイトル
+            $table->text('content')->nullable(); // コンテンツ（汎用）
+            $table->text('content_markdown')->nullable(); // Markdownエディタ用
+            $table->text('content_html')->nullable(); // HTMLエディタ用
+            $table->text('content_blade')->nullable(); // Bladeエディタ用
+            $table->text('meta_description')->nullable(); // メタディスクリプション
+            $table->unsignedBigInteger('ogp_image_id')->nullable(); // OGP画像
             $table->string('storage_type', 20)->default('database'); // 保存方法（database/file）
             $table->string('editor_type', 20)->default('html'); // エディタタイプ（gui/markdown/html/blade）
             $table->enum('status', ['draft', 'published', 'scheduled'])->default('draft'); // ステータス
@@ -48,8 +55,13 @@ return new class extends Migration
             $table->softDeletes();
             
             // ソフトデリート対応のユニーク制約
-            // deleted_atがNULLの場合のみslugがユニークになる
             $table->unique(['slug', 'deleted_at'], 'plg_dixlase_pages_slug_deleted_at_unique');
+            
+            // 外部キー制約
+            $table->foreign('ogp_image_id')
+                ->references('id')
+                ->on('media')
+                ->onDelete('set null');
         });
     }
 
