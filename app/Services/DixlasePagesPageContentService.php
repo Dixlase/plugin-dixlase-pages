@@ -22,15 +22,18 @@
 
 namespace Plugins\DixlasePages\App\Services;
 
-use App\Services\ContentFileService;
-use Plugins\DixlasePages\App\Models\DixlasePagesPage;
+use App\Traits\ManagesContentFiles;
+use Illuminate\Support\Facades\Storage;
 
 /**
- * ページコンテンツサービス
- * コアのContentFileServiceを継承し、ページ固有の機能を追加
+ * ページコンテンツファイル管理サービス
+ * ファイルベースのコンテンツ保存を管理
+ * ManagesContentFilesトレイトを使用して共通機能を提供（ライセンス伝搬を避けるため継承なし）
  */
-class DixlasePagesPageContentService extends ContentFileService
+class DixlasePagesPageContentService
 {
+    use ManagesContentFiles;
+
     /**
      * プラグインスラッグ
      */
@@ -42,53 +45,37 @@ class DixlasePagesPageContentService extends ContentFileService
     public function __construct()
     {
         // storage/app/private/plugins/dixlase-pages/{page-slug}/
-        parent::__construct('plugins/' . self::PLUGIN_SLUG, 'local', 'en');
+        $this->basePath = 'plugins/' . self::PLUGIN_SLUG;
+        $this->disk = 'local';
+        $this->defaultLocale = 'en';
     }
 
     /**
-     * ページのコンテンツを取得する（DB or ファイル）
+     * スラッグ変更時にファイルをリネームする（単一ロケール対応）
+     * コントローラーとの互換性のため、引数順序が異なるラッパーメソッド
      *
-     * @param Page $page ページモデル
+     * @param string $oldSlug 旧スラッグ
+     * @param string $newSlug 新スラッグ
+     * @param string $editorType エディタータイプ
      * @param string $locale 言語コード
-     * @return string|null コンテンツ
+     * @return bool リネーム成功時はtrue
      */
-    public function getContent(Page $page, string $locale): ?string
+    public function renameFile(string $oldSlug, string $newSlug, string $editorType, string $locale): bool
     {
-        $storageType = $page->storage_type->value ?? 'database';
-        $editorType = $page->editor_type->value ?? 'html';
+        $oldPath = $this->getFilePath($oldSlug, $locale, $editorType);
+        $newPath = $this->getFilePath($newSlug, $locale, $editorType);
 
-        if ($storageType === 'file') {
-            return $this->loadFromFile($page->slug, $locale, $editorType);
-        }
-
-        // データベースから取得（エディタータイプ別カラム）
-        $translation = $page->translate($locale);
-        if ($translation) {
-            $contentColumn = 'content_' . $editorType;
-            return $translation->{$contentColumn} ?? $translation->content ?? null;
+        // ファイルが存在する場合はリネーム
+        if (Storage::disk($this->disk)->exists($oldPath)) {
+            // 新しいディレクトリが存在しない場合は作成
+            $newDirectory = dirname($newPath);
+            if (!Storage::disk($this->disk)->exists($newDirectory)) {
+                Storage::disk($this->disk)->makeDirectory($newDirectory);
+            }
+            
+            return Storage::disk($this->disk)->move($oldPath, $newPath);
         }
         
-        return null;
-    }
-
-    /**
-     * ページのコンテンツを保存する（DB or ファイル）
-     *
-     * @param Page $page ページモデル
-     * @param string $locale 言語コード
-     * @param string $content コンテンツ
-     * @return bool 保存成功時はtrue
-     */
-    public function saveContent(Page $page, string $locale, string $content): bool
-    {
-        $storageType = $page->storage_type->value ?? 'database';
-        $editorType = $page->editor_type->value ?? 'html';
-
-        if ($storageType === 'file') {
-            return $this->saveToFile($page->slug, $locale, $editorType, $content);
-        }
-
-        // データベースに保存（翻訳テーブルへの保存はコントローラーで行う）
         return true;
     }
 }
