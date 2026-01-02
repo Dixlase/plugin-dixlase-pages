@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class Page extends Model
+class DixlasePagesPage extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -196,7 +196,7 @@ class Page extends Model
      */
     public function getPageUrlAttribute(): string
     {
-        $pagesDirectory = PageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
         return url($pagesDirectory . '/' . $this->slug);
     }
 
@@ -205,6 +205,6 @@ class Page extends Model
      */
     protected static function newFactory()
     {
-        return \Plugins\DixlasePages\Database\Factories\PageFactory::new();
+        return \Plugins\DixlasePages\Database\Factories\DixlasePagesPageFactory::new();
     }
 }

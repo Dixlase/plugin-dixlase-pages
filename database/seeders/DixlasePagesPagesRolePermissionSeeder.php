@@ -25,7 +25,7 @@ namespace Plugins\DixlasePages\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class PagesRolePermissionSeeder extends Seeder
+class DixlasePagesPagesRolePermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.

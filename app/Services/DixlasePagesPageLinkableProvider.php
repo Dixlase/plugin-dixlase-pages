@@ -25,9 +25,9 @@ namespace Plugins\DixlasePages\App\Services;
 use App\Contracts\PluginIntegration\LinkableProviderInterface;
 use App\DTO\PluginIntegration\LinkableDTO;
 use App\Helpers\LocaleHelper;
-use Plugins\DixlasePages\App\Models\Page;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 
-class PageLinkableProvider implements LinkableProviderInterface
+class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
 {
     /**
      * プロバイダーの識別子を取得
@@ -58,7 +58,7 @@ class PageLinkableProvider implements LinkableProviderInterface
      */
     public function isAvailable(): bool
     {
-        return class_exists(Page::class);
+        return class_exists(DixlasePagesPage::class);
     }
 
     /**
@@ -68,7 +68,7 @@ class PageLinkableProvider implements LinkableProviderInterface
     {
         $locale = LocaleHelper::getCurrentLocale();
         
-        $pages = Page::published()
+        $pages = DixlasePagesPage::published()
             ->with(['translations' => function ($query) use ($locale) {
                 $query->where('locale', $locale);
             }])
@@ -86,7 +86,7 @@ class PageLinkableProvider implements LinkableProviderInterface
     {
         $locale = LocaleHelper::getCurrentLocale();
         
-        $pages = Page::published()
+        $pages = DixlasePagesPage::published()
             ->whereHas('translations', function ($q) use ($query, $locale) {
                 $q->where('locale', $locale)
                   ->where(function ($sq) use ($query) {
@@ -110,7 +110,7 @@ class PageLinkableProvider implements LinkableProviderInterface
     {
         $locale = LocaleHelper::getCurrentLocale();
         
-        $page = Page::with(['translations' => function ($q) use ($locale) {
+        $page = DixlasePagesPage::with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }])->find($id);
 
@@ -120,7 +120,7 @@ class PageLinkableProvider implements LinkableProviderInterface
     /**
      * PageモデルをLinkableDTOに変換
      */
-    protected function pageToDTO(Page $page, string $locale): LinkableDTO
+    protected function pageToDTO(DixlasePagesPage $page, string $locale): LinkableDTO
     {
         $translation = $page->translations->first();
         $title = $translation?->title ?? $page->slug;
