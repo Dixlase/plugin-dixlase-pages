@@ -33,7 +33,6 @@ use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\UpdatePagesSettingsRequest;
 use Plugins\DixlasePages\App\Enums\PageStatus;
 use Plugins\DixlasePages\App\Services\PageContentService;
-use App\Helpers\LocaleHelper;
 use Illuminate\Http\Request;
 
 class DixlasePagesAdminPagesController extends Controller
@@ -135,47 +134,42 @@ class DixlasePagesAdminPagesController extends Controller
             $storageType = 'database';
         }
         
-        // ページ本体を作成
+        $content = $validated['content'] ?? '';
+        
+        // コンテンツカラムの準備
+        $contentData = [
+            'content' => null,
+            'content_markdown' => null,
+            'content_html' => null,
+            'content_blade' => null,
+        ];
+        
+        if ($storageType === 'file') {
+            // ファイル保存の場合はコンテンツをファイルに保存
+            $this->contentService->saveToFile(
+                $validated['slug'],
+                app()->getLocale(),
+                $validated['editor_type'],
+                $content
+            );
+        } else {
+            // DB保存の場合はエディタータイプ別のカラムに保存
+            $contentColumn = 'content_' . $validated['editor_type'];
+            $contentData[$contentColumn] = $content;
+        }
+        
+        // ページを作成
         $page = Page::create([
             'slug' => $validated['slug'],
+            'title' => $validated['title'] ?? null,
+            'meta_description' => $validated['meta_description'] ?? null,
+            'ogp_image_id' => $validated['ogp_image_id'] ?? null,
             'storage_type' => $storageType,
             'editor_type' => $validated['editor_type'],
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
+            ...$contentData,
         ]);
-
-        // 翻訳データを保存
-        if (isset($validated['translations'])) {
-            foreach ($validated['translations'] as $locale => $data) {
-                $content = $data['content'] ?? '';
-                
-                if ($storageType === 'file') {
-                    // ファイル保存の場合はコンテンツをファイルに保存
-                    $this->contentService->saveToFile(
-                        $page->slug,
-                        $locale,
-                        $validated['editor_type'],
-                        $content
-                    );
-                    // DBにはコンテンツを保存しない
-                    $validated['translations'][$locale]['content'] = null;
-                    $validated['translations'][$locale]['content_markdown'] = null;
-                    $validated['translations'][$locale]['content_html'] = null;
-                    $validated['translations'][$locale]['content_blade'] = null;
-                } else {
-                    // DB保存の場合はエディタータイプ別のカラムに保存
-                    $validated['translations'][$locale]['content'] = null; // 旧カラムはnull
-                    $validated['translations'][$locale]['content_markdown'] = null;
-                    $validated['translations'][$locale]['content_html'] = null;
-                    $validated['translations'][$locale]['content_blade'] = null;
-                    
-                    // 現在のエディタータイプのカラムにのみ保存
-                    $contentColumn = 'content_' . $validated['editor_type'];
-                    $validated['translations'][$locale][$contentColumn] = $content;
-                }
-            }
-            $page->setTranslations($validated['translations']);
-        }
 
         return redirect()
             ->route('admin.pages.index')
@@ -196,19 +190,13 @@ class DixlasePagesAdminPagesController extends Controller
     public function edit(Page $page)
     {
         // ファイル保存の場合、ファイルからコンテンツを読み込む
-        $fileContents = [];
+        $fileContents = null;
         if ($page->storage_type->value === 'file') {
-            $locales = LocaleHelper::supportedLocales();
-            foreach ($locales as $locale) {
-                $fileContent = $this->contentService->loadFromFile(
-                    $page->slug,
-                    $locale,
-                    $page->editor_type->value
-                );
-                if ($fileContent !== null) {
-                    $fileContents[$locale] = $fileContent;
-                }
-            }
+            $fileContents = $this->contentService->loadFromFile(
+                $page->slug,
+                app()->getLocale(),
+                $page->editor_type->value
+            );
         }
         
         return view('dixlase-pages::admin.pages.edit', array_merge($this->viewParams, compact('page', 'fileContents')));
@@ -230,68 +218,61 @@ class DixlasePagesAdminPagesController extends Controller
         $oldSlug = $page->slug;
         $oldStorageType = $page->storage_type->value;
         $oldEditorType = $page->editor_type->value;
-        $locales = LocaleHelper::supportedLocales();
+        $locale = app()->getLocale();
         
         // スラッグが変更された場合、ファイルをリネーム
         if ($oldStorageType === 'file' && $oldSlug !== $validated['slug']) {
-            $this->contentService->renameFiles($oldSlug, $validated['slug'], $oldEditorType, $locales);
+            $this->contentService->renameFile($oldSlug, $validated['slug'], $oldEditorType, $locale);
         }
+        
+        $content = $validated['content'] ?? '';
+        
+        // コンテンツカラムの準備
+        $contentData = [
+            'content' => null,
+            'content_markdown' => null,
+            'content_html' => null,
+            'content_blade' => null,
+        ];
         
         // 保存方法が変更された場合の処理
         if ($oldStorageType !== $storageType) {
             if ($oldStorageType === 'file' && $storageType === 'database') {
                 // ファイル→DB: ファイルからコンテンツを読み込んでDBに保存、ファイルを削除
-                foreach ($locales as $locale) {
-                    $fileContent = $this->contentService->loadFromFile($validated['slug'], $locale, $oldEditorType);
-                    if ($fileContent !== null && isset($validated['translations'][$locale])) {
-                        $validated['translations'][$locale]['content'] = $fileContent;
-                    }
+                $fileContent = $this->contentService->loadFromFile($validated['slug'], $locale, $oldEditorType);
+                if ($fileContent !== null) {
+                    $content = $fileContent;
                 }
-                $this->contentService->deleteAllFiles($validated['slug'], $oldEditorType, $locales);
+                $this->contentService->deleteFile($validated['slug'], $locale, $oldEditorType);
             }
         }
         
-        // ページ本体を更新
+        if ($storageType === 'file') {
+            // ファイル保存の場合はコンテンツをファイルに保存
+            $this->contentService->saveToFile(
+                $validated['slug'],
+                $locale,
+                $validated['editor_type'],
+                $content
+            );
+        } else {
+            // DB保存の場合はエディタータイプ別のカラムに保存
+            $contentColumn = 'content_' . $validated['editor_type'];
+            $contentData[$contentColumn] = $content;
+        }
+        
+        // ページを更新
         $page->update([
             'slug' => $validated['slug'],
+            'title' => $validated['title'] ?? null,
+            'meta_description' => $validated['meta_description'] ?? null,
+            'ogp_image_id' => $validated['ogp_image_id'] ?? null,
             'storage_type' => $storageType,
             'editor_type' => $validated['editor_type'],
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
+            ...$contentData,
         ]);
-
-        // 翻訳データを更新
-        if (isset($validated['translations'])) {
-            foreach ($validated['translations'] as $locale => $data) {
-                $content = $data['content'] ?? '';
-                
-                if ($storageType === 'file') {
-                    // ファイル保存の場合はコンテンツをファイルに保存
-                    $this->contentService->saveToFile(
-                        $page->slug,
-                        $locale,
-                        $validated['editor_type'],
-                        $content
-                    );
-                    // DBにはコンテンツを保存しない
-                    $validated['translations'][$locale]['content'] = null;
-                    $validated['translations'][$locale]['content_markdown'] = null;
-                    $validated['translations'][$locale]['content_html'] = null;
-                    $validated['translations'][$locale]['content_blade'] = null;
-                } else {
-                    // DB保存の場合はエディタータイプ別のカラムに保存
-                    $validated['translations'][$locale]['content'] = null; // 旧カラムはnull
-                    $validated['translations'][$locale]['content_markdown'] = null;
-                    $validated['translations'][$locale]['content_html'] = null;
-                    $validated['translations'][$locale]['content_blade'] = null;
-                    
-                    // 現在のエディタータイプのカラムにのみ保存
-                    $contentColumn = 'content_' . $validated['editor_type'];
-                    $validated['translations'][$locale][$contentColumn] = $content;
-                }
-            }
-            $page->setTranslations($validated['translations']);
-        }
 
         return redirect()
             ->route('admin.pages.edit', $page)
@@ -355,22 +336,16 @@ class DixlasePagesAdminPagesController extends Controller
     {
         // ファイル保存でない場合は空を返す
         if ($page->storage_type->value !== 'file') {
-            return response()->json(['contents' => []]);
+            return response()->json(['content' => '']);
         }
 
-        $locales = LocaleHelper::supportedLocales();
-        $contents = [];
+        $content = $this->contentService->loadFromFile(
+            $page->slug,
+            app()->getLocale(),
+            $editorType
+        );
 
-        foreach ($locales as $locale) {
-            $fileContent = $this->contentService->loadFromFile(
-                $page->slug,
-                $locale,
-                $editorType
-            );
-            $contents[$locale] = $fileContent ?? '';
-        }
-
-        return response()->json(['contents' => $contents]);
+        return response()->json(['content' => $content ?? '']);
     }
 
     /**
@@ -379,30 +354,21 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function getContent(Page $page, string $storageType, string $editorType)
     {
-        $locales = LocaleHelper::supportedLocales();
-        $contents = [];
+        $content = '';
 
-        foreach ($locales as $locale) {
-            if ($storageType === 'file') {
-                // ファイルからコンテンツを読み込む
-                $content = $this->contentService->loadFromFile(
-                    $page->slug,
-                    $locale,
-                    $editorType
-                );
-                $contents[$locale] = $content ?? '';
-            } else {
-                // DBからエディタータイプ別のカラムを読み込む
-                $translation = $page->translate($locale);
-                if ($translation) {
-                    $contentColumn = 'content_' . $editorType;
-                    $contents[$locale] = $translation->{$contentColumn} ?? '';
-                } else {
-                    $contents[$locale] = '';
-                }
-            }
+        if ($storageType === 'file') {
+            // ファイルからコンテンツを読み込む
+            $content = $this->contentService->loadFromFile(
+                $page->slug,
+                app()->getLocale(),
+                $editorType
+            ) ?? '';
+        } else {
+            // DBからエディタータイプ別のカラムを読み込む
+            $contentColumn = 'content_' . $editorType;
+            $content = $page->{$contentColumn} ?? '';
         }
 
-        return response()->json(['contents' => $contents]);
+        return response()->json(['content' => $content]);
     }
 }
