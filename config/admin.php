@@ -23,34 +23,7 @@
 
 return [
     // プラグイン設定画面のルート名
-    'settings_route' => 'admin.pages.settings',
+    'settings_route' => 'dixlase-pages::pages.settings',
     
-    'nav' => [
-        'pages' => [
-            '_insert_after' => 'front', // フロントページ管理のあとに追加、または '_insert_before' => 'media'
-            'text' => 'dixlase-pages::admin.nav.pages.text',
-            'icon' => 'fas fa-fw fa-file-alt', // ページ管理
-            'can' => 'admin',
-            'children' => [
-                'index' => [
-                    'text' => 'dixlase-pages::admin.nav.pages.index',
-                    'route' => 'admin.pages.index',
-                    'icon' => 'fas fa-fw fa-file', // ページ一覧
-                    'can' => 'admin',
-                ],
-                'create' => [
-                    'text' => 'dixlase-pages::admin.nav.pages.create',
-                    'route' => 'admin.pages.create',
-                    'icon' => 'fas fa-fw fa-file-circle-plus', // ページ作成
-                    'can' => 'admin',
-                ],
-                'settings' => [
-                    'text' => 'dixlase-pages::admin.nav.pages.settings',
-                    'route' => 'admin.pages.settings',
-                    'icon' => 'fas fa-fw fa-cog', // 設定
-                    'can' => 'admin',
-                ],
-            ],
-        ],
-    ],
+    // 注: ナビゲーション設定は config/admin/navigation.php に移動
 ];
