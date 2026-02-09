@@ -44,7 +44,7 @@ $content = $fileContents ?? ($page->getContentByEditorType() ?? '');
 --}}
 
 <!-- コンテンツエディタ（単一言語） -->
-<x-content-editor
+<x-form-content-editor
     :storageType="old('storage_type', $page->storage_type ?? 'database')"
     :editorType="old('editor_type', $page->editor_type ?? 'html')"
     :title="old('title', $page->title ?? '')"
