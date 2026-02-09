@@ -30,19 +30,19 @@ return [
         'children' => [
             'index' => [
                 'text' => 'dixlase-pages::admin.nav.pages.index',
-                'route' => 'dixlase-pages::pages.index',
+                'route' => 'dixlase-pages::admin.pages.index',
                 'icon' => 'fas fa-fw fa-file',
                 'can' => 'admin',
             ],
             'create' => [
                 'text' => 'dixlase-pages::admin.nav.pages.create',
-                'route' => 'dixlase-pages::pages.create',
+                'route' => 'dixlase-pages::admin.pages.create',
                 'icon' => 'fas fa-fw fa-file-circle-plus',
                 'can' => 'admin',
             ],
             'settings' => [
                 'text' => 'dixlase-pages::admin.nav.pages.settings',
-                'route' => 'dixlase-pages::pages.settings',
+                'route' => 'dixlase-pages::admin.pages.settings',
                 'icon' => 'fas fa-fw fa-cog',
                 'can' => 'admin',
             ],

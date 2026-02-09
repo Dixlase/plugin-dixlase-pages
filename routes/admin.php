@@ -37,12 +37,12 @@ use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesContro
 | - log.admin.activity: 管理画面操作ログ
 |
 | ルートプレフィックス: /admin（動的に取得）
-| ルート名: プラグイン側で完全に制御（例: dixlase-pages::pages.index）
+| ルート名: プラグイン側で完全に制御（例: dixlase-pages::admin.pages.index）
 |
 */
 
 Route::prefix('pages')
-    ->name('dixlase-pages::pages.')
+    ->name('dixlase-pages::admin.pages.')
     ->group(function () {
         Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
         Route::get('/new', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
