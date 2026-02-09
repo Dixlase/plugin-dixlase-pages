@@ -25,20 +25,24 @@ use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesContro
 
 /*
 |--------------------------------------------------------------------------
-| プラグイン管理画面ルート
+| プラグイン管理画面ルート（自動読み込み）
 |--------------------------------------------------------------------------
 |
-| このファイルは routes/admin.php から読み込まれます。
-| 親ルートグループから以下が継承されます：
+| このファイルはプラグインが有効化されている場合、PluginServiceProviderによって
+| 自動的に読み込まれます。以下のミドルウェアが自動適用されます：
 |
-| - プレフィックス: /admin（動的に取得）
-| - ルート名プレフィックス: admin.
-| - ミドルウェア: admin.ip, auth:member, verified, log.admin.activity
+| - admin.ip: IPアドレスフィルタリング
+| - auth:member: 管理メンバー認証
+| - verified: メール認証済みチェック
+| - log.admin.activity: 管理画面操作ログ
+|
+| ルートプレフィックス: /admin（動的に取得）
+| ルート名: プラグイン側で完全に制御（例: dixlase-pages::pages.index）
 |
 */
 
 Route::prefix('pages')
-    ->name('pages.')
+    ->name('dixlase-pages::pages.')
     ->group(function () {
         Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
         Route::get('/new', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
