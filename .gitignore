@@ -21,3 +21,8 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Claude Code / AI assistant configs
+CLAUDE.md
+/.claude/
+/.mcp.json
