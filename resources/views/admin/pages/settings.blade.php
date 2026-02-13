@@ -21,7 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('layouts.admin')
 
 @section('content')
-    <form id="pages-settings-form" action="{{ route('admin.pages.settings.update') }}" method="POST">
+    <form id="pages-settings-form" action="{{ route('dixlase-pages::admin.pages.settings.update') }}" method="POST">
         @csrf
         
         <!-- 基本設定 -->
@@ -33,7 +33,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 
                 <div class="grid grid-cols-1 gap-6">
                     <!-- ページディレクトリ -->
-                    @include('components::form.text', [
+                    @include('components::form-text', [
                         'name' => 'pages_directory',
                         'label' => __('dixlase-pages::admin.settings.basic.pages_directory'),
                         'value' => old('pages_directory', $settings['pages_directory'] ?? 'pages'),
@@ -42,7 +42,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     ])
 
                     <!-- デフォルトステータス -->
-                    @include('components::form.select', [
+                    @include('components::form-select', [
                         'name' => 'default_status',
                         'label' => __('dixlase-pages::admin.settings.basic.default_status'),
                         'value' => old('default_status', $settings['default_status'] ?? 'published'),
@@ -65,7 +65,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 
                 <div class="grid grid-cols-1 gap-6">
                     <!-- SEO機能 -->
-                    @include('components::form.checkbox', [
+                    @include('components::form-checkbox', [
                         'name' => 'seo_enabled',
                         'label' => __('dixlase-pages::admin.settings.features.seo_enabled'),
                         'checked' => old('seo_enabled', $settings['seo_enabled'] ?? true),
@@ -79,7 +79,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @endsection
 
 @section('save')
-    @include('components.save', [
+    @include('components::admin.save-button', [
         'id_confirmation' => 'confirmPagesSettingsModal',
         'label' => __('common.save'),
         'title' => __('dixlase-pages::admin.settings.confirm_title'),

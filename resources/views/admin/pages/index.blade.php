@@ -24,12 +24,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="mx-auto">
     <!-- ページヘッダー -->
     <div class="flex justify-start mb-4">
-        @include('components::form.button', [
+        @include('components::form-button', [
             'type' => 'button',
             'variant' => 'primary',
             'label' => __('common.create'),
             'icon' => 'fas fa-plus',
-            'onclick' => "window.location.href='" . route('admin.pages.create') . "'",
+            'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
         ])
     </div>
 
@@ -38,7 +38,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         <form method="GET" role="search">
             <fieldset>
                 <legend>{{ __('common.search') }}</legend>
-                @include('components::form.text', [
+                @include('components::form-text', [
                     'name' => 'search',
                     'value' => request('search'),
                     'placeholder' => __('dixlase-pages::admin.pages.search_placeholder'),
@@ -47,7 +47,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             
             <fieldset>
                 <legend>{{ __('dixlase-pages::admin.pages.status_filter') }}</legend>
-                @include('components::form.select', [
+                @include('components::form-select', [
                     'name' => 'status',
                     'options' => [
                         '' => 'dixlase-pages::admin.pages.all_status',
@@ -60,7 +60,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </fieldset>
             
             <div class="flex gap-2 mt-4">
-                @include('components::form.button', [
+                @include('components::form-button', [
                     'type' => 'submit',
                     'variant' => 'primary',
                     'label' => __('common.search'),
@@ -71,7 +71,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     </section>
 
     <!-- ページネーションコントロール -->
-    @include('components::pagination-controls', [
+    @include('components::ui-pagination-controls', [
         'paginator' => $pages,
         'currentPerPage' => request('per_page', 25),
         'totalLabel' => 'components.pagination.total_count',
@@ -105,9 +105,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         ]);
     @endphp
     
-    @include('components::pagination', [
+    @include('components::ui-pagination', [
         'pagination' => $paginationData,
-        'route' => 'admin.pages.index',
+        'route' => 'dixlase-pages::admin.pages.index',
         'routeParams' => $routeParams,
     ])
 
@@ -148,7 +148,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                     <td class="admin-table__cell admin-table__cell--primary" data-label="{{ __('common.title') }}" role="gridcell">
                                         <div class="flex flex-col gap-1">
                                             <div class="admin-table__primary-content">
-                                                <a href="{{ route('admin.pages.edit', $page) }}" class="hover:underline font-medium">
+                                                <a href="{{ route('dixlase-pages::admin.pages.edit', $page) }}" class="hover:underline font-medium">
                                                     {{ $page->title }}
                                                 </a>
                                             </div>
@@ -163,7 +163,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                         <code class="admin-code">{{ $page->slug }}</code>
                                     </td>
                                     <td class="admin-table__cell" data-label="{{ __('common.status') }}" role="gridcell">
-                                        @include('components::status-badge', [
+                                        @include('components::ui-status-badge', [
                                             'status' => $page->status->value,
                                             'label' => $page->status->label(),
                                             'variant' => $page->status->cssClass(),
@@ -184,17 +184,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                     </td>
                                     <td class="admin-table__cell admin-table__cell--actions" data-label="{{ __('common.actions') }}" role="gridcell">
                                         <div class="flex flex-wrap gap-1">
-                                            @include('components::form.button', [
+                                            @include('components::form-button', [
                                                 'type' => 'button',
                                                 'variant' => 'secondary',
                                                 'size' => 'sm',
                                                 'label' => __('common.edit'),
                                                 'icon' => 'fas fa-edit',
                                                 'class' => 'my-1',
-                                                'onclick' => "window.location.href='" . route('admin.pages.edit', $page) . "'",
+                                                'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.edit', $page) . "'",
                                             ])
                                             
-                                            @include('components::form.button', [
+                                            @include('components::form-button', [
                                                 'type' => 'button',
                                                 'variant' => 'danger',
                                                 'size' => 'sm',
@@ -204,7 +204,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                 'onclick' => "if(confirm('" . __('dixlase-pages::admin.actions.delete_confirm') . "')) { 
                                                     var form = document.createElement('form');
                                                     form.method = 'POST';
-                                                    form.action = '" . route('admin.pages.destroy', $page) . "';
+                                                    form.action = '" . route('dixlase-pages::admin.pages.destroy', $page) . "';
                                                     form.innerHTML = '<input type=\"hidden\" name=\"_token\" value=\"" . csrf_token() . "\"><input type=\"hidden\" name=\"_method\" value=\"DELETE\">';
                                                     document.body.appendChild(form);
                                                     form.submit();
@@ -234,9 +234,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     ]);
                 @endphp
                 
-                @include('components::pagination', [
+                @include('components::ui-pagination', [
                     'pagination' => $paginationData,
-                    'route' => 'admin.pages.index',
+                    'route' => 'dixlase-pages::admin.pages.index',
                     'routeParams' => $routeParams,
                 ])
             @else
@@ -250,12 +250,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <p class="admin-empty-state__description">
                         {{ __('dixlase-pages::admin.messages.no_pages_description') }}
                     </p>
-                    @include('components::form.button', [
+                    @include('components::form-button', [
                         'type' => 'button',
                         'variant' => 'primary',
                         'label' => __('common.create'),
                         'icon' => 'fas fa-plus',
-                        'onclick' => "window.location.href='" . route('admin.pages.create') . "'",
+                        'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
                     ])
                 </div>
             @endif

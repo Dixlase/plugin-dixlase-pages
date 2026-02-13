@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
-<form id="pageCreateForm" action="{{ route('admin.pages.store') }}" method="POST">
+<form id="pageCreateForm" action="{{ route('dixlase-pages::admin.pages.store') }}" method="POST">
     @csrf
     <!-- フォーム -->
     @include('dixlase-pages::admin.pages.partials.form', [
@@ -34,7 +34,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <!-- 保存ボタンとモーダル -->
 @section('save')
-    @include('components.save', [
+    @include('components::admin.save-button', [
         'id' => 'confirmationModal',
         'onclick' => "openModal('confirmationModal')",
         'title' => __('common.save_confirmation_title'),
