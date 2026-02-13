@@ -68,7 +68,7 @@ $content = $fileContents ?? ($page->getContentByEditorType() ?? '');
 <div class="mt-4">
     @foreach(['title', 'content', 'slug', 'storage_type', 'editor_type', 'status', 'published_at', 'meta_description', 'ogp_image_id'] as $field)
         @if($errors->has($field))
-            @include('components::form.error', ['messages' => $errors->get($field)])
+            @include('components::form-error', ['messages' => $errors->get($field)])
         @endif
     @endforeach
 </div>
