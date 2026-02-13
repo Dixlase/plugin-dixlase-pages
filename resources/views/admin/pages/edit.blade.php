@@ -23,12 +23,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
-<form id="pageUpdateForm" action="{{ route('admin.pages.update', ['page' => $page->id] ) }}" method="POST">
+<form id="pageUpdateForm" action="{{ route('dixlase-pages::admin.pages.update', ['page' => $page->id] ) }}" method="POST">
     @csrf
     @method('PATCH')
 
     <!-- id -->
-    @include('components::form.hidden', [
+    @include('components::form-hidden', [
         'name' => 'id',
         'value' => $page->id,
     ])
@@ -45,7 +45,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <!-- 保存ボタンとモーダル -->
 @section('save')
-    @include('components.save', [
+    @include('components::admin.save-button', [
         'id' => 'confirmationModal',
         'onclick' => "openModal('confirmationModal')",
         'title' => __('common.save_confirmation_title'),
