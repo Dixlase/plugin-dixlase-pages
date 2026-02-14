@@ -26,29 +26,29 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         
         <!-- 基本設定 -->
         <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin.settings.basic.title') }}</h2>
+            <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.basic.title') }}</h2>
             
             <fieldset>
-                <legend>{{ __('dixlase-pages::admin.settings.basic.pages_directory') }}</legend>
+                <legend>{{ __('dixlase-pages::admin/pages/settings.basic.pages_directory') }}</legend>
                 
                 <div class="grid grid-cols-1 gap-6">
                     <!-- ページディレクトリ -->
                     @include('components::form-text', [
                         'name' => 'pages_directory',
-                        'label' => __('dixlase-pages::admin.settings.basic.pages_directory'),
+                        'label' => __('dixlase-pages::admin/pages/settings.basic.pages_directory'),
                         'value' => old('pages_directory', $settings['pages_directory'] ?? 'pages'),
                         'required' => true,
-                        'help' => __('dixlase-pages::admin.settings.basic.pages_directory_help')
+                        'help' => __('dixlase-pages::admin/pages/settings.basic.pages_directory_help')
                     ])
 
                     <!-- デフォルトステータス -->
                     @include('components::form-select', [
                         'name' => 'default_status',
-                        'label' => __('dixlase-pages::admin.settings.basic.default_status'),
+                        'label' => __('dixlase-pages::admin/pages/settings.basic.default_status'),
                         'value' => old('default_status', $settings['default_status'] ?? 'published'),
                         'options' => [
-                            'published' => __('dixlase-pages::admin.settings.basic.status_published'),
-                            'draft' => __('dixlase-pages::admin.settings.basic.status_draft')
+                            'published' => __('dixlase-pages::admin/pages/settings.basic.status_published'),
+                            'draft' => __('dixlase-pages::admin/pages/settings.basic.status_draft')
                         ],
                         'required' => true
                     ])
@@ -58,18 +58,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
         <!-- 機能設定 -->
         <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin.settings.features.title') }}</h2>
+            <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.features.title') }}</h2>
             
             <fieldset>
-                <legend>{{ __('dixlase-pages::admin.settings.features.seo_enabled') }}</legend>
+                <legend>{{ __('dixlase-pages::admin/pages/settings.features.seo_enabled') }}</legend>
                 
                 <div class="grid grid-cols-1 gap-6">
                     <!-- SEO機能 -->
                     @include('components::form-checkbox', [
                         'name' => 'seo_enabled',
-                        'label' => __('dixlase-pages::admin.settings.features.seo_enabled'),
+                        'label' => __('dixlase-pages::admin/pages/settings.features.seo_enabled'),
                         'checked' => old('seo_enabled', $settings['seo_enabled'] ?? true),
-                        'help' => __('dixlase-pages::admin.settings.features.seo_enabled_help')
+                        'help' => __('dixlase-pages::admin/pages/settings.features.seo_enabled_help')
                     ])
                 </div>
             </fieldset>
@@ -82,8 +82,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     @include('components::admin.save-button', [
         'id_confirmation' => 'confirmPagesSettingsModal',
         'label' => __('common.save'),
-        'title' => __('dixlase-pages::admin.settings.confirm_title'),
-        'message' => __('dixlase-pages::admin.settings.confirm_message'),
+        'title' => __('dixlase-pages::admin/pages/settings.confirm_title'),
+        'message' => __('dixlase-pages::admin/pages/settings.confirm_message'),
         'confirm_label' => __('common.save'),
         'cancel_label' => __('common.cancel'),
         'form' => 'pages-settings-form',

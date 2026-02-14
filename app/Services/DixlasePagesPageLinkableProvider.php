@@ -24,7 +24,6 @@ namespace Plugins\DixlasePages\App\Services;
 
 use App\Contracts\PluginIntegration\LinkableProviderInterface;
 use App\DTO\PluginIntegration\LinkableDTO;
-use App\Helpers\LocaleHelper;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 
 class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
@@ -66,17 +65,12 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
      */
     public function getAvailableItems(int $limit = 100): array
     {
-        $locale = LocaleHelper::getCurrentLocale();
-        
         $pages = DixlasePagesPage::published()
-            ->with(['translations' => function ($query) use ($locale) {
-                $query->where('locale', $locale);
-            }])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
 
-        return $pages->map(fn($page) => $this->pageToDTO($page, $locale))->toArray();
+        return $pages->map(fn($page) => $this->pageToDTO($page))->toArray();
     }
 
     /**
@@ -84,23 +78,15 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
      */
     public function searchItems(string $query, int $limit = 20): array
     {
-        $locale = LocaleHelper::getCurrentLocale();
-        
         $pages = DixlasePagesPage::published()
-            ->whereHas('translations', function ($q) use ($query, $locale) {
-                $q->where('locale', $locale)
-                  ->where(function ($sq) use ($query) {
-                      $sq->where('title', 'like', "%{$query}%")
-                         ->orWhere('content', 'like', "%{$query}%");
-                  });
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('content', 'like', "%{$query}%");
             })
-            ->with(['translations' => function ($q) use ($locale) {
-                $q->where('locale', $locale);
-            }])
             ->limit($limit)
             ->get();
 
-        return $pages->map(fn($page) => $this->pageToDTO($page, $locale))->toArray();
+        return $pages->map(fn($page) => $this->pageToDTO($page))->toArray();
     }
 
     /**
@@ -108,31 +94,23 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
      */
     public function getItemById(string $id): ?LinkableDTO
     {
-        $locale = LocaleHelper::getCurrentLocale();
-        
-        $page = DixlasePagesPage::with(['translations' => function ($q) use ($locale) {
-            $q->where('locale', $locale);
-        }])->find($id);
+        $page = DixlasePagesPage::find($id);
 
-        return $page ? $this->pageToDTO($page, $locale) : null;
+        return $page ? $this->pageToDTO($page) : null;
     }
 
     /**
      * PageモデルをLinkableDTOに変換
      */
-    protected function pageToDTO(DixlasePagesPage $page, string $locale): LinkableDTO
+    protected function pageToDTO(DixlasePagesPage $page): LinkableDTO
     {
-        $translation = $page->translations->first();
-        $title = $translation?->title ?? $page->slug;
-        
         return new LinkableDTO(
             id: (string) $page->id,
-            title: $title,
-            url: route('dixlase-pages.show', ['slug' => $page->slug]),
+            title: $page->title ?? $page->slug,
+            url: route('dixlase-pages::page.show', ['slug' => $page->slug]),
             type: 'page',
             source: 'dixlase-pages',
             sourceTable: 'plg_dixlase_pages',
-            locale: $locale,
         );
     }
 }

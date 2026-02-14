@@ -25,12 +25,12 @@ return [
         'name' => 'Dixlase ページ管理',
         'description' => 'ウェブサイトに静的ページ管理機能を追加します。固定ページの作成・編集・削除、SEO設定、公開/非公開制御など、コンテンツ管理に必要な機能を提供します。',
     ],
-    
+
     // メニュープラグイン連携用
     'provider' => [
         'label' => 'ページ',
     ],
-    
+
     'nav' => [
         'pages' => [
             'text' => 'ページ管理',
@@ -40,6 +40,7 @@ return [
         ],
     ],
 
+    // Headings must stay here (resolvePluginHeadingKey uses dot notation)
     'pages' => [
         'index' => [
             'heading' => 'ページマスター',
@@ -53,67 +54,5 @@ return [
         'settings' => [
             'heading' => 'ページ設定',
         ],
-        'search_section' => '検索・フィルター',
-        'search_placeholder' => 'タイトル、コンテンツ、スラッグ、説明文で検索',
-        'all_status' => 'すべてのステータス',
-        'status_filter' => 'ステータスフィルター',
-        'list_section' => 'ページ一覧',
-        'table_label' => 'ページ一覧テーブル',
-    ],
-
-    'form' => [
-        'meta_description' => '説明文',
-        'meta_description_help' => '検索エンジンの検索結果に表示される説明文です。120-160文字程度を推奨します。',
-        'ogp_image' => 'OGP画像',
-        'ogp_image_help' => 'SNSでシェアされた際に表示される画像のパスをアップロードされたメディアから選択してください。',
-    ],
-
-    'actions' => [
-        'delete_confirm' => 'このページを削除してもよろしいですか？',
-    ],
-
-    'settings' => [
-        'basic' => [
-            'title' => '基本設定',
-            'pages_directory' => 'ページディレクトリ',
-            'pages_directory_help' => 'ページのURLに使用するディレクトリ名',
-            'default_status' => 'デフォルトステータス',
-            'status_published' => '公開',
-            'status_draft' => '下書き',
-        ],
-        'features' => [
-            'title' => '機能設定',
-            'enable_comments' => 'コメント機能を有効にする',
-            'enable_comments_help' => 'ページにコメント機能を表示します',
-            'seo_enabled' => 'SEO機能を有効にする',
-            'seo_enabled_help' => 'メタタグやSEO最適化機能を有効にします',
-        ],
-        'confirm_title' => 'ページ設定の保存',
-        'confirm_message' => 'ページ設定を保存してもよろしいですか？',
-    ],
-
-    'messages' => [
-        'no_pages_found' => 'ページが見つかりません。',
-        'no_pages_description' => '新しいページを作成してください。',
-        'total_pages' => '全:total件',
-        'per_page' => '表示件数',
-        'create_confirmation_message' => 'この内容でページを作成しますか？',
-        'update_confirmation_message' => 'この内容でページを更新しますか？',
-    ],
-
-    'validation' => [
-        'title_required' => 'タイトルは必須です。',
-        'title_max' => 'タイトルは255文字以内で入力してください。',
-        'slug_format' => 'スラッグは半角英数字とハイフンのみ使用できます。',
-        'slug_unique' => 'このスラッグは既に使用されています。',
-        'content_required' => 'コンテンツは必須です。',
-        'status_required' => 'ステータスは必須です。',
-        'published_at_date' => '公開日時は正しい日付形式で入力してください。',
-        'published_at_future' => '公開日時は現在時刻以降を指定してください。',
-        'pages_directory_required' => 'ページディレクトリは必須です。',
-        'pages_directory_alpha_dash' => 'ページディレクトリは半角英数字とハイフン、アンダースコアのみ使用できます。',
-        'default_status_required' => 'デフォルトステータスは必須です。',
-        'default_status_in' => 'デフォルトステータスは公開または下書きを選択してください。',
-        'at_least_one_title_required' => '少なくとも1つの言語でタイトルを入力してください。',
     ],
 ];

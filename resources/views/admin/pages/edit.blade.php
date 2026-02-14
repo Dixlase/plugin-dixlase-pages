@@ -50,7 +50,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         'onclick' => "openModal('confirmationModal')",
         'title' => __('common.save_confirmation_title'),
         'label' => __('common.update'),
-        'message' => __('dixlase-pages::admin.messages.update_confirmation_message'),
+        'message' => __('dixlase-pages::admin/pages/edit.confirmation_message'),
         'confirm_label' => __('common.update'),
         'cancel_label' => __('common.back'),
         'form' => 'pageUpdateForm',

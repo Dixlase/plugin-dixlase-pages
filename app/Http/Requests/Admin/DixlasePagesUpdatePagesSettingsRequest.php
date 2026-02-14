@@ -57,10 +57,10 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'pages_directory' => __('dixlase-pages::admin.settings.basic.pages_directory'),
-            'default_status' => __('dixlase-pages::admin.settings.basic.default_status'),
-            'enable_comments' => __('dixlase-pages::admin.settings.basic.enable_comments'),
-            'seo_enabled' => __('dixlase-pages::admin.settings.basic.seo_enabled'),
+            'pages_directory' => __('dixlase-pages::admin/pages/settings.basic.pages_directory'),
+            'default_status' => __('dixlase-pages::admin/pages/settings.basic.default_status'),
+            'enable_comments' => __('dixlase-pages::admin/pages/settings.basic.enable_comments'),
+            'seo_enabled' => __('dixlase-pages::admin/pages/settings.basic.seo_enabled'),
         ];
     }
 
@@ -72,10 +72,10 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'pages_directory.required' => __('dixlase-pages::admin.settings.validation.pages_directory_required'),
-            'pages_directory.alpha_dash' => __('dixlase-pages::admin.settings.validation.pages_directory_alpha_dash'),
-            'default_status.required' => __('dixlase-pages::admin.settings.validation.default_status_required'),
-            'default_status.in' => __('dixlase-pages::admin.settings.validation.default_status_in'),
+            'pages_directory.required' => __('dixlase-pages::admin/pages/validation.pages_directory_required'),
+            'pages_directory.alpha_dash' => __('dixlase-pages::admin/pages/validation.pages_directory_alpha_dash'),
+            'default_status.required' => __('dixlase-pages::admin/pages/validation.default_status_required'),
+            'default_status.in' => __('dixlase-pages::admin/pages/validation.default_status_in'),
         ];
     }
 }
