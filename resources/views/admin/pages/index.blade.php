@@ -41,16 +41,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-text', [
                     'name' => 'search',
                     'value' => request('search'),
-                    'placeholder' => __('dixlase-pages::admin.pages.search_placeholder'),
+                    'placeholder' => __('dixlase-pages::admin/pages/index.search_placeholder'),
                 ])
             </fieldset>
             
             <fieldset>
-                <legend>{{ __('dixlase-pages::admin.pages.status_filter') }}</legend>
+                <legend>{{ __('dixlase-pages::admin/pages/index.status_filter') }}</legend>
                 @include('components::form-select', [
                     'name' => 'status',
                     'options' => [
-                        '' => 'dixlase-pages::admin.pages.all_status',
+                        '' => 'dixlase-pages::admin/pages/index.all_status',
                         'draft' => 'components.status.draft',
                         'published' => 'components.status.published',
                         'scheduled' => 'components.status.scheduled',
@@ -112,11 +112,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 
     <!-- ページ一覧セクション -->
-    <section class="admin-section !p-0 !border-0 !bg-transparent !dark:bg-transparent" aria-label="{{ __('dixlase-pages::admin.pages.list_section') }}">
+    <section class="admin-section !p-0 !border-0 !bg-transparent !dark:bg-transparent" aria-label="{{ __('dixlase-pages::admin/pages/index.list_section') }}">
         <div class="admin-card">
             @if($pages->count() > 0)
                 <div class="responsive-table mb-6">
-                    <table class="admin-table" role="table" aria-label="{{ __('dixlase-pages::admin.pages.table_label') }}">
+                    <table class="admin-table" role="table" aria-label="{{ __('dixlase-pages::admin/pages/index.table_label') }}">
                         <thead class="admin-table__head">
                             <tr class="admin-table__row">
                                 <th class="admin-table__header" scope="col">
@@ -201,7 +201,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                 'label' => __('common.delete'),
                                                 'icon' => 'fas fa-trash',
                                                 'class' => 'my-1',
-                                                'onclick' => "if(confirm('" . __('dixlase-pages::admin.actions.delete_confirm') . "')) { 
+                                                'onclick' => "if(confirm('" . __('dixlase-pages::admin/pages/index.delete_confirm') . "')) {
                                                     var form = document.createElement('form');
                                                     form.method = 'POST';
                                                     form.action = '" . route('dixlase-pages::admin.pages.destroy', $page) . "';
@@ -245,10 +245,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         <i class="fas fa-file-alt" aria-hidden="true"></i>
                     </div>
                     <h3 class="admin-empty-state__title">
-                        {{ __('dixlase-pages::admin.messages.no_pages_found') }}
+                        {{ __('dixlase-pages::admin/pages/index.no_pages_found') }}
                     </h3>
                     <p class="admin-empty-state__description">
-                        {{ __('dixlase-pages::admin.messages.no_pages_description') }}
+                        {{ __('dixlase-pages::admin/pages/index.no_pages_description') }}
                     </p>
                     @include('components::form-button', [
                         'type' => 'button',

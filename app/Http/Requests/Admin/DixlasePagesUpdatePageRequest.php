@@ -47,7 +47,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
     public function rules(): array
     {
         $pageId = $this->route('page')->id ?? null;
-        
+
         return [
             // スラッグは必須（更新時は既存のスラッグがあるため）
             // ソフトデリートされたレコードは除外してユニークチェック
@@ -58,40 +58,25 @@ class DixlasePagesUpdatePageRequest extends FormRequest
                 'regex:/^[a-z0-9\-]+$/',
                 Rule::unique('plg_dixlase_pages', 'slug')->ignore($pageId)->whereNull('deleted_at'),
             ],
+            'title' => ['nullable', 'string', 'max:255'],
+            'content' => ['nullable', 'string'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
+            'ogp_image_id' => ['nullable', 'exists:media,id'],
             'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
             'editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'status' => ['required', Rule::enum(ContentStatus::class)],
             'published_at' => ['nullable', 'date', 'after_or_equal:now'],
-            
-            // 翻訳データ
-            'translations' => ['required', 'array'],
-            // タイトルは各言語で任意だが、少なくとも1つは必須（カスタムバリデーションで対応）
-            'translations.*.title' => ['nullable', 'string', 'max:255'],
-            'translations.*.content' => ['nullable', 'string'],
-            'translations.*.meta_description' => ['nullable', 'string', 'max:500'],
-            'translations.*.ogp_image_id' => ['nullable', 'exists:media,id'],
         ];
     }
-    
+
     /**
      * バリデーション後の追加チェック
      */
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            // 少なくとも1つの言語でタイトルが入力されているかチェック
-            $translations = $this->translations ?? [];
-            $hasTitle = false;
-            
-            foreach ($translations as $locale => $data) {
-                if (!empty($data['title'])) {
-                    $hasTitle = true;
-                    break;
-                }
-            }
-            
-            if (!$hasTitle) {
-                $validator->errors()->add('translations', __('dixlase-pages::admin.validation.at_least_one_title_required'));
+            if (empty($this->title)) {
+                $validator->errors()->add('title', __('dixlase-pages::admin/pages/validation.title_required'));
             }
         });
     }
@@ -118,13 +103,13 @@ class DixlasePagesUpdatePageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => __('pages-plugin::admin.validation.title_required'),
-            'title.max' => __('pages-plugin::admin.validation.title_max'),
-            'slug.regex' => __('pages-plugin::admin.validation.slug_format'),
-            'content.required' => __('pages-plugin::admin.validation.content_required'),
-            'status.required' => __('pages-plugin::admin.validation.status_required'),
-            'published_at.date' => __('pages-plugin::admin.validation.published_at_date'),
-            'published_at.after_or_equal' => __('pages-plugin::admin.validation.published_at_future'),
+            'title.required' => __('dixlase-pages::admin/pages/validation.title_required'),
+            'title.max' => __('dixlase-pages::admin/pages/validation.title_max'),
+            'slug.regex' => __('dixlase-pages::admin/pages/validation.slug_format'),
+            'content.required' => __('dixlase-pages::admin/pages/validation.content_required'),
+            'status.required' => __('dixlase-pages::admin/pages/validation.status_required'),
+            'published_at.date' => __('dixlase-pages::admin/pages/validation.published_at_date'),
+            'published_at.after_or_equal' => __('dixlase-pages::admin/pages/validation.published_at_future'),
         ];
     }
 }

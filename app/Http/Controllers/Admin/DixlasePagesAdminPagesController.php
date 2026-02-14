@@ -173,7 +173,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         return redirect()
             ->route('dixlase-pages::admin.pages.index')
-            ->with('success', 'ページが正常に作成されました。');
+            ->with('success', __('dixlase-pages::admin/pages/create.success'));
     }
 
     /**
@@ -276,7 +276,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         return redirect()
             ->route('dixlase-pages::admin.pages.edit', $page)
-            ->with('success', 'ページが正常に更新されました。');
+            ->with('success', __('dixlase-pages::admin/pages/edit.success'));
     }
 
     /**
@@ -293,7 +293,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         return redirect()
             ->route('dixlase-pages::admin.pages.index')
-            ->with('success', 'ページが正常に削除されました。');
+            ->with('success', __('dixlase-pages::admin/pages/index.delete_success'));
     }
 
     /**
@@ -321,7 +321,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         return redirect()
             ->route('dixlase-pages::admin.pages.settings')
-            ->with('success', 'ページ設定が更新されました。');
+            ->with('success', __('dixlase-pages::admin/pages/settings.success'));
     }
 
     /**

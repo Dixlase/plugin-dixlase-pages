@@ -26,7 +26,6 @@ namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
-use App\Helpers\LocaleHelper;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -57,40 +56,25 @@ class DixlasePagesStorePageRequest extends FormRequest
                 'regex:/^[a-z0-9\-]*$/',
                 Rule::unique('plg_dixlase_pages', 'slug')->whereNull('deleted_at'),
             ],
+            'title' => ['nullable', 'string', 'max:255'],
+            'content' => ['nullable', 'string'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
+            'ogp_image_id' => ['nullable', 'exists:media,id'],
             'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
             'editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'status' => ['required', Rule::enum(ContentStatus::class)],
             'published_at' => ['nullable', 'date', 'after_or_equal:now'],
-            
-            // 翻訳データ
-            'translations' => ['required', 'array'],
-            // タイトルは各言語で任意だが、少なくとも1つは必須（カスタムバリデーションで対応）
-            'translations.*.title' => ['nullable', 'string', 'max:255'],
-            'translations.*.content' => ['nullable', 'string'],
-            'translations.*.meta_description' => ['nullable', 'string', 'max:500'],
-            'translations.*.ogp_image_id' => ['nullable', 'exists:media,id'],
         ];
     }
-    
+
     /**
      * バリデーション後の追加チェック
      */
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            // 少なくとも1つの言語でタイトルが入力されているかチェック
-            $translations = $this->translations ?? [];
-            $hasTitle = false;
-            
-            foreach ($translations as $locale => $data) {
-                if (!empty($data['title'])) {
-                    $hasTitle = true;
-                    break;
-                }
-            }
-            
-            if (!$hasTitle) {
-                $validator->errors()->add('translations', __('dixlase-pages::admin.validation.at_least_one_title_required'));
+            if (empty($this->title)) {
+                $validator->errors()->add('title', __('dixlase-pages::admin/pages/validation.title_required'));
             }
         });
     }
@@ -101,13 +85,10 @@ class DixlasePagesStorePageRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // スラッグが空の場合、タイトルから自動生成
-        if (empty($this->slug)) {
-            $slug = $this->generateSlugFromTitle();
-            if ($slug) {
-                $this->merge(['slug' => $slug]);
-            }
+        if (empty($this->slug) && !empty($this->title)) {
+            $this->merge(['slug' => $this->convertToSlug($this->title)]);
         }
-        
+
         // 日付指定以外の場合はpublished_atをクリア
         if ($this->status !== ContentStatus::SCHEDULED->value) {
             $this->merge(['published_at' => null]);
@@ -118,35 +99,7 @@ class DixlasePagesStorePageRequest extends FormRequest
             $this->merge(['published_at' => now()]);
         }
     }
-    
-    /**
-     * タイトルからスラッグを生成
-     */
-    protected function generateSlugFromTitle(): ?string
-    {
-        $translations = $this->translations ?? [];
-        $preferredLocale = LocaleHelper::getUserPreferredLocale();
-        
-        // 優先言語のタイトルを取得
-        $title = $translations[$preferredLocale]['title'] ?? null;
-        
-        // なければ最初に見つかったタイトルを使用
-        if (empty($title)) {
-            foreach ($translations as $data) {
-                if (!empty($data['title'])) {
-                    $title = $data['title'];
-                    break;
-                }
-            }
-        }
-        
-        if (empty($title)) {
-            return null;
-        }
-        
-        return $this->convertToSlug($title);
-    }
-    
+
     /**
      * 文字列をスラッグに変換
      */
@@ -187,29 +140,29 @@ class DixlasePagesStorePageRequest extends FormRequest
             'パ' => 'pa', 'ピ' => 'pi', 'プ' => 'pu', 'ペ' => 'pe', 'ポ' => 'po',
             'ッ' => '',
         ];
-        
+
         $result = mb_strtolower($text);
-        
+
         // ひらがな・カタカナをローマ字に変換
         foreach ($romajiMap as $kana => $romaji) {
             $result = str_replace($kana, $romaji, $result);
         }
-        
+
         // 非ASCII文字を削除
         $result = preg_replace('/[^\x00-\x7F]/u', '', $result);
-        
+
         // 空白、アンダースコアをハイフンに変換
         $result = preg_replace('/[\s_]+/', '-', $result);
-        
+
         // 英数字とハイフン以外を削除
         $result = preg_replace('/[^a-z0-9-]/', '', $result);
-        
+
         // 連続するハイフンを1つに
         $result = preg_replace('/-+/', '-', $result);
-        
+
         // 先頭と末尾のハイフンを削除
         $result = trim($result, '-');
-        
+
         return $result;
     }
 
@@ -219,14 +172,14 @@ class DixlasePagesStorePageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => __('pages-plugin::admin.validation.title_required'),
-            'title.max' => __('pages-plugin::admin.validation.title_max'),
-            'slug.regex' => __('pages-plugin::admin.validation.slug_format'),
-            'slug.unique' => __('pages-plugin::admin.validation.slug_unique'),
-            'content.required' => __('pages-plugin::admin.validation.content_required'),
-            'status.required' => __('pages-plugin::admin.validation.status_required'),
-            'published_at.date' => __('pages-plugin::admin.validation.published_at_date'),
-            'published_at.after_or_equal' => __('pages-plugin::admin.validation.published_at_future'),
+            'title.required' => __('dixlase-pages::admin/pages/validation.title_required'),
+            'title.max' => __('dixlase-pages::admin/pages/validation.title_max'),
+            'slug.regex' => __('dixlase-pages::admin/pages/validation.slug_format'),
+            'slug.unique' => __('dixlase-pages::admin/pages/validation.slug_unique'),
+            'content.required' => __('dixlase-pages::admin/pages/validation.content_required'),
+            'status.required' => __('dixlase-pages::admin/pages/validation.status_required'),
+            'published_at.date' => __('dixlase-pages::admin/pages/validation.published_at_date'),
+            'published_at.after_or_equal' => __('dixlase-pages::admin/pages/validation.published_at_future'),
         ];
     }
 }
