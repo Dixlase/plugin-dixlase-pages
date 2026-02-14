@@ -21,6 +21,8 @@
  */
 
 return [
+    'heading' => 'Page Master',
+    'description' => 'Manage all pages. You can search, filter by status, and perform bulk operations.',
     'search_section' => 'Search & Filter',
     'search_placeholder' => 'Search by title, content, slug, description',
     'all_status' => 'All Status',

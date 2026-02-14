@@ -30,29 +30,4 @@ return [
     'provider' => [
         'label' => 'Pages',
     ],
-
-    'nav' => [
-        'pages' => [
-            'text' => 'Page Management',
-            'index' => 'Page Master',
-            'create' => 'Create Page',
-            'settings' => 'Page Settings',
-        ],
-    ],
-
-    // Headings must stay here (resolvePluginHeadingKey uses dot notation)
-    'pages' => [
-        'index' => [
-            'heading' => 'Page Master',
-        ],
-        'create' => [
-            'heading' => 'Create Page',
-        ],
-        'edit' => [
-            'heading' => 'Edit Page',
-        ],
-        'settings' => [
-            'heading' => 'Page Settings',
-        ],
-    ],
 ];

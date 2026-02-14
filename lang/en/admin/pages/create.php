@@ -21,6 +21,8 @@
  */
 
 return [
+    'heading' => 'Create Page',
+    'description' => 'Create a new page. You can set title, content, SEO settings, publish status, and more.',
     'confirmation_message' => 'Do you want to create a page with this content?',
     'success' => 'The page has been created successfully.',
 ];

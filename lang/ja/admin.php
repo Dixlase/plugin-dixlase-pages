@@ -30,29 +30,4 @@ return [
     'provider' => [
         'label' => 'ページ',
     ],
-
-    'nav' => [
-        'pages' => [
-            'text' => 'ページ管理',
-            'index' => 'ページマスター',
-            'create' => 'ページ作成',
-            'settings' => 'ページ設定',
-        ],
-    ],
-
-    // Headings must stay here (resolvePluginHeadingKey uses dot notation)
-    'pages' => [
-        'index' => [
-            'heading' => 'ページマスター',
-        ],
-        'create' => [
-            'heading' => 'ページ作成',
-        ],
-        'edit' => [
-            'heading' => 'ページ編集',
-        ],
-        'settings' => [
-            'heading' => 'ページ設定',
-        ],
-    ],
 ];

@@ -21,6 +21,8 @@
  */
 
 return [
+    'heading' => 'ページマスター',
+    'description' => 'すべてのページを管理します。検索、ステータスフィルター、一括操作が行えます。',
     'search_section' => '検索・フィルター',
     'search_placeholder' => 'タイトル、コンテンツ、スラッグ、説明文で検索',
     'all_status' => 'すべてのステータス',
