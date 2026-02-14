@@ -24,24 +24,24 @@ return [
     // ページ管理
     'pages' => [
         '_insert_after' => 'front',
-        'text' => 'dixlase-pages::admin.nav.pages.text',
+        'text' => 'dixlase-pages::admin/navigation.pages.text',
         'icon' => 'fas fa-fw fa-file-alt',
         'can' => 'admin',
         'children' => [
             'index' => [
-                'text' => 'dixlase-pages::admin.nav.pages.index',
+                'text' => 'dixlase-pages::admin/navigation.pages.index',
                 'route' => 'dixlase-pages::admin.pages.index',
                 'icon' => 'fas fa-fw fa-file',
                 'can' => 'admin',
             ],
             'create' => [
-                'text' => 'dixlase-pages::admin.nav.pages.create',
+                'text' => 'dixlase-pages::admin/navigation.pages.create',
                 'route' => 'dixlase-pages::admin.pages.create',
                 'icon' => 'fas fa-fw fa-file-circle-plus',
                 'can' => 'admin',
             ],
             'settings' => [
-                'text' => 'dixlase-pages::admin.nav.pages.settings',
+                'text' => 'dixlase-pages::admin/navigation.pages.settings',
                 'route' => 'dixlase-pages::admin.pages.settings',
                 'icon' => 'fas fa-fw fa-cog',
                 'can' => 'admin',

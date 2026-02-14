@@ -21,6 +21,8 @@
  */
 
 return [
+    'heading' => 'Page Settings',
+    'description' => 'Configure page management settings. You can set the pages directory, default status, and feature toggles.',
     'basic' => [
         'title' => 'Basic Settings',
         'pages_directory' => 'Pages Directory',
