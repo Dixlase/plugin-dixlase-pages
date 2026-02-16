@@ -18,58 +18,23 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
-@php
-use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
-
-// ステータス値の取得
-$statusValue = old('status', isset($page) && $page->exists ? $page->status->value : 'draft');
-$publishedAtValue = old('published_at', isset($page) && $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '');
-
-// ページディレクトリ設定を取得
-$pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
-
-// コンテンツ取得（ファイル保存の場合はファイルから）
-$content = $fileContents ?? ($page->getContentByEditorType() ?? '');
-@endphp
-
-{{-- 
-フォーム順序:
-1. タイトル
-2. エディタータイプ
-3. コンテンツ
-4. スラッグ
-5. 保存方法
-6. OGP
-7. 状態
---}}
-
-<!-- コンテンツエディタ（単一言語） -->
-<x-form-content-editor
-    :storageType="old('storage_type', $page->storage_type ?? 'database')"
-    :editorType="old('editor_type', $page->editor_type ?? 'html')"
-    :title="old('title', $page->title ?? '')"
-    :content="old('content', $content)"
-    :metaDescription="old('meta_description', $page->meta_description ?? '')"
-    :ogpImageId="old('ogp_image_id', $page->ogp_image_id ?? '')"
+<x-dixlase-pages::page-content-editor
+    :title="$page->title ?? ''"
+    :storageType="$page->storage_type?->value ?? 'database'"
+    :editorType="$page->editor_type?->value ?? 'html'"
+    :content="$content"
     :identifier="$page->slug ?? ''"
     :pageId="$page->id ?? null"
-    :showMetaDescription="true"
-    :showOgpImage="true"
-    :showSlug="true"
-    :slugValue="old('slug', $page->slug ?? '')"
-    :showStatus="true"
+    :editorTranslations="$editorTranslations"
+    :storageOptions="$storageOptions"
+    :editorIcons="$editorIcons"
+    :editorColors="$editorColors"
+    :slugValue="$page->slug ?? ''"
+    :slugBaseUrl="$slugBaseUrl"
+    :metaDescription="$page->meta_description ?? ''"
+    :ogpImageId="$page->ogp_image_id"
+    :ogpImage="$ogpImage"
     :statusValue="$statusValue"
+    :statusOptions="$statusOptions"
     :publishedAtValue="$publishedAtValue"
-    :pagesDirectory="$pagesDirectory"
 />
-
-<!-- バリデーションエラー表示 -->
-@if($errors->any())
-<div class="mt-4">
-    @foreach(['title', 'content', 'slug', 'storage_type', 'editor_type', 'status', 'published_at', 'meta_description', 'ogp_image_id'] as $field)
-        @if($errors->has($field))
-            @include('components::form-error', ['messages' => $errors->get($field)])
-        @endif
-    @endforeach
-</div>
-@endif
