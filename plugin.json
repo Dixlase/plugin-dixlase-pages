@@ -12,6 +12,9 @@
     "url": "https://exc-d.com",
     "license": "GPL-3.0",
     "license_template": "license-gpl.txt",
+    "providers": [
+        "Plugins\\DixlasePages\\App\\Providers\\DixlasePagesServiceProvider"
+    ],
     "namespace": "Plugins\\DixlasePages",
     "type": "dixlase-plugin",
     "category": "content",
