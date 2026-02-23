@@ -32,5 +32,62 @@
         "front_routes": true,
         "api_routes": false,
         "settings_page": true
+    },
+    "declares": {
+        "configs": {
+            "roles": false,
+            "database_cleanup": false,
+            "navigation": true
+        },
+        "assets": {
+            "common": ["js/app.js", "css/style.scss"],
+            "admin": [],
+            "front": []
+        },
+        "contracts": [],
+        "migrations": true,
+        "commands": false,
+        "middleware": false
+    },
+    "permissions": {
+        "database": {
+            "own_tables": true,
+            "core_tables": []
+        },
+        "storage": {
+            "own_directory": true,
+            "public_uploads": false,
+            "temp_files": false
+        },
+        "settings": {
+            "read_core": true,
+            "write_own": false
+        },
+        "members": {
+            "read": false,
+            "write": false,
+            "create": false,
+            "delete": false
+        },
+        "mail": {
+            "send": false,
+            "bulk_send": false
+        },
+        "content": {
+            "read_other_plugins": [],
+            "write_other_plugins": []
+        },
+        "system": {
+            "register_shortcodes": false,
+            "register_middleware": false,
+            "register_commands": false,
+            "register_blade_directives": false,
+            "modify_routes": false
+        },
+        "_optional": [],
+        "_notes": {
+            "ja": "",
+            "en": ""
+        }
     }
 }

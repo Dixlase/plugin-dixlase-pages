@@ -1,1 +1,8 @@
-/* SCSS for PagesPlugin */
+/* SCSS for DixlasePages */
+
+// 右サイドバーのトランジション
+.page-editor-right-sidebar {
+    transition: width 300ms ease-in-out,
+        opacity 300ms ease-in-out,
+        padding-left 300ms ease-in-out;
+}
