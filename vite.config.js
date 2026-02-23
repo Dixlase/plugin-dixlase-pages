@@ -25,13 +25,13 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'plugins/PagesPlugin/resources/src/js/app.js',
-                'plugins/PagesPlugin/resources/src/css/style.css',
+                'plugins/DixlasePages/resources/src/js/app.js',
+                'plugins/DixlasePages/resources/src/css/style.scss',
             ],
             refresh: true,
         }),
     ],
     build: {
-        outDir: 'plugins/PagesPlugin/resources/assets',
+        outDir: 'plugins/DixlasePages/resources/assets',
     },
 });

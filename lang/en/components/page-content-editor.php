@@ -36,4 +36,6 @@ return [
     'status' => 'Status',
     'published_at' => 'Publish Date & Time',
     'published_at_help' => 'Set the date and time for scheduled publishing.',
+    'sidebar_open' => 'Open settings sidebar',
+    'sidebar_close' => 'Close settings sidebar',
 ];

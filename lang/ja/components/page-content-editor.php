@@ -36,4 +36,6 @@ return [
     'status' => 'ステータス',
     'published_at' => '公開日時',
     'published_at_help' => '予約公開する日時を設定します。',
+    'sidebar_open' => '設定サイドバーを開く',
+    'sidebar_close' => '設定サイドバーを閉じる',
 ];

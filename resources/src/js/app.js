@@ -1,1 +1,2 @@
-// JavaScript for PagesPlugin
+// JavaScript for DixlasePages
+import './page-editor.js';
