@@ -12,7 +12,7 @@
 
 /**
  * ページエディタ Alpine.js コンポーネント
- * フォーム状態管理と右サイドバー開閉を担当する
+ * フォーム状態管理を担当する（右サイドバー状態はコア adminLayout() で管理）
  */
 document.addEventListener('alpine:init', () => {
     Alpine.data('pageEditor', (config = {}) => ({
@@ -26,35 +26,11 @@ document.addEventListener('alpine:init', () => {
         publishedAt: config.publishedAt || '',
         slugBaseUrl: config.slugBaseUrl || '',
 
-        // 右サイドバー状態
-        rightSidebarCollapsed: false,
-        rightSidebarReady: false,
-
         init() {
-            // localStorageからサイドバー状態を復元
-            this.rightSidebarCollapsed = localStorage.getItem('pageEditorRightSidebarCollapsed') === 'true';
-
-            // 次のティックでトランジションを有効化（初期表示時のアニメーション防止）
-            this.$nextTick(() => {
-                this.rightSidebarReady = true;
-            });
-
-            // サイドバー状態をlocalStorageに永続化
-            this.$watch('rightSidebarCollapsed', (value) => {
-                localStorage.setItem('pageEditorRightSidebarCollapsed', value);
-            });
-
             // ストレージタイプ変更時にエディタータイプを連動更新
             this.$watch('storageType', () => {
                 this.updateEditorType();
             });
-        },
-
-        /**
-         * 右サイドバーの開閉をトグルする
-         */
-        toggleRightSidebar() {
-            this.rightSidebarCollapsed = !this.rightSidebarCollapsed;
         },
 
         /**

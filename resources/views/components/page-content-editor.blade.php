@@ -236,8 +236,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         </div>
 
         {{-- ===== 右サイドバートグルボタン（Desktop のみ） ===== --}}
-        <button @click="toggleRightSidebar()"
-                class="hidden lg:flex items-center self-stretch flex-shrink-0 mx-0 backdrop-blur-sm dark:bg-gray-900/75 bg-white/75 text-blue-400 dark:text-white px-1.5 rounded-lg shadow-md border border-gray-300 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+        <button type="button"
+                @click="toggleRightSidebar()"
+                class="hidden lg:flex items-center self-start mt-2 flex-shrink-0 backdrop-blur-sm dark:bg-gray-900/75 bg-white/75 text-blue-400 dark:text-white px-1.5 py-4 rounded-l-lg shadow-md border border-gray-300 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
                 :style="rightSidebarReady ? 'transition: background-color 200ms ease-in-out' : ''"
                 :aria-label="rightSidebarCollapsed
                     ? '{{ __('dixlase-pages::components/page-content-editor.sidebar_open') }}'
