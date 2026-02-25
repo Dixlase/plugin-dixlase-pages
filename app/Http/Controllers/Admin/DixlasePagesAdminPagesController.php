@@ -130,37 +130,18 @@ class DixlasePagesAdminPagesController extends Controller
         $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
         $slugBaseUrl = config('app.url').'/'.$pagesDirectory.'/';
 
-        // ストレージ保存方法オプション（form-radio-card-group用）
+        // ストレージ保存方法オプション（form-select用）
         $storageOptions = [];
+        $storageDescriptions = [];
         foreach (ContentStorageType::optionsWithDescription() as $value => $option) {
-            $storageOptions[] = [
-                'value' => $value,
-                'label' => $option['label'],
-                'description' => $option['description'],
-                'icon' => $value === 'database' ? 'fas fa-database' : 'fas fa-file-code',
-            ];
+            $storageOptions[$value] = $option['label'];
+            $storageDescriptions[$value] = $option['description'];
         }
 
-        // ステータスオプション（form-radio-card-group用）
+        // ステータスオプション（form-select用）
         $statusOptions = [];
         foreach (ContentStatus::optionsWithDescription() as $value => $option) {
-            $statusOptions[] = [
-                'value' => $value,
-                'label' => $option['label'],
-                'description' => $option['description'],
-                'icon' => match ($value) {
-                    'draft' => 'fas fa-pencil-alt',
-                    'published' => 'fas fa-globe',
-                    'scheduled' => 'fas fa-clock',
-                    default => 'fas fa-question',
-                },
-                'color' => match ($value) {
-                    'draft' => 'gray',
-                    'published' => 'green',
-                    'scheduled' => 'yellow',
-                    default => 'gray',
-                },
-            ];
+            $statusOptions[$value] = $option['label'];
         }
 
         // エディター翻訳キー（Alpine.js $t()用）
@@ -200,6 +181,7 @@ class DixlasePagesAdminPagesController extends Controller
             'content',
             'slugBaseUrl',
             'storageOptions',
+            'storageDescriptions',
             'statusOptions',
             'editorTranslations',
             'editorIcons',

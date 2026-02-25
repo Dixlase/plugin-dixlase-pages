@@ -109,17 +109,15 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
 
         $storageOptions = $result['storageOptions'];
         $this->assertCount(2, $storageOptions);
+        $this->assertArrayHasKey('database', $storageOptions);
+        $this->assertArrayHasKey('file', $storageOptions);
+        $this->assertIsString($storageOptions['database']);
+        $this->assertIsString($storageOptions['file']);
 
-        foreach ($storageOptions as $option) {
-            $this->assertArrayHasKey('value', $option);
-            $this->assertArrayHasKey('label', $option);
-            $this->assertArrayHasKey('description', $option);
-            $this->assertArrayHasKey('icon', $option);
-        }
-
-        $values = array_column($storageOptions, 'value');
-        $this->assertContains('database', $values);
-        $this->assertContains('file', $values);
+        $storageDescriptions = $result['storageDescriptions'];
+        $this->assertCount(2, $storageDescriptions);
+        $this->assertArrayHasKey('database', $storageDescriptions);
+        $this->assertArrayHasKey('file', $storageDescriptions);
     }
 
     /**
@@ -132,19 +130,9 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
 
         $statusOptions = $result['statusOptions'];
         $this->assertCount(3, $statusOptions);
-
-        foreach ($statusOptions as $option) {
-            $this->assertArrayHasKey('value', $option);
-            $this->assertArrayHasKey('label', $option);
-            $this->assertArrayHasKey('description', $option);
-            $this->assertArrayHasKey('icon', $option);
-            $this->assertArrayHasKey('color', $option);
-        }
-
-        $values = array_column($statusOptions, 'value');
-        $this->assertContains('draft', $values);
-        $this->assertContains('published', $values);
-        $this->assertContains('scheduled', $values);
+        $this->assertArrayHasKey('draft', $statusOptions);
+        $this->assertArrayHasKey('published', $statusOptions);
+        $this->assertArrayHasKey('scheduled', $statusOptions);
     }
 
     /**
