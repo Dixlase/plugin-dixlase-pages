@@ -27,6 +27,9 @@ document.addEventListener('alpine:init', () => {
         slugBaseUrl: config.slugBaseUrl || '',
 
         init() {
+            // 右サイドバーの有効化をレイアウトに通知
+            this.$dispatch('right-sidebar-active');
+
             // ストレージタイプ変更時にエディタータイプを連動更新
             this.$watch('storageType', () => {
                 this.updateEditorType();
