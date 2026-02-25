@@ -38,4 +38,5 @@ return [
     'published_at_help' => '予約公開する日時を設定します。',
     'sidebar_open' => '設定サイドバーを開く',
     'sidebar_close' => '設定サイドバーを閉じる',
+    'editor_type_help' => 'エディタータイプは新規作成時のみ選択でき、保存後は変更できません。',
 ];

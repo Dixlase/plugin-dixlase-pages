@@ -50,9 +50,6 @@ class DixlasePagesPage extends Model
         'slug',
         'title',
         'content',
-        'content_markdown',
-        'content_html',
-        'content_blade',
         'meta_description',
         'ogp_image_id',
         'storage_type',
@@ -161,34 +158,23 @@ class DixlasePagesPage extends Model
     /**
      * コンテンツを取得（エディタータイプに応じて）
      * ファイル保存の場合はファイルからコンテンツを読み込む
-     * DB保存の場合はエディタータイプ別のカラムから読み込む
+     * DB保存の場合は content カラムから読み込む
      */
     public function getContentByEditorType(): ?string
     {
-        $editorType = $this->editor_type->value ?? 'html';
-        
         // ファイル保存の場合
         if ($this->storage_type && $this->storage_type->value === 'file') {
             $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
+
             return $contentService->loadFromFile(
                 $this->slug,
                 app()->getLocale(),
-                $editorType
+                $this->editor_type->value ?? 'html'
             );
         }
-        
-        // DB保存の場合はエディタータイプ別のカラムから読み込む
-        $contentColumn = 'content_' . $editorType;
-        
-        // エディタータイプ別のカラムを優先
-        $content = $this->{$contentColumn} ?? null;
-        
-        // エディタータイプ別カラムがnullの場合は旧contentカラムを試す（後方互換性）
-        if ($content === null) {
-            $content = $this->attributes['content'] ?? null;
-        }
-        
-        return $content;
+
+        // DB保存の場合は content カラムから読み込む
+        return $this->content;
     }
 
     /**

@@ -38,4 +38,5 @@ return [
     'published_at_help' => 'Set the date and time for scheduled publishing.',
     'sidebar_open' => 'Open settings sidebar',
     'sidebar_close' => 'Close settings sidebar',
+    'editor_type_help' => 'The editor type can only be selected when creating a new page and cannot be changed after saving.',
 ];

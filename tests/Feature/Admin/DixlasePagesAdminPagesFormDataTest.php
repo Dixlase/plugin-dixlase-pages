@@ -143,7 +143,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         $page = DixlasePagesPage::factory()->published()->create([
             'storage_type' => 'database',
             'editor_type' => 'html',
-            'content_html' => '<p>テスト</p>',
+            'content' => '<p>テスト</p>',
         ]);
 
         $result = $this->prepareFormData->invoke($this->controller, $page);
@@ -159,7 +159,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         $page = DixlasePagesPage::factory()->create([
             'storage_type' => 'database',
             'editor_type' => 'html',
-            'content_html' => '<h1>DBコンテンツ</h1>',
+            'content' => '<h1>DBコンテンツ</h1>',
         ]);
 
         $result = $this->prepareFormData->invoke($this->controller, $page);
@@ -175,7 +175,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         $page = DixlasePagesPage::factory()->create([
             'storage_type' => 'file',
             'editor_type' => 'html',
-            'content_html' => '<p>DB content</p>',
+            'content' => '<p>DB content</p>',
         ]);
 
         $fileContent = '<h1>File content</h1>';
