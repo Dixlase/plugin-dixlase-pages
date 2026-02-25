@@ -28,6 +28,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     'identifier' => '',
     'editorTranslations' => [],
     'storageOptions' => [],
+    'storageDescriptions' => [],
     'editorIcons' => [],
     'editorColors' => [],
     // スラッグ
@@ -285,16 +286,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     'text' => __('common.content_storage.label'),
                 ])
 
-                <x-form-radio-card-group
+                <x-form-select
                     name="storage_type"
                     :options="$storageOptions"
                     :value="$storageType"
                     xModel="storageType"
-                    :columns="1"
-                    color="blue"
-                    variant="filled"
-                    :showCheck="true"
                 />
+                <ul class="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
+                    @foreach ($storageDescriptions as $value => $description)
+                        <li><span class="font-medium text-gray-700 dark:text-gray-300">{{ $storageOptions[$value] }}</span> — {{ $description }}</li>
+                    @endforeach
+                </ul>
 
                 {{-- ファイル保存時の情報表示 --}}
                 <div x-show="isFileStorage" x-cloak class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -365,15 +367,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         'text' => __('dixlase-pages::components/page-content-editor.status'),
                     ])
 
-                    <x-form-radio-card-group
+                    <x-form-select
                         name="status"
                         :options="$statusOptions"
                         :value="$statusValue"
                         xModel="status"
-                        :columns="1"
-                        color="blue"
-                        variant="filled"
-                        :showCheck="true"
                     />
                     @include('components::form-error', ['name' => 'status'])
                 </div>

@@ -27,6 +27,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     :pageId="$page->id ?? null"
     :editorTranslations="$editorTranslations"
     :storageOptions="$storageOptions"
+    :storageDescriptions="$storageDescriptions"
     :editorIcons="$editorIcons"
     :editorColors="$editorColors"
     :slugValue="$page->slug ?? ''"
