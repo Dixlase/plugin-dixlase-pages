@@ -25,21 +25,28 @@ document.addEventListener('alpine:init', () => {
         slug: config.slug || '',
         publishedAt: config.publishedAt || '',
         slugBaseUrl: config.slugBaseUrl || '',
+        isEditMode: config.isEditMode || false,
 
         init() {
             // 右サイドバーの有効化をレイアウトに通知
             this.$dispatch('right-sidebar-active');
 
-            // ストレージタイプ変更時にエディタータイプを連動更新
+            // ストレージタイプ変更時にエディタータイプを連動更新（新規作成時のみ）
             this.$watch('storageType', () => {
-                this.updateEditorType();
+                if (!this.isEditMode) {
+                    this.updateEditorType();
+                }
             });
         },
 
         /**
          * 現在のストレージタイプで利用可能なエディター一覧を返す
+         * 編集時は現在のエディタータイプのみ返す
          */
         get availableEditors() {
+            if (this.isEditMode) {
+                return [this.editorType];
+            }
             const editors = {
                 'database': ['gui', 'markdown', 'html'],
                 'file': ['blade', 'markdown', 'html'],

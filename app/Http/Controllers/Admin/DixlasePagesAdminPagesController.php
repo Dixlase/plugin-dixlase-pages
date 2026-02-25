@@ -222,13 +222,8 @@ class DixlasePagesAdminPagesController extends Controller
 
         $content = $validated['content'] ?? '';
 
-        // コンテンツカラムの準備
-        $contentData = [
-            'content' => null,
-            'content_markdown' => null,
-            'content_html' => null,
-            'content_blade' => null,
-        ];
+        // コンテンツの保存先を決定
+        $contentData = ['content' => null];
 
         if ($storageType === 'file') {
             // ファイル保存の場合はコンテンツをファイルに保存
@@ -239,9 +234,8 @@ class DixlasePagesAdminPagesController extends Controller
                 $content
             );
         } else {
-            // DB保存の場合はエディタータイプ別のカラムに保存
-            $contentColumn = 'content_'.$validated['editor_type'];
-            $contentData[$contentColumn] = $content;
+            // DB保存の場合は content カラムに保存
+            $contentData['content'] = $content;
         }
 
         // ページを作成
@@ -301,41 +295,38 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $validated = $request->validated();
 
+        // editor_type はモデルの既存値を維持（編集時は変更不可）
+        $editorType = $page->editor_type->value;
+
         // GUIエディタの場合は強制的にDBに
         $storageType = $validated['storage_type'];
-        if ($validated['editor_type'] === 'gui') {
+        if ($editorType === 'gui') {
             $storageType = 'database';
         }
 
         $oldSlug = $page->slug;
         $oldStorageType = $page->storage_type->value;
-        $oldEditorType = $page->editor_type->value;
         $locale = app()->getLocale();
 
         // スラッグが変更された場合、ファイルをリネーム
         if ($oldStorageType === 'file' && $oldSlug !== $validated['slug']) {
-            $this->contentService->renameFile($oldSlug, $validated['slug'], $oldEditorType, $locale);
+            $this->contentService->renameFile($oldSlug, $validated['slug'], $editorType, $locale);
         }
 
         $content = $validated['content'] ?? '';
 
-        // コンテンツカラムの準備
-        $contentData = [
-            'content' => null,
-            'content_markdown' => null,
-            'content_html' => null,
-            'content_blade' => null,
-        ];
+        // コンテンツの保存先を決定
+        $contentData = ['content' => null];
 
         // 保存方法が変更された場合の処理
         if ($oldStorageType !== $storageType) {
             if ($oldStorageType === 'file' && $storageType === 'database') {
                 // ファイル→DB: ファイルからコンテンツを読み込んでDBに保存、ファイルを削除
-                $fileContent = $this->contentService->loadFromFile($validated['slug'], $locale, $oldEditorType);
+                $fileContent = $this->contentService->loadFromFile($validated['slug'], $locale, $editorType);
                 if ($fileContent !== null) {
                     $content = $fileContent;
                 }
-                $this->contentService->deleteFile($validated['slug'], $locale, $oldEditorType);
+                $this->contentService->deleteFile($validated['slug'], $locale, $editorType);
             }
         }
 
@@ -344,13 +335,12 @@ class DixlasePagesAdminPagesController extends Controller
             $this->contentService->saveToFile(
                 $validated['slug'],
                 $locale,
-                $validated['editor_type'],
+                $editorType,
                 $content
             );
         } else {
-            // DB保存の場合はエディタータイプ別のカラムに保存
-            $contentColumn = 'content_'.$validated['editor_type'];
-            $contentData[$contentColumn] = $content;
+            // DB保存の場合は content カラムに保存
+            $contentData['content'] = $content;
         }
 
         // ページを更新
@@ -360,7 +350,6 @@ class DixlasePagesAdminPagesController extends Controller
             'meta_description' => $validated['meta_description'] ?? null,
             'ogp_image_id' => $validated['ogp_image_id'] ?? null,
             'storage_type' => $storageType,
-            'editor_type' => $validated['editor_type'],
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
             ...$contentData,
@@ -451,9 +440,8 @@ class DixlasePagesAdminPagesController extends Controller
                 $editorType
             ) ?? '';
         } else {
-            // DBからエディタータイプ別のカラムを読み込む
-            $contentColumn = 'content_'.$editorType;
-            $content = $page->{$contentColumn} ?? '';
+            // DBから content カラムを読み込む
+            $content = $page->content ?? '';
         }
 
         return response()->json(['content' => $content]);
