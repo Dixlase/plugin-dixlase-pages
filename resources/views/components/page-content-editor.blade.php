@@ -68,11 +68,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         slugBaseUrl: '{{ $slugBaseUrl }}'
      })">
 
-    {{-- 2カラムレイアウト（Desktop: 横並び / Mobile: 縦積み） --}}
-    <div class="flex flex-col lg:flex-row">
-
         {{-- ===== メインコンテンツエリア ===== --}}
-        <div class="flex-1 min-w-0 space-y-6">
+        <div class="space-y-6">
 
             {{-- 1. タイトル --}}
             <div>
@@ -238,8 +235,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         {{-- ===== 右サイドバートグルボタン（Desktop のみ） ===== --}}
         <button type="button"
                 @click="toggleRightSidebar()"
-                class="hidden lg:flex items-center self-start mt-2 flex-shrink-0 backdrop-blur-sm dark:bg-gray-900/75 bg-white/75 text-blue-400 dark:text-white px-1.5 py-4 rounded-l-lg shadow-md border border-gray-300 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                :style="rightSidebarReady ? 'transition: background-color 200ms ease-in-out' : ''"
+                class="hidden lg:flex fixed top-14 right-0 z-40 items-center backdrop-blur-sm dark:bg-gray-900/75 bg-white/75 text-blue-400 dark:text-white px-1.5 py-4 rounded-l-lg shadow-md border border-r-0 border-gray-300 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                :class="{
+                    'translate-x-0': rightSidebarCollapsed,
+                    '-translate-x-80': !rightSidebarCollapsed
+                }"
+                :style="rightSidebarReady ? 'transition: transform 200ms ease-in-out' : ''"
                 :aria-label="rightSidebarCollapsed
                     ? '{{ __('dixlase-pages::components/page-content-editor.sidebar_open') }}'
                     : '{{ __('dixlase-pages::components/page-content-editor.sidebar_close') }}'">
@@ -247,12 +248,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         </button>
 
         {{-- ===== 右サイドバー ===== --}}
-        <div class="page-editor-right-sidebar mt-6 lg:mt-0 lg:pl-4 space-y-6 lg:w-80 lg:flex-shrink-0"
+        <div class="page-editor-right-sidebar mt-6 lg:mt-0 space-y-6 lg:fixed lg:top-12 lg:right-0 lg:bottom-0 lg:w-80 lg:z-30 lg:overflow-y-auto lg:bg-white/75 dark:lg:bg-gray-900/75 lg:backdrop-blur-sm lg:border-l lg:border-gray-200 dark:lg:border-gray-600 lg:shadow-md lg:px-6 lg:py-6"
              :class="{
-                 'lg:w-0 lg:opacity-0 lg:overflow-hidden lg:pl-0': rightSidebarCollapsed,
-                 'lg:w-80 lg:opacity-100': !rightSidebarCollapsed
+                 'lg:translate-x-80': rightSidebarCollapsed,
+                 'lg:translate-x-0': !rightSidebarCollapsed
              }"
-             :style="rightSidebarReady ? '' : ''">
+             :style="rightSidebarReady ? 'transition: transform 300ms ease-in-out' : ''"
+             >
 
             {{-- 4. スラッグ --}}
             <div>
@@ -396,5 +398,4 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
         </div>
 
-    </div>
 </div>
