@@ -50,7 +50,7 @@ document.addEventListener('alpine:init', () => {
             }
             const editors = {
                 'database': ['gui', 'markdown', 'html'],
-                'file': ['markdown', 'html'],
+                'file': ['gui', 'markdown', 'html'],
             };
             return editors[this.storageType] || [];
         },

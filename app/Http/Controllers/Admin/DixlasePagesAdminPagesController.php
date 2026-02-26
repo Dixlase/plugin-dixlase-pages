@@ -216,12 +216,7 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $validated = $request->validated();
 
-        // GUIエディタの場合は強制的にDBに
         $storageType = $validated['storage_type'];
-        if ($validated['editor_type'] === 'gui') {
-            $storageType = 'database';
-        }
-
         $content = $validated['content'] ?? '';
 
         // ファイル保存の場合はファイルにも保存
@@ -291,12 +286,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         // editor_type はモデルの既存値を維持（編集時は変更不可）
         $editorType = $page->editor_type->value;
-
-        // GUIエディタの場合は強制的にDBに
         $storageType = $validated['storage_type'];
-        if ($editorType === 'gui') {
-            $storageType = 'database';
-        }
 
         $oldSlug = $page->slug;
         $oldStorageType = $page->storage_type->value;
@@ -371,9 +361,10 @@ class DixlasePagesAdminPagesController extends Controller
         $statusIcons = [
             'draft' => 'fas fa-pencil-alt',
             'published' => 'fas fa-eye',
+            'scheduled' => 'fas fa-calendar-alt',
         ];
         $statusCardOptions = [];
-        foreach ([ContentStatus::DRAFT, ContentStatus::PUBLISHED] as $status) {
+        foreach ([ContentStatus::DRAFT, ContentStatus::PUBLISHED, ContentStatus::SCHEDULED] as $status) {
             $statusCardOptions[] = [
                 'value' => $status->value,
                 'label' => $status->label(),

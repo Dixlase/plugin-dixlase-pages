@@ -46,7 +46,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     {
         return [
             'pages_directory' => 'required|string|max:255|alpha_dash',
-            'default_status' => 'required|in:published,draft',
+            'default_status' => 'required|in:published,draft,scheduled',
             'default_editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'default_storage_type' => ['required', Rule::enum(ContentStorageType::class)],
         ];
