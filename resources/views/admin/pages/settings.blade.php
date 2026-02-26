@@ -80,7 +80,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         name="default_editor_type"
                         :options="$editorTypeCardOptions"
                         :value="old('default_editor_type', $settings['default_editor_type'] ?? 'html')"
-                        :columns="4"
+                        :columns="3"
                     />
                     <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_editor_type_help')" />
                     <x-form-error name="default_editor_type" />
@@ -102,29 +102,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_storage_type_help')" />
                     <x-form-error name="default_storage_type" />
                 </div>
-            </div>
-        </section>
-
-        {{-- 機能設定 --}}
-        <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.features.title') }}</h2>
-
-            <div class="grid grid-cols-1 gap-6">
-                {{-- Bladeエディタの許可 --}}
-                <x-form-toggle
-                    name="blade_enabled"
-                    :label="__('dixlase-pages::admin/pages/settings.features.blade_enabled')"
-                    :checked="old('blade_enabled', $settings['blade_enabled'] ?? false)"
-                    :help="__('dixlase-pages::admin/pages/settings.features.blade_enabled_help')"
-                />
-
-                {{-- スケジュール公開の有効化 --}}
-                <x-form-toggle
-                    name="scheduled_publish_enabled"
-                    :label="__('dixlase-pages::admin/pages/settings.features.scheduled_publish_enabled')"
-                    :checked="old('scheduled_publish_enabled', $settings['scheduled_publish_enabled'] ?? false)"
-                    :help="__('dixlase-pages::admin/pages/settings.features.scheduled_publish_enabled_help')"
-                />
             </div>
         </section>
 

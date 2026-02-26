@@ -49,23 +49,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
             'default_status' => 'required|in:published,draft',
             'default_editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'default_storage_type' => ['required', Rule::enum(ContentStorageType::class)],
-            'blade_enabled' => 'boolean',
-            'scheduled_publish_enabled' => 'boolean',
         ];
-    }
-
-    /**
-     * バリデーション前の処理
-     */
-    protected function prepareForValidation(): void
-    {
-        // トグルが未送信の場合は false を設定
-        if (! $this->has('blade_enabled')) {
-            $this->merge(['blade_enabled' => false]);
-        }
-        if (! $this->has('scheduled_publish_enabled')) {
-            $this->merge(['scheduled_publish_enabled' => false]);
-        }
     }
 
     /**
@@ -80,8 +64,6 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
             'default_status' => __('dixlase-pages::admin/pages/settings.basic.default_status'),
             'default_editor_type' => __('dixlase-pages::admin/pages/settings.basic.default_editor_type'),
             'default_storage_type' => __('dixlase-pages::admin/pages/settings.basic.default_storage_type'),
-            'blade_enabled' => __('dixlase-pages::admin/pages/settings.features.blade_enabled'),
-            'scheduled_publish_enabled' => __('dixlase-pages::admin/pages/settings.features.scheduled_publish_enabled'),
         ];
     }
 
