@@ -365,21 +365,74 @@ class DixlasePagesAdminPagesController extends Controller
         // 設定データを取得
         $settings = DixlasePagesPageSetting::pluck('value', 'name')->toArray();
 
-        // エディタータイプ選択肢
-        $editorTypeOptions = [];
-        foreach (ContentEditorType::cases() as $type) {
-            $editorTypeOptions[$type->value] = __($type->translationKey());
+        // デフォルトステータスのラジオカードオプション
+        $statusIcons = [
+            'draft' => 'fas fa-pencil-alt',
+            'published' => 'fas fa-eye',
+        ];
+        $statusCardOptions = [];
+        foreach ([ContentStatus::DRAFT, ContentStatus::PUBLISHED] as $status) {
+            $statusCardOptions[] = [
+                'value' => $status->value,
+                'label' => $status->label(),
+                'description' => $status->description(),
+                'icon' => $statusIcons[$status->value],
+                'color' => $status->cssClass(),
+            ];
         }
 
-        // ストレージタイプ選択肢
-        $storageTypeOptions = [];
-        foreach (ContentStorageType::cases() as $type) {
-            $storageTypeOptions[$type->value] = __($type->translationKey());
+        // エディタータイプのラジオカードオプション
+        $editorIcons = [
+            'gui' => 'fas fa-magic',
+            'markdown' => 'fab fa-markdown',
+            'html' => 'fas fa-code',
+            'blade' => 'fab fa-laravel',
+        ];
+        $editorColors = [
+            'gui' => 'purple',
+            'markdown' => 'blue',
+            'html' => 'orange',
+            'blade' => 'red',
+        ];
+        $editorTypeCardOptions = [];
+        foreach (ContentEditorType::cases() as $type) {
+            $editorTypeCardOptions[] = [
+                'value' => $type->value,
+                'label' => __($type->translationKey()),
+                'description' => __($type->descriptionKey()),
+                'icon' => $editorIcons[$type->value],
+                'color' => $editorColors[$type->value],
+            ];
         }
+
+        // ストレージタイプのラジオカードオプション
+        $storageIcons = [
+            'database' => 'fas fa-database',
+            'file' => 'fas fa-file-code',
+        ];
+        $storageColors = [
+            'database' => 'blue',
+            'file' => 'green',
+        ];
+        $storageTypeCardOptions = [];
+        foreach (ContentStorageType::cases() as $type) {
+            $storageTypeCardOptions[] = [
+                'value' => $type->value,
+                'label' => __($type->translationKey()),
+                'description' => __($type->descriptionKey()),
+                'icon' => $storageIcons[$type->value],
+                'color' => $storageColors[$type->value],
+            ];
+        }
+
+        // ページディレクトリのURL表示用ベースURL
+        $siteUrl = config('app.url');
 
         $this->viewParams['settings'] = $settings;
-        $this->viewParams['editorTypeOptions'] = $editorTypeOptions;
-        $this->viewParams['storageTypeOptions'] = $storageTypeOptions;
+        $this->viewParams['statusCardOptions'] = $statusCardOptions;
+        $this->viewParams['editorTypeCardOptions'] = $editorTypeCardOptions;
+        $this->viewParams['storageTypeCardOptions'] = $storageTypeCardOptions;
+        $this->viewParams['siteUrl'] = $siteUrl;
 
         return view('dixlase-pages::admin.pages.settings', $this->viewParams);
     }

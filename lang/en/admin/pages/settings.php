@@ -28,8 +28,6 @@ return [
         'pages_directory' => 'Pages Directory',
         'pages_directory_help' => 'Directory name used in page URLs',
         'default_status' => 'Default Status',
-        'status_published' => 'Published',
-        'status_draft' => 'Draft',
         'default_editor_type' => 'Default Editor Type',
         'default_editor_type_help' => 'Default editor type when creating new pages.',
         'default_storage_type' => 'Default Storage Method',

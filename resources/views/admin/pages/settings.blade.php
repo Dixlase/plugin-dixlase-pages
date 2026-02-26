@@ -30,45 +30,78 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
             <div class="grid grid-cols-1 gap-6">
                 {{-- ページディレクトリ --}}
-                <x-form-text
-                    name="pages_directory"
-                    :label="__('dixlase-pages::admin/pages/settings.basic.pages_directory')"
-                    :value="old('pages_directory', $settings['pages_directory'] ?? 'pages')"
-                    :help="__('dixlase-pages::admin/pages/settings.basic.pages_directory_help')"
-                    required
-                />
+                <div>
+                    <x-form-label
+                        for="pages_directory"
+                        :text="__('dixlase-pages::admin/pages/settings.basic.pages_directory')"
+                        :required="true"
+                    />
+                    <div class="mt-1 flex items-center">
+                        <span class="inline-flex items-center px-3 py-2 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">
+                            {{ $siteUrl }}/
+                        </span>
+                        <input
+                            type="text"
+                            name="pages_directory"
+                            id="pages_directory"
+                            value="{{ old('pages_directory', $settings['pages_directory'] ?? 'pages') }}"
+                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.pages_directory_help')" />
+                    <x-form-error name="pages_directory" />
+                </div>
 
                 {{-- デフォルトステータス --}}
-                <x-form-select
-                    name="default_status"
-                    :label="__('dixlase-pages::admin/pages/settings.basic.default_status')"
-                    :value="old('default_status', $settings['default_status'] ?? 'published')"
-                    :options="[
-                        'published' => __('dixlase-pages::admin/pages/settings.basic.status_published'),
-                        'draft' => __('dixlase-pages::admin/pages/settings.basic.status_draft'),
-                    ]"
-                    required
-                />
+                <div>
+                    <x-form-label
+                        :text="__('dixlase-pages::admin/pages/settings.basic.default_status')"
+                        :required="true"
+                        class="mb-2"
+                    />
+                    <x-form-radio-card-group
+                        name="default_status"
+                        :options="$statusCardOptions"
+                        :value="old('default_status', $settings['default_status'] ?? 'published')"
+                        :columns="2"
+                    />
+                    <x-form-error name="default_status" />
+                </div>
 
                 {{-- デフォルトエディタタイプ --}}
-                <x-form-select
-                    name="default_editor_type"
-                    :label="__('dixlase-pages::admin/pages/settings.basic.default_editor_type')"
-                    :value="old('default_editor_type', $settings['default_editor_type'] ?? 'html')"
-                    :options="$editorTypeOptions"
-                    :help="__('dixlase-pages::admin/pages/settings.basic.default_editor_type_help')"
-                    required
-                />
+                <div>
+                    <x-form-label
+                        :text="__('dixlase-pages::admin/pages/settings.basic.default_editor_type')"
+                        :required="true"
+                        class="mb-2"
+                    />
+                    <x-form-radio-card-group
+                        name="default_editor_type"
+                        :options="$editorTypeCardOptions"
+                        :value="old('default_editor_type', $settings['default_editor_type'] ?? 'html')"
+                        :columns="4"
+                    />
+                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_editor_type_help')" />
+                    <x-form-error name="default_editor_type" />
+                </div>
 
                 {{-- デフォルト保存方式 --}}
-                <x-form-select
-                    name="default_storage_type"
-                    :label="__('dixlase-pages::admin/pages/settings.basic.default_storage_type')"
-                    :value="old('default_storage_type', $settings['default_storage_type'] ?? 'database')"
-                    :options="$storageTypeOptions"
-                    :help="__('dixlase-pages::admin/pages/settings.basic.default_storage_type_help')"
-                    required
-                />
+                <div>
+                    <x-form-label
+                        :text="__('dixlase-pages::admin/pages/settings.basic.default_storage_type')"
+                        :required="true"
+                        class="mb-2"
+                    />
+                    <x-form-radio-card-group
+                        name="default_storage_type"
+                        :options="$storageTypeCardOptions"
+                        :value="old('default_storage_type', $settings['default_storage_type'] ?? 'database')"
+                        :columns="2"
+                    />
+                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_storage_type_help')" />
+                    <x-form-error name="default_storage_type" />
+                </div>
             </div>
         </section>
 
