@@ -39,4 +39,5 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     :statusOptions="$statusOptions"
     :publishedAtValue="$publishedAtValue"
     :isEditMode="$page->exists"
+    :fileStorageBasePath="$fileStorageBasePath"
 />

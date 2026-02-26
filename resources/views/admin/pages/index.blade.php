@@ -25,11 +25,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     <!-- ページヘッダー -->
     <div class="flex justify-start mb-4">
         @include('components::form-button', [
-            'type' => 'button',
+            'type' => 'link',
             'variant' => 'primary',
             'label' => __('common.create'),
             'icon' => 'fas fa-plus',
-            'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
+            'href' => route('dixlase-pages::admin.pages.create'),
         ])
     </div>
 
@@ -183,33 +183,39 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                         </time>
                                     </td>
                                     <td class="admin-table__cell admin-table__cell--actions" data-label="{{ __('common.actions') }}" role="gridcell">
-                                        <div class="flex flex-wrap gap-1">
-                                            @include('components::form-button', [
-                                                'type' => 'button',
-                                                'variant' => 'secondary',
-                                                'size' => 'sm',
-                                                'label' => __('common.edit'),
-                                                'icon' => 'fas fa-edit',
-                                                'class' => 'my-1',
-                                                'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.edit', $page) . "'",
-                                            ])
-                                            
-                                            @include('components::form-button', [
-                                                'type' => 'button',
-                                                'variant' => 'danger',
-                                                'size' => 'sm',
-                                                'label' => __('common.delete'),
-                                                'icon' => 'fas fa-trash',
-                                                'class' => 'my-1',
-                                                'onclick' => "if(confirm('" . __('dixlase-pages::admin/pages/index.delete_confirm') . "')) {
-                                                    var form = document.createElement('form');
-                                                    form.method = 'POST';
-                                                    form.action = '" . route('dixlase-pages::admin.pages.destroy', $page) . "';
-                                                    form.innerHTML = '<input type=\"hidden\" name=\"_token\" value=\"" . csrf_token() . "\"><input type=\"hidden\" name=\"_method\" value=\"DELETE\">';
-                                                    document.body.appendChild(form);
-                                                    form.submit();
-                                                }",
-                                            ])
+                                        <div class="flex items-center justify-end gap-2">
+                                            <x-form-button
+                                                type="link"
+                                                variant="ghost"
+                                                size="sm"
+                                                icon="fas fa-edit"
+                                                :href="route('dixlase-pages::admin.pages.edit', $page)"
+                                                title="{{ __('common.edit') }}"
+                                            />
+
+                                            <form action="{{ route('dixlase-pages::admin.pages.destroy', $page) }}" method="POST" id="deleteForm-{{ $page->id }}">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                            <x-form-button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                icon="fas fa-trash"
+                                                class="!text-red-600 hover:!text-red-900 dark:!text-red-400 dark:hover:!text-red-300"
+                                                :xClick="'openModal(\'deleteModal-' . $page->id . '\')'"
+                                                title="{{ __('common.delete') }}"
+                                            />
+                                            <x-ui-modal
+                                                :id="'deleteModal-' . $page->id"
+                                                :title="__('dixlase-pages::admin/pages/index.delete_confirm_title')"
+                                                :message="__('dixlase-pages::admin/pages/index.delete_confirm')"
+                                                :confirm_label="__('common.delete')"
+                                                :cancel_label="__('common.cancel')"
+                                                icon_type="danger"
+                                                confirm_color="red"
+                                                :form="'deleteForm-' . $page->id"
+                                            />
                                         </div>
                                     </td>
                                 </tr>
@@ -251,11 +257,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         {{ __('dixlase-pages::admin/pages/index.no_pages_description') }}
                     </p>
                     @include('components::form-button', [
-                        'type' => 'button',
+                        'type' => 'link',
                         'variant' => 'primary',
                         'label' => __('common.create'),
                         'icon' => 'fas fa-plus',
-                        'onclick' => "window.location.href='" . route('dixlase-pages::admin.pages.create') . "'",
+                        'href' => route('dixlase-pages::admin.pages.create'),
                     ])
                 </div>
             @endif

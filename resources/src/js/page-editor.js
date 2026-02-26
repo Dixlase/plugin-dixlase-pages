@@ -26,6 +26,7 @@ document.addEventListener('alpine:init', () => {
         publishedAt: config.publishedAt || '',
         slugBaseUrl: config.slugBaseUrl || '',
         isEditMode: config.isEditMode || false,
+        fileStorageBasePath: config.fileStorageBasePath || '',
 
         init() {
             // 右サイドバーの有効化をレイアウトに通知
@@ -75,7 +76,7 @@ document.addEventListener('alpine:init', () => {
                 'gui': 'json',
             };
             const ext = extensions[this.editorType] || 'txt';
-            return `storage/app/pages/${this.identifier}.${ext}`;
+            return `${this.fileStorageBasePath}/${this.identifier}.${ext}`;
         },
 
         /**
