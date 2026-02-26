@@ -226,23 +226,17 @@ class DixlasePagesAdminPagesController extends Controller
 
         $content = $validated['content'] ?? '';
 
-        // コンテンツの保存先を決定
-        $contentData = ['content' => null];
-
+        // ファイル保存の場合はファイルにも保存
         if ($storageType === 'file') {
-            // ファイル保存の場合はコンテンツをファイルに保存
             $this->contentService->saveToFile(
                 $validated['slug'],
                 app()->getLocale(),
                 $validated['editor_type'],
                 $content
             );
-        } else {
-            // DB保存の場合は content カラムに保存
-            $contentData['content'] = $content;
         }
 
-        // ページを作成
+        // ページを作成（常にDBにもコンテンツを保存 = バックアップ）
         $page = DixlasePagesPage::create([
             'slug' => $validated['slug'],
             'title' => $validated['title'] ?? null,
@@ -252,7 +246,7 @@ class DixlasePagesAdminPagesController extends Controller
             'editor_type' => $validated['editor_type'],
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
-            ...$contentData,
+            'content' => $content,
         ]);
 
         return redirect()
@@ -319,35 +313,25 @@ class DixlasePagesAdminPagesController extends Controller
 
         $content = $validated['content'] ?? '';
 
-        // コンテンツの保存先を決定
-        $contentData = ['content' => null];
-
         // 保存方法が変更された場合の処理
         if ($oldStorageType !== $storageType) {
             if ($oldStorageType === 'file' && $storageType === 'database') {
-                // ファイル→DB: ファイルからコンテンツを読み込んでDBに保存、ファイルを削除
-                $fileContent = $this->contentService->loadFromFile($validated['slug'], $locale, $editorType);
-                if ($fileContent !== null) {
-                    $content = $fileContent;
-                }
+                // ファイル→DB: ファイルを削除（DBには常にバックアップがあるため読み込み不要）
                 $this->contentService->deleteFile($validated['slug'], $locale, $editorType);
             }
         }
 
+        // ファイル保存の場合はファイルにも保存
         if ($storageType === 'file') {
-            // ファイル保存の場合はコンテンツをファイルに保存
             $this->contentService->saveToFile(
                 $validated['slug'],
                 $locale,
                 $editorType,
                 $content
             );
-        } else {
-            // DB保存の場合は content カラムに保存
-            $contentData['content'] = $content;
         }
 
-        // ページを更新
+        // ページを更新（常にDBにもコンテンツを保存 = バックアップ）
         $page->update([
             'slug' => $validated['slug'],
             'title' => $validated['title'] ?? null,
@@ -356,7 +340,7 @@ class DixlasePagesAdminPagesController extends Controller
             'storage_type' => $storageType,
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
-            ...$contentData,
+            'content' => $content,
         ]);
 
         return redirect()
