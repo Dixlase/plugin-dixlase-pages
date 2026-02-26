@@ -89,9 +89,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         @php
                             $editorType = $page->editor_type->value ?? 'html';
-                            $content = $page->content ?? '';
+                            $content = $page->getContentByEditorType() ?? '';
                         @endphp
-                        
+
                         @if($editorType === 'markdown')
                             {{-- Markdownの場合はパースして出力（ショートコード処理付き） --}}
                             {!! shortcode_parse(\Illuminate\Support\Str::markdown($content)) !!}
