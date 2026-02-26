@@ -23,12 +23,15 @@
 
 namespace Plugins\DixlasePages\App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
+use App\Contracts\RouteSlugProvider;
+use App\DTO\RouteSlug\RegisteredSlug;
 use App\Traits\PluginLoaderTrait;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
+use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageLinkableProvider;
 
-class DixlasePagesServiceProvider extends ServiceProvider
+class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugProvider
 {
     use PluginLoaderTrait;
     
@@ -46,15 +49,51 @@ class DixlasePagesServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        // ルートスラッグプロバイダーの登録
+        $this->registerRouteSlugProvider();
+
         // ビューの登録
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'dixlase-pages');
-        
+
         // 翻訳ファイルの登録
         $this->loadTranslationsFrom(__DIR__ . '/../../lang', 'dixlase-pages');
-        
+
         // マイグレーションの登録
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
-        
+
         // 注: ルート（routes/web.php, routes/admin.php, routes/api.php）はPluginServiceProviderが自動読み込み
+    }
+
+    /**
+     * ルートスラッグプロバイダーを登録
+     */
+    protected function registerRouteSlugProvider(): void
+    {
+        if (app()->bound(\App\Services\RouteSlugRegistry::class)) {
+            app(\App\Services\RouteSlugRegistry::class)
+                ->registerProvider('dixlase-pages', $this);
+        }
+    }
+
+    /**
+     * プラグインが管理するルートスラッグを返す
+     *
+     * @return array<RegisteredSlug>
+     */
+    public function getRouteSlugs(): array
+    {
+        try {
+            $slug = DixlasePagesPageSetting::getValue('pages_directory', 'pages');
+        } catch (\Exception $e) {
+            $slug = 'pages';
+        }
+
+        return [
+            new RegisteredSlug(
+                slug: $slug,
+                owner: 'dixlase-pages:pages_directory',
+                label: 'dixlase-pages::route-slug.owners.pages_directory',
+            ),
+        ];
     }
 }

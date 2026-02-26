@@ -27,11 +27,12 @@ return [
     'slug_unique' => 'このスラッグは既に使用されています。',
     'content_required' => 'コンテンツは必須です。',
     'status_required' => 'ステータスは必須です。',
+    'published_at_required' => '日付指定の場合、公開日時は必須です。',
     'published_at_date' => '公開日時は正しい日付形式で入力してください。',
     'published_at_future' => '公開日時は現在時刻以降を指定してください。',
     'pages_directory_required' => 'ページディレクトリは必須です。',
     'pages_directory_alpha_dash' => 'ページディレクトリは半角英数字とハイフン、アンダースコアのみ使用できます。',
     'default_status_required' => 'デフォルトステータスは必須です。',
-    'default_status_in' => 'デフォルトステータスは公開または下書きを選択してください。',
+    'default_status_in' => 'デフォルトステータスは公開、下書き、または日付指定を選択してください。',
     'at_least_one_title_required' => 'タイトルは必須です。',
 ];
