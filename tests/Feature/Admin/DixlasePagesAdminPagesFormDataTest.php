@@ -91,13 +91,11 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         $this->assertArrayHasKey('editorColors', $result);
         $this->assertArrayHasKey('statusValue', $result);
         $this->assertArrayHasKey('publishedAtValue', $result);
-        $this->assertArrayHasKey('ogpImage', $result);
         $this->assertArrayHasKey('fileStorageBasePath', $result);
 
         $this->assertSame('', $result['content']);
         $this->assertSame('draft', $result['statusValue']);
         $this->assertSame('', $result['publishedAtValue']);
-        $this->assertNull($result['ogpImage']);
     }
 
     /**

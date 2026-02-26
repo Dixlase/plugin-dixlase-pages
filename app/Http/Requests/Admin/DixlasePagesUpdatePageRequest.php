@@ -59,8 +59,6 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
-            'meta_description' => ['nullable', 'string', 'max:500'],
-            'ogp_image_id' => ['nullable', 'exists:media,id'],
             'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
             'status' => ['required', Rule::enum(ContentStatus::class)],
             'published_at' => ['nullable', 'date', 'after_or_equal:now'],
@@ -84,11 +82,6 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // ogp_image_id が空文字の場合は null に変換
-        if ($this->ogp_image_id === '') {
-            $this->merge(['ogp_image_id' => null]);
-        }
-
         // 日付指定以外の場合はpublished_atをクリア
         if ($this->status !== ContentStatus::SCHEDULED->value) {
             $this->merge(['published_at' => null]);

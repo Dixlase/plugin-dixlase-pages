@@ -25,10 +25,8 @@ namespace Plugins\DixlasePages\App\Models;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
-use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -50,8 +48,6 @@ class DixlasePagesPage extends Model
         'slug',
         'title',
         'content',
-        'meta_description',
-        'ogp_image_id',
         'storage_type',
         'editor_type',
         'status',
@@ -145,14 +141,6 @@ class DixlasePagesPage extends Model
     public function scopeScheduled($query)
     {
         return $query->where('status', ContentStatus::SCHEDULED->value);
-    }
-
-    /**
-     * OGP画像とのリレーション
-     */
-    public function ogpImage(): BelongsTo
-    {
-        return $this->belongsTo(Media::class, 'ogp_image_id');
     }
 
     /**

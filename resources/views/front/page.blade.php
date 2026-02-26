@@ -22,20 +22,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('title', $page->title)
 
-@push('meta')
-    @if($page->meta_description)
-        <meta name="description" content="{{ $page->meta_description }}">
-    @endif
-    
-    @if($page->ogp_image)
-        <meta property="og:image" content="{{ $page->ogp_image }}">
-    @endif
-    
-    <meta property="og:title" content="{{ $page->title }}">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="{{ url()->current() }}">
-@endpush
-
 @section('content')
     <div class="dixlase-page">
         <!-- プレビューモード表示 -->

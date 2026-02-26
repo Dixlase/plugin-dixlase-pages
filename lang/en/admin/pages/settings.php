@@ -22,7 +22,7 @@
 
 return [
     'heading' => 'Page Settings',
-    'description' => 'Configure page management settings. You can set the pages directory, default status, and feature toggles.',
+    'description' => 'Configure page management settings including directory, defaults, and features.',
     'basic' => [
         'title' => 'Basic Settings',
         'pages_directory' => 'Pages Directory',
@@ -30,13 +30,17 @@ return [
         'default_status' => 'Default Status',
         'status_published' => 'Published',
         'status_draft' => 'Draft',
+        'default_editor_type' => 'Default Editor Type',
+        'default_editor_type_help' => 'Default editor type when creating new pages.',
+        'default_storage_type' => 'Default Storage Method',
+        'default_storage_type_help' => 'Default content storage method when creating new pages.',
     ],
     'features' => [
         'title' => 'Feature Settings',
-        'enable_comments' => 'Enable Comments',
-        'enable_comments_help' => 'Display comment functionality on pages',
-        'seo_enabled' => 'Enable SEO Features',
-        'seo_enabled_help' => 'Enable meta tags and SEO optimization features',
+        'blade_enabled' => 'Allow Blade Editor',
+        'blade_enabled_help' => 'Enable the Blade editor for new pages. Only enable if trusted administrators will use it.',
+        'scheduled_publish_enabled' => 'Enable Scheduled Publishing',
+        'scheduled_publish_enabled_help' => 'Allow pages to be scheduled for future publication.',
     ],
     'confirm_title' => 'Save Page Settings',
     'confirm_message' => 'Are you sure you want to save the page settings?',
