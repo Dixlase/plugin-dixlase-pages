@@ -24,6 +24,7 @@ namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStorageType;
+use App\Rules\UniqueRouteSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -45,7 +46,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pages_directory' => 'required|string|max:255|alpha_dash',
+            'pages_directory' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:pages_directory')],
             'default_status' => 'required|in:published,draft,scheduled',
             'default_editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'default_storage_type' => ['required', Rule::enum(ContentStorageType::class)],

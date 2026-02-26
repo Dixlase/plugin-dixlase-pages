@@ -61,7 +61,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             'content' => ['nullable', 'string'],
             'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
             'status' => ['required', Rule::enum(ContentStatus::class)],
-            'published_at' => ['nullable', 'date', 'after_or_equal:now'],
+            'published_at' => ['required_if:status,scheduled', 'nullable', 'date', 'after_or_equal:now'],
         ];
     }
 
@@ -105,6 +105,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             'content.required' => __('dixlase-pages::admin/pages/validation.content_required'),
             'status.required' => __('dixlase-pages::admin/pages/validation.status_required'),
             'published_at.date' => __('dixlase-pages::admin/pages/validation.published_at_date'),
+            'published_at.required_if' => __('dixlase-pages::admin/pages/validation.published_at_required'),
             'published_at.after_or_equal' => __('dixlase-pages::admin/pages/validation.published_at_future'),
         ];
     }
