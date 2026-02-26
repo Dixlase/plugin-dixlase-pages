@@ -64,7 +64,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         name="default_status"
                         :options="$statusCardOptions"
                         :value="old('default_status', $settings['default_status'] ?? 'published')"
-                        :columns="2"
+                        :columns="3"
                     />
                     <x-form-error name="default_status" />
                 </div>
