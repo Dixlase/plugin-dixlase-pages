@@ -74,8 +74,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     @include('components::ui-pagination-controls', [
         'paginator' => $pages,
         'currentPerPage' => request('per_page', 25),
-        'totalLabel' => 'components.pagination.total_count',
-        'perPageLabel' => 'components.pagination.per_page_label',
+        'totalLabel' => 'components/ui-pagination.total_count',
+        'perPageLabel' => 'components/ui-pagination.per_page_label',
         'showSort' => true,
         'sortOptions' => [
             'title' => __('common.title'),
