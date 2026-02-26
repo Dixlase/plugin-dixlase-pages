@@ -66,7 +66,7 @@ document.addEventListener('alpine:init', () => {
          * ファイル保存時のファイルパスを返す
          */
         get filePath() {
-            if (!this.isFileStorage || !this.identifier) {
+            if (!this.isFileStorage || !this.slug) {
                 return '';
             }
             const extensions = {
@@ -76,7 +76,7 @@ document.addEventListener('alpine:init', () => {
                 'gui': 'json',
             };
             const ext = extensions[this.editorType] || 'txt';
-            return `${this.fileStorageBasePath}/${this.identifier}.${ext}`;
+            return `${this.fileStorageBasePath}/${this.slug}.${ext}`;
         },
 
         /**
