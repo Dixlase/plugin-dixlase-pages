@@ -252,7 +252,7 @@ class DixlasePagesAdminPagesController extends Controller
         ]);
 
         return redirect()
-            ->route('dixlase-pages::admin.pages.index')
+            ->route('dixlase-pages::admin.pages.edit', $page)
             ->with('success', __('dixlase-pages::admin/pages/create.success'));
     }
 
