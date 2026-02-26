@@ -33,13 +33,6 @@ return [
         'default_storage_type' => 'Default Storage Method',
         'default_storage_type_help' => 'Default content storage method when creating new pages.',
     ],
-    'features' => [
-        'title' => 'Feature Settings',
-        'blade_enabled' => 'Allow Blade Editor',
-        'blade_enabled_help' => 'Enable the Blade editor for new pages. Only enable if trusted administrators will use it.',
-        'scheduled_publish_enabled' => 'Enable Scheduled Publishing',
-        'scheduled_publish_enabled_help' => 'Allow pages to be scheduled for future publication.',
-    ],
     'confirm_title' => 'Save Page Settings',
     'confirm_message' => 'Are you sure you want to save the page settings?',
     'success' => 'Page settings have been updated successfully.',

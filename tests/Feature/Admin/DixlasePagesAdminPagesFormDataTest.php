@@ -198,8 +198,6 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
             'common.content_editor.markdown_description',
             'common.content_editor.html',
             'common.content_editor.html_description',
-            'common.content_editor.blade',
-            'common.content_editor.blade_description',
         ];
 
         foreach ($requiredKeys as $key) {
@@ -215,7 +213,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
-        $requiredEditors = ['gui', 'markdown', 'html', 'blade'];
+        $requiredEditors = ['gui', 'markdown', 'html'];
 
         foreach ($requiredEditors as $editor) {
             $this->assertArrayHasKey($editor, $result['editorIcons']);

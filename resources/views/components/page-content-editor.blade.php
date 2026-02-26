@@ -235,21 +235,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     ])
                 </div>
 
-                {{-- Blade エディタ --}}
-                <div x-show="editorType === 'blade'" x-cloak>
-                    @include('components::form-textarea', [
-                        'id' => 'content_blade',
-                        'name' => 'content',
-                        'value' => $content,
-                        'class' => 'min-h-96 font-mono text-sm',
-                        'xModel' => 'content',
-                    ])
-                    <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>
-                        {{ __('common.content_editor.blade_warning') }}
-                    </div>
-                </div>
-
                 @include('components::form-error', ['name' => 'content'])
             </div>
 

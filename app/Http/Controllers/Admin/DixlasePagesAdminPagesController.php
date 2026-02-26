@@ -123,8 +123,8 @@ class DixlasePagesAdminPagesController extends Controller
      */
     private function prepareFormData(DixlasePagesPage $page, ?string $fileContents = null): array
     {
-        // コンテンツ取得（ファイル保存の場合はファイルから）
-        $content = $fileContents ?? ($page->getContentByEditorType() ?? '');
+        // コンテンツ取得（新規ページの場合は空、既存ページはファイルまたはDBから）
+        $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
 
         // ページディレクトリ設定
         $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
@@ -152,8 +152,6 @@ class DixlasePagesAdminPagesController extends Controller
             'common.content_editor.markdown_description' => __('common.content_editor.markdown_description'),
             'common.content_editor.html' => __('common.content_editor.html'),
             'common.content_editor.html_description' => __('common.content_editor.html_description'),
-            'common.content_editor.blade' => __('common.content_editor.blade'),
-            'common.content_editor.blade_description' => __('common.content_editor.blade_description'),
         ];
 
         // エディタータイプ別アイコン・色マップ
@@ -161,17 +159,15 @@ class DixlasePagesAdminPagesController extends Controller
             'gui' => 'fas fa-magic',
             'markdown' => 'fab fa-markdown',
             'html' => 'fas fa-code',
-            'blade' => 'fab fa-laravel',
         ];
         $editorColors = [
             'gui' => 'purple',
             'markdown' => 'blue',
             'html' => 'orange',
-            'blade' => 'red',
         ];
 
         // old()込みのステータス値（Alpine.js初期化用）
-        $statusValue = old('status', $page->exists ? $page->status->value : 'draft');
+        $statusValue = old('status', $page->status->value);
         $publishedAtValue = old('published_at', $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '');
 
         // ファイル保存時の表示用ベースパス
@@ -198,6 +194,12 @@ class DixlasePagesAdminPagesController extends Controller
     public function create()
     {
         $page = new DixlasePagesPage();
+
+        // 設定のデフォルト値を適用
+        $page->status = DixlasePagesPageSetting::getValue('default_status', 'draft');
+        $page->editor_type = DixlasePagesPageSetting::getValue('default_editor_type', 'html');
+        $page->storage_type = DixlasePagesPageSetting::getValue('default_storage_type', 'database');
+
         $formData = $this->prepareFormData($page);
 
         return view('dixlase-pages::admin.pages.create', array_merge(
@@ -381,27 +383,29 @@ class DixlasePagesAdminPagesController extends Controller
             ];
         }
 
-        // エディタータイプのラジオカードオプション
+        // エディタータイプのラジオカードオプション（Bladeは現在無効）
         $editorIcons = [
             'gui' => 'fas fa-magic',
             'markdown' => 'fab fa-markdown',
             'html' => 'fas fa-code',
-            'blade' => 'fab fa-laravel',
         ];
         $editorColors = [
             'gui' => 'purple',
             'markdown' => 'blue',
             'html' => 'orange',
-            'blade' => 'red',
         ];
         $editorTypeCardOptions = [];
         foreach (ContentEditorType::cases() as $type) {
+            // Bladeエディタは現バージョンでは無効
+            if ($type === ContentEditorType::BLADE) {
+                continue;
+            }
             $editorTypeCardOptions[] = [
                 'value' => $type->value,
                 'label' => __($type->translationKey()),
                 'description' => __($type->descriptionKey()),
-                'icon' => $editorIcons[$type->value],
-                'color' => $editorColors[$type->value],
+                'icon' => $editorIcons[$type->value] ?? 'fas fa-file',
+                'color' => $editorColors[$type->value] ?? 'gray',
             ];
         }
 
