@@ -46,6 +46,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     'pageId' => null,
     // 編集モードフラグ
     'isEditMode' => false,
+    // ファイル保存時の表示用ベースパス
+    'fileStorageBasePath' => '',
 ])
 
 {{--
@@ -69,7 +71,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         slug: @js(old('slug', $slugValue)),
         publishedAt: '{{ $publishedAtValue }}',
         slugBaseUrl: '{{ $slugBaseUrl }}',
-        isEditMode: {{ $isEditMode ? 'true' : 'false' }}
+        isEditMode: {{ $isEditMode ? 'true' : 'false' }},
+        fileStorageBasePath: '{{ $fileStorageBasePath }}'
      })">
 
         {{-- ===== メインコンテンツエリア ===== --}}

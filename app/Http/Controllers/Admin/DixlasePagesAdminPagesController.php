@@ -177,6 +177,9 @@ class DixlasePagesAdminPagesController extends Controller
         // OGP画像モデル（プレビュー表示用）
         $ogpImage = $page->ogp_image_id ? $page->ogpImage : null;
 
+        // ファイル保存時の表示用ベースパス
+        $fileStorageBasePath = 'storage/app/private/' . $this->contentService->getBasePath();
+
         return compact(
             'content',
             'slugBaseUrl',
@@ -189,6 +192,7 @@ class DixlasePagesAdminPagesController extends Controller
             'statusValue',
             'publishedAtValue',
             'ogpImage',
+            'fileStorageBasePath',
         );
     }
 

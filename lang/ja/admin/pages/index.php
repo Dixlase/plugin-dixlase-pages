@@ -29,6 +29,7 @@ return [
     'status_filter' => 'ステータスフィルター',
     'list_section' => 'ページ一覧',
     'table_label' => 'ページ一覧テーブル',
+    'delete_confirm_title' => 'ページの削除',
     'delete_confirm' => 'このページを削除してもよろしいですか？',
     'no_pages_found' => 'ページが見つかりません。',
     'no_pages_description' => '新しいページを作成してください。',

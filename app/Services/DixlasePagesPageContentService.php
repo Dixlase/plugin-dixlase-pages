@@ -29,30 +29,56 @@ use Illuminate\Support\Facades\Storage;
  * ページコンテンツファイル管理サービス
  * ファイルベースのコンテンツ保存を管理
  * ManagesContentFilesトレイトを使用して共通機能を提供（ライセンス伝搬を避けるため継承なし）
+ *
+ * ファイル構造: storage/app/private/{plugin-slug}/{page-slug}.{extension}
+ * プラグインスラッグはplugin.jsonから動的に取得
  */
 class DixlasePagesPageContentService
 {
     use ManagesContentFiles;
 
     /**
-     * プラグインスラッグ
-     */
-    protected const PLUGIN_SLUG = 'dixlase-pages';
-
-    /**
      * コンストラクタ
+     * plugin.jsonからプラグインスラッグを取得してベースパスを設定
      */
     public function __construct()
     {
-        // storage/app/private/plugins/dixlase-pages/{page-slug}/
-        $this->basePath = 'plugins/' . self::PLUGIN_SLUG;
+        $pluginJson = json_decode(
+            file_get_contents(__DIR__ . '/../../plugin.json'),
+            true
+        );
+        $pluginSlug = $pluginJson['slug'] ?? 'dixlase-pages';
+
+        // storage/app/private/{plugin-slug}/{page-slug}.{extension}
+        $this->basePath = $pluginSlug;
         $this->disk = 'local';
         $this->defaultLocale = 'en';
     }
 
     /**
+     * ファイルパスを取得する（フラット構造）
+     * 構造: {basePath}/{slug}.{extension} または {basePath}/{slug}.{locale}.{extension}
+     * デフォルト言語はファイル名に言語コードを付けない
+     *
+     * @param string $slug スラッグ
+     * @param string $locale 言語コード
+     * @param string $editorType エディタータイプ
+     * @return string ファイルパス
+     */
+    public function getFilePath(string $slug, string $locale, string $editorType): string
+    {
+        $extension = $this->extensions[$editorType] ?? 'txt';
+
+        // デフォルト言語はファイル名に言語コードを付けない
+        if ($locale === $this->defaultLocale) {
+            return "{$this->basePath}/{$slug}.{$extension}";
+        }
+
+        return "{$this->basePath}/{$slug}.{$locale}.{$extension}";
+    }
+
+    /**
      * スラッグ変更時にファイルをリネームする（単一ロケール対応）
-     * コントローラーとの互換性のため、引数順序が異なるラッパーメソッド
      *
      * @param string $oldSlug 旧スラッグ
      * @param string $newSlug 新スラッグ
@@ -65,17 +91,36 @@ class DixlasePagesPageContentService
         $oldPath = $this->getFilePath($oldSlug, $locale, $editorType);
         $newPath = $this->getFilePath($newSlug, $locale, $editorType);
 
-        // ファイルが存在する場合はリネーム
         if (Storage::disk($this->disk)->exists($oldPath)) {
-            // 新しいディレクトリが存在しない場合は作成
-            $newDirectory = dirname($newPath);
-            if (!Storage::disk($this->disk)->exists($newDirectory)) {
-                Storage::disk($this->disk)->makeDirectory($newDirectory);
-            }
-            
             return Storage::disk($this->disk)->move($oldPath, $newPath);
         }
-        
+
         return true;
+    }
+
+    /**
+     * スラッグに関連するすべてのファイルを削除する（フラット構造対応）
+     * ディレクトリではなく、スラッグにマッチするファイルを検索して削除
+     *
+     * @param string $slug スラッグ
+     * @return bool すべて削除成功時はtrue
+     */
+    public function deleteDirectory(string $slug): bool
+    {
+        $files = Storage::disk($this->disk)->files($this->basePath);
+        $success = true;
+        $pattern = '/^' . preg_quote($slug, '/') . '\./';
+
+        foreach ($files as $file) {
+            $filename = basename($file);
+            // {slug}.{ext} または {slug}.{locale}.{ext} パターンに一致するファイルを削除
+            if (preg_match($pattern, $filename)) {
+                if (! Storage::disk($this->disk)->delete($file)) {
+                    $success = false;
+                }
+            }
+        }
+
+        return $success;
     }
 }

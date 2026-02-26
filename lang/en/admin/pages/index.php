@@ -29,6 +29,7 @@ return [
     'status_filter' => 'Status Filter',
     'list_section' => 'Page List',
     'table_label' => 'Page List Table',
+    'delete_confirm_title' => 'Delete Page',
     'delete_confirm' => 'Are you sure you want to delete this page?',
     'no_pages_found' => 'No pages found.',
     'no_pages_description' => 'Please create a new page.',
