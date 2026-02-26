@@ -28,8 +28,6 @@ return [
         'pages_directory' => 'ページディレクトリ',
         'pages_directory_help' => 'ページのURLに使用するディレクトリ名',
         'default_status' => 'デフォルトステータス',
-        'status_published' => '公開',
-        'status_draft' => '下書き',
         'default_editor_type' => 'デフォルトエディタタイプ',
         'default_editor_type_help' => '新規ページ作成時のデフォルトエディタタイプ。',
         'default_storage_type' => 'デフォルト保存方式',
