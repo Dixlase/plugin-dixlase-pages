@@ -21,18 +21,12 @@
  */
 
 return [
-    'ogp_section' => 'OGP / SEO Settings',
     'publish_section' => 'Publish Settings',
     'title' => 'Title',
     'title_placeholder' => 'Enter page title',
     'slug' => 'Slug',
     'slug_help' => 'URL identifier. Only lowercase letters, numbers, and hyphens. Auto-generated from title if empty.',
     'slug_url_preview' => 'Page URL',
-    'meta_description' => 'Description text',
-    'meta_description_help' => 'Displayed in search engine results. 120-160 characters recommended.',
-    'ogp_image' => 'OGP Image',
-    'ogp_image_help' => 'Image displayed when shared on social media.',
-    'select_ogp_image' => 'Select OGP Image',
     'status' => 'Status',
     'published_at' => 'Publish Date & Time',
     'published_at_help' => 'Set the date and time for scheduled publishing.',

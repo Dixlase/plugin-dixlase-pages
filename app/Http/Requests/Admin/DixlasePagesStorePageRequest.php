@@ -58,8 +58,6 @@ class DixlasePagesStorePageRequest extends FormRequest
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
-            'meta_description' => ['nullable', 'string', 'max:500'],
-            'ogp_image_id' => ['nullable', 'exists:media,id'],
             'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
             'editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'status' => ['required', Rule::enum(ContentStatus::class)],
@@ -84,11 +82,6 @@ class DixlasePagesStorePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // ogp_image_id が空文字の場合は null に変換
-        if ($this->ogp_image_id === '') {
-            $this->merge(['ogp_image_id' => null]);
-        }
-
         // スラッグが空の場合、タイトルから自動生成
         if (empty($this->slug) && !empty($this->title)) {
             $this->merge(['slug' => $this->convertToSlug($this->title)]);

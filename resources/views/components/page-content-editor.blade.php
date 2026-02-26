@@ -34,10 +34,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     // スラッグ
     'slugValue' => '',
     'slugBaseUrl' => '',
-    // OGP/SEO
-    'metaDescription' => '',
-    'ogpImageId' => null,
-    'ogpImage' => null,
     // ステータス
     'statusValue' => 'draft',
     'statusOptions' => [],
@@ -56,8 +52,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 | Main Content                     |[>]| Right Sidebar  |
 |  Title                           |   | Slug           |
 |  Editor Type (radio cards)       |   | Storage Type   |
-|  Content Editor                  |   | OGP / SEO      |
-|                                  |   | Publish        |
+|  Content Editor                  |   | Publish        |
+|                                  |   |                |
 +----------------------------------+---+----------------+
 --}}
 
@@ -342,45 +338,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-error', ['name' => 'storage_type'])
             </div>
 
-            {{-- 6. OGP / SEO 設定 --}}
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                    {{ __('dixlase-pages::components/page-content-editor.ogp_section') }}
-                </h3>
-
-                {{-- meta_description --}}
-                <div class="mb-4">
-                    @include('components::form-label', [
-                        'for' => 'meta_description',
-                        'text' => __('dixlase-pages::components/page-content-editor.meta_description'),
-                    ])
-                    @include('components::form-textarea', [
-                        'name' => 'meta_description',
-                        'value' => $metaDescription,
-                        'rows' => 3,
-                    ])
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ __('dixlase-pages::components/page-content-editor.meta_description_help') }}
-                    </p>
-                    @include('components::form-error', ['name' => 'meta_description'])
-                </div>
-
-                {{-- OGP画像 --}}
-                <div>
-                    <x-media.picker
-                        name="ogp_image_id"
-                        :label="__('dixlase-pages::components/page-content-editor.ogp_image')"
-                        :value="$ogpImageId"
-                        :media="$ogpImage"
-                        :help="__('dixlase-pages::components/page-content-editor.ogp_image_help')"
-                        :buttonText="__('dixlase-pages::components/page-content-editor.select_ogp_image')"
-                        aspectRatio="ogp"
-                    />
-                    @include('components::form-error', ['name' => 'ogp_image_id'])
-                </div>
-            </div>
-
-            {{-- 7. 公開設定 --}}
+            {{-- 6. 公開設定 --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                     {{ __('dixlase-pages::components/page-content-editor.publish_section') }}

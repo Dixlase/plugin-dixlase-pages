@@ -22,7 +22,10 @@
 
 namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
+use App\Enums\ContentEditorType;
+use App\Enums\ContentStorageType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
 {
@@ -44,9 +47,25 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
         return [
             'pages_directory' => 'required|string|max:255|alpha_dash',
             'default_status' => 'required|in:published,draft',
-            'enable_comments' => 'boolean',
-            'seo_enabled' => 'boolean',
+            'default_editor_type' => ['required', Rule::enum(ContentEditorType::class)],
+            'default_storage_type' => ['required', Rule::enum(ContentStorageType::class)],
+            'blade_enabled' => 'boolean',
+            'scheduled_publish_enabled' => 'boolean',
         ];
+    }
+
+    /**
+     * バリデーション前の処理
+     */
+    protected function prepareForValidation(): void
+    {
+        // トグルが未送信の場合は false を設定
+        if (! $this->has('blade_enabled')) {
+            $this->merge(['blade_enabled' => false]);
+        }
+        if (! $this->has('scheduled_publish_enabled')) {
+            $this->merge(['scheduled_publish_enabled' => false]);
+        }
     }
 
     /**
@@ -59,8 +78,10 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
         return [
             'pages_directory' => __('dixlase-pages::admin/pages/settings.basic.pages_directory'),
             'default_status' => __('dixlase-pages::admin/pages/settings.basic.default_status'),
-            'enable_comments' => __('dixlase-pages::admin/pages/settings.basic.enable_comments'),
-            'seo_enabled' => __('dixlase-pages::admin/pages/settings.basic.seo_enabled'),
+            'default_editor_type' => __('dixlase-pages::admin/pages/settings.basic.default_editor_type'),
+            'default_storage_type' => __('dixlase-pages::admin/pages/settings.basic.default_storage_type'),
+            'blade_enabled' => __('dixlase-pages::admin/pages/settings.features.blade_enabled'),
+            'scheduled_publish_enabled' => __('dixlase-pages::admin/pages/settings.features.scheduled_publish_enabled'),
         ];
     }
 

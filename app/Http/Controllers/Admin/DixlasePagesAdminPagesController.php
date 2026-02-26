@@ -22,6 +22,7 @@
 
 namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
+use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Traits\AdminInterfaceTrait;
@@ -64,8 +65,7 @@ class DixlasePagesAdminPagesController extends Controller
             $pages->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('content', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%")
-                    ->orWhere('meta_description', 'like', "%{$search}%");
+                    ->orWhere('slug', 'like', "%{$search}%");
             });
         }
 
@@ -174,9 +174,6 @@ class DixlasePagesAdminPagesController extends Controller
         $statusValue = old('status', $page->exists ? $page->status->value : 'draft');
         $publishedAtValue = old('published_at', $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '');
 
-        // OGP画像モデル（プレビュー表示用）
-        $ogpImage = $page->ogp_image_id ? $page->ogpImage : null;
-
         // ファイル保存時の表示用ベースパス
         $fileStorageBasePath = 'storage/app/private/' . $this->contentService->getBasePath();
 
@@ -191,7 +188,6 @@ class DixlasePagesAdminPagesController extends Controller
             'editorColors',
             'statusValue',
             'publishedAtValue',
-            'ogpImage',
             'fileStorageBasePath',
         );
     }
@@ -240,8 +236,6 @@ class DixlasePagesAdminPagesController extends Controller
         $page = DixlasePagesPage::create([
             'slug' => $validated['slug'],
             'title' => $validated['title'] ?? null,
-            'meta_description' => $validated['meta_description'] ?? null,
-            'ogp_image_id' => $validated['ogp_image_id'] ?? null,
             'storage_type' => $storageType,
             'editor_type' => $validated['editor_type'],
             'status' => $validated['status'],
@@ -335,8 +329,6 @@ class DixlasePagesAdminPagesController extends Controller
         $page->update([
             'slug' => $validated['slug'],
             'title' => $validated['title'] ?? null,
-            'meta_description' => $validated['meta_description'] ?? null,
-            'ogp_image_id' => $validated['ogp_image_id'] ?? null,
             'storage_type' => $storageType,
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
@@ -373,7 +365,21 @@ class DixlasePagesAdminPagesController extends Controller
         // 設定データを取得
         $settings = DixlasePagesPageSetting::pluck('value', 'name')->toArray();
 
+        // エディタータイプ選択肢
+        $editorTypeOptions = [];
+        foreach (ContentEditorType::cases() as $type) {
+            $editorTypeOptions[$type->value] = __($type->translationKey());
+        }
+
+        // ストレージタイプ選択肢
+        $storageTypeOptions = [];
+        foreach (ContentStorageType::cases() as $type) {
+            $storageTypeOptions[$type->value] = __($type->translationKey());
+        }
+
         $this->viewParams['settings'] = $settings;
+        $this->viewParams['editorTypeOptions'] = $editorTypeOptions;
+        $this->viewParams['storageTypeOptions'] = $storageTypeOptions;
 
         return view('dixlase-pages::admin.pages.settings', $this->viewParams);
     }
@@ -386,7 +392,7 @@ class DixlasePagesAdminPagesController extends Controller
         $validated = $request->validated();
 
         // 設定をデータベースに保存
-        DixlasePagesPageSetting::updateOrCreate($validated);
+        DixlasePagesPageSetting::setMany($validated);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.settings')

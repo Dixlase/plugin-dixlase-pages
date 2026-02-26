@@ -21,18 +21,12 @@
  */
 
 return [
-    'ogp_section' => 'OGP / SEO 設定',
     'publish_section' => '公開設定',
     'title' => 'タイトル',
     'title_placeholder' => 'ページタイトルを入力',
     'slug' => 'スラッグ',
     'slug_help' => 'URLに使用される識別子。半角英数字とハイフンのみ。空欄の場合はタイトルから自動生成されます。',
     'slug_url_preview' => 'ページURL',
-    'meta_description' => '説明文',
-    'meta_description_help' => '検索エンジンの検索結果に表示される説明文です。120〜160文字程度を推奨します。',
-    'ogp_image' => 'OGP画像',
-    'ogp_image_help' => 'SNSでシェアされた際に表示される画像です。',
-    'select_ogp_image' => 'OGP画像を選択',
     'status' => 'ステータス',
     'published_at' => '公開日時',
     'published_at_help' => '予約公開する日時を設定します。',

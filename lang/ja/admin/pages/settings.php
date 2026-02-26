@@ -22,7 +22,7 @@
 
 return [
     'heading' => 'ページ設定',
-    'description' => 'ページ管理の設定を行います。ページディレクトリ、デフォルトステータス、機能の有効化などを設定できます。',
+    'description' => 'ページ管理のディレクトリ、デフォルト値、機能の設定を行います。',
     'basic' => [
         'title' => '基本設定',
         'pages_directory' => 'ページディレクトリ',
@@ -30,13 +30,17 @@ return [
         'default_status' => 'デフォルトステータス',
         'status_published' => '公開',
         'status_draft' => '下書き',
+        'default_editor_type' => 'デフォルトエディタタイプ',
+        'default_editor_type_help' => '新規ページ作成時のデフォルトエディタタイプ。',
+        'default_storage_type' => 'デフォルト保存方式',
+        'default_storage_type_help' => '新規ページ作成時のデフォルト保存方式。',
     ],
     'features' => [
         'title' => '機能設定',
-        'enable_comments' => 'コメント機能を有効にする',
-        'enable_comments_help' => 'ページにコメント機能を表示します',
-        'seo_enabled' => 'SEO機能を有効にする',
-        'seo_enabled_help' => 'メタタグやSEO最適化機能を有効にします',
+        'blade_enabled' => 'Bladeエディタを許可',
+        'blade_enabled_help' => 'Bladeエディタを有効にします。信頼できる管理者のみが使用する場合に有効にしてください。',
+        'scheduled_publish_enabled' => 'スケジュール公開を有効にする',
+        'scheduled_publish_enabled_help' => 'ページの予約公開を許可します。',
     ],
     'confirm_title' => 'ページ設定の保存',
     'confirm_message' => 'ページ設定を保存してもよろしいですか？',
