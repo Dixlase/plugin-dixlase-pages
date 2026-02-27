@@ -2,6 +2,6 @@
 
 return [
     'owners' => [
-        'pages_directory' => 'ページディレクトリ',
+        'directory' => 'ページディレクトリ',
     ],
 ];

@@ -46,7 +46,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pages_directory' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:pages_directory')],
+            'pages_directory' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:directory')],
             'default_status' => 'required|in:published,draft,scheduled',
             'default_editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'default_storage_type' => ['required', Rule::enum(ContentStorageType::class)],

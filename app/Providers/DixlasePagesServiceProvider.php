@@ -91,8 +91,8 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
         return [
             new RegisteredSlug(
                 slug: $slug,
-                owner: 'dixlase-pages:pages_directory',
-                label: 'dixlase-pages::route-slug.owners.pages_directory',
+                owner: 'dixlase-pages:directory',
+                label: 'dixlase-pages::route-slug.owners.directory',
             ),
         ];
     }

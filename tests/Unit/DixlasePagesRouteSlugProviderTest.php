@@ -44,7 +44,7 @@ class DixlasePagesRouteSlugProviderTest extends TestCase
         $slugs = $provider->getRouteSlugs();
 
         $slug = $slugs[0];
-        $this->assertSame('dixlase-pages:pages_directory', $slug->owner);
+        $this->assertSame('dixlase-pages:directory', $slug->owner);
     }
 
     /**
@@ -56,7 +56,7 @@ class DixlasePagesRouteSlugProviderTest extends TestCase
         $slugs = $provider->getRouteSlugs();
 
         $slug = $slugs[0];
-        $this->assertSame('dixlase-pages::route-slug.owners.pages_directory', $slug->label);
+        $this->assertSame('dixlase-pages::route-slug.owners.directory', $slug->label);
     }
 
     /**
