@@ -127,7 +127,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         }
                     }" x-init="updateEditorOptions(); $watch('availableEditors', () => updateEditorOptions())">
                         <template x-if="editorOptions.length > 0">
-                            <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                            <div class="grid gap-4 grid-cols-1 sm:grid-cols-3">
                                 <template x-for="option in editorOptions" :key="option.value">
                                     <label class="relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-all duration-150"
                                            :class="[

@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @section('content')
 <div class="mx-auto">
     <!-- ページヘッダー -->
-    <div class="flex justify-start mb-4">
+    <div class="flex justify-end mb-4">
         @include('components::form-button', [
             'type' => 'link',
             'variant' => 'primary',
@@ -51,9 +51,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     'name' => 'status',
                     'options' => [
                         '' => 'dixlase-pages::admin/pages/index.all_status',
-                        'draft' => 'components.status.draft',
-                        'published' => 'components.status.published',
-                        'scheduled' => 'components.status.scheduled',
+                        'draft' => 'common.publish_status.draft',
+                        'published' => 'common.publish_status.published',
+                        'scheduled' => 'common.publish_status.scheduled',
                     ],
                     'value' => request('status'),
                 ])
@@ -247,15 +247,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 ])
             @else
                 <div class="admin-empty-state">
-                    <div class="admin-empty-state__icon">
-                        <i class="fas fa-file-alt" aria-hidden="true"></i>
-                    </div>
                     <h3 class="admin-empty-state__title">
                         {{ __('dixlase-pages::admin/pages/index.no_pages_found') }}
                     </h3>
-                    <p class="admin-empty-state__description">
-                        {{ __('dixlase-pages::admin/pages/index.no_pages_description') }}
-                    </p>
                     @include('components::form-button', [
                         'type' => 'link',
                         'variant' => 'primary',

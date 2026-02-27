@@ -37,9 +37,6 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
     
     public function register()
     {
-        // Merge admin navigation
-        $this->mergeAdminNavigation('DixlasePages', __DIR__ . '/../../config/admin.php');
-        
         // LinkableProviderを登録
         $this->app->singleton(DixlasePagesPageLinkableProvider::class);
         
