@@ -29,7 +29,7 @@ use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 Route::middleware(['front.ip'])->group(
     function () {
         // データベースから設定を取得、なければデフォルト値を使用
-        $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        $pagesDirectory = DixlasePagesPageSetting::getValue('url_directory', 'pages');
         
         Route::get($pagesDirectory . '/{slug}', function ($slug) {
             

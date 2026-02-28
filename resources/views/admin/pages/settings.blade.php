@@ -29,11 +29,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.basic.title') }}</h2>
 
             <div class="grid grid-cols-1 gap-6">
-                {{-- ページディレクトリ --}}
+                {{-- URLディレクトリ --}}
                 <div>
                     <x-form-label
-                        for="pages_directory"
-                        :text="__('dixlase-pages::admin/pages/settings.basic.pages_directory')"
+                        for="url_directory"
+                        :text="__('dixlase-pages::admin/pages/settings.basic.url_directory')"
                         :required="true"
                     />
                     <div class="mt-1 flex items-center">
@@ -42,15 +42,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         </span>
                         <input
                             type="text"
-                            name="pages_directory"
-                            id="pages_directory"
-                            value="{{ old('pages_directory', $settings['pages_directory'] ?? 'pages') }}"
+                            name="url_directory"
+                            id="url_directory"
+                            value="{{ old('url_directory', $settings['url_directory'] ?? 'pages') }}"
                             class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-blue-500 focus:border-blue-500"
                             required
                         />
                     </div>
-                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.pages_directory_help')" />
-                    <x-form-error name="pages_directory" />
+                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.url_directory_help')" />
+                    <x-form-error name="url_directory" />
                 </div>
 
                 {{-- デフォルトステータス --}}

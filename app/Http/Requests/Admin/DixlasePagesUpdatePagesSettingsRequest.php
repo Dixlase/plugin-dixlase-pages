@@ -46,7 +46,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pages_directory' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:directory')],
+            'url_directory' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:url_directory')],
             'default_status' => 'required|in:published,draft,scheduled',
             'default_editor_type' => ['required', Rule::enum(ContentEditorType::class)],
             'default_storage_type' => ['required', Rule::enum(ContentStorageType::class)],
@@ -61,7 +61,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'pages_directory' => __('dixlase-pages::admin/pages/settings.basic.pages_directory'),
+            'url_directory' => __('dixlase-pages::admin/pages/settings.basic.url_directory'),
             'default_status' => __('dixlase-pages::admin/pages/settings.basic.default_status'),
             'default_editor_type' => __('dixlase-pages::admin/pages/settings.basic.default_editor_type'),
             'default_storage_type' => __('dixlase-pages::admin/pages/settings.basic.default_storage_type'),
@@ -76,8 +76,8 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'pages_directory.required' => __('dixlase-pages::admin/pages/validation.pages_directory_required'),
-            'pages_directory.alpha_dash' => __('dixlase-pages::admin/pages/validation.pages_directory_alpha_dash'),
+            'url_directory.required' => __('dixlase-pages::admin/pages/validation.url_directory_required'),
+            'url_directory.alpha_dash' => __('dixlase-pages::admin/pages/validation.url_directory_alpha_dash'),
             'default_status.required' => __('dixlase-pages::admin/pages/validation.default_status_required'),
             'default_status.in' => __('dixlase-pages::admin/pages/validation.default_status_in'),
         ];

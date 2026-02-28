@@ -170,7 +170,7 @@ class DixlasePagesPage extends Model
      */
     public function getPageUrlAttribute(): string
     {
-        $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        $pagesDirectory = DixlasePagesPageSetting::getValue('url_directory', 'pages');
         return url($pagesDirectory . '/' . $this->slug);
     }
 
