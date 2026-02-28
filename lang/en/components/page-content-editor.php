@@ -33,4 +33,5 @@ return [
     'sidebar_open' => 'Open settings sidebar',
     'sidebar_close' => 'Close settings sidebar',
     'editor_type_help' => 'The editor type can only be selected when creating a new page and cannot be changed after saving.',
+    'preview' => 'Preview',
 ];
