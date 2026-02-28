@@ -30,6 +30,7 @@ use App\Traits\AdminLoggedInTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Route;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesStorePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePagesSettingsRequest;
@@ -50,6 +51,24 @@ class DixlasePagesAdminPagesController extends Controller
         $this->contentService = $contentService;
         $this->initialize();
         $this->initializeAfterLogin();
+    }
+
+    /**
+     * フォームデータからプレビュー表示する（保存せずに新しいタブで表示）
+     */
+    public function preview(Request $request)
+    {
+        $page = new DixlasePagesPage();
+        $page->title = $request->input('title', '');
+        $page->slug = $request->input('slug', '');
+        $page->content = $request->input('content', '');
+        $page->editor_type = $request->input('editor_type', 'html');
+        // プレビューでは常にdatabaseとして扱い、POSTされたcontentを直接表示する
+        $page->storage_type = 'database';
+        $page->status = $request->input('status', 'draft');
+        $page->published_at = $request->input('published_at') ?: null;
+
+        return view('dixlase-pages::front.page', compact('page'));
     }
 
     /**
@@ -173,6 +192,11 @@ class DixlasePagesAdminPagesController extends Controller
         // ファイル保存時の表示用ベースパス
         $fileStorageBasePath = 'storage/app/private/' . $this->contentService->getBasePath();
 
+        // プレビューURL
+        $previewUrl = Route::has('dixlase-pages::admin.pages.preview')
+            ? route('dixlase-pages::admin.pages.preview')
+            : '';
+
         return compact(
             'content',
             'slugBaseUrl',
@@ -185,6 +209,7 @@ class DixlasePagesAdminPagesController extends Controller
             'statusValue',
             'publishedAtValue',
             'fileStorageBasePath',
+            'previewUrl',
         );
     }
 

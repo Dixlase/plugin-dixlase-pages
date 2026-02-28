@@ -44,6 +44,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     'isEditMode' => false,
     // ファイル保存時の表示用ベースパス
     'fileStorageBasePath' => '',
+    // プレビューURL
+    'previewUrl' => '',
 ])
 
 {{--
@@ -68,7 +70,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         publishedAt: '{{ $publishedAtValue }}',
         slugBaseUrl: '{{ $slugBaseUrl }}',
         isEditMode: {{ $isEditMode ? 'true' : 'false' }},
-        fileStorageBasePath: '{{ $fileStorageBasePath }}'
+        fileStorageBasePath: '{{ $fileStorageBasePath }}',
+        previewUrl: '{{ $previewUrl }}'
      })">
 
         {{-- ===== メインコンテンツエリア ===== --}}
@@ -281,7 +284,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 {{-- URLプレビュー --}}
                 <div class="mt-2 text-sm" x-show="slug" x-cloak>
                     <span class="text-gray-500 dark:text-gray-400">{{ __('dixlase-pages::components/page-content-editor.slug_url_preview') }}:</span>
-                    <span class="font-mono text-blue-600 dark:text-blue-400 break-all" x-text="pageUrl"></span>
+                    @if ($isEditMode)
+                        <a :href="pageUrl" target="_blank" rel="noopener noreferrer"
+                           class="font-mono text-blue-600 dark:text-blue-400 break-all hover:underline"
+                           x-text="pageUrl"></a>
+                    @else
+                        <span class="font-mono text-blue-600 dark:text-blue-400 break-all" x-text="pageUrl"></span>
+                    @endif
                 </div>
                 @include('components::form-error', ['name' => 'slug'])
             </div>
@@ -323,7 +332,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-error', ['name' => 'storage_type'])
             </div>
 
-            {{-- 6. 公開設定 --}}
+            {{-- 6. プレビュー --}}
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <x-form-button
+                    variant="tertiary"
+                    icon="fas fa-external-link-alt"
+                    :label="__('dixlase-pages::components/page-content-editor.preview')"
+                    class="w-full"
+                    x-click="openPreview()"
+                />
+            </div>
+
+            {{-- 7. 公開設定 --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                     {{ __('dixlase-pages::components/page-content-editor.publish_section') }}
