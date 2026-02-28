@@ -25,6 +25,7 @@ namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Rules\UniqueContentSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -55,7 +56,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
                 'string',
                 'max:255',
                 'regex:/^[a-z0-9\-]+$/',
-                Rule::unique('plg_dixlase_pages', 'slug')->ignore($pageId)->whereNull('deleted_at'),
+                UniqueContentSlug::for('plg_dixlase_pages')->ignore($pageId),
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],

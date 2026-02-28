@@ -26,6 +26,7 @@ namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Rules\UniqueContentSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -54,7 +55,7 @@ class DixlasePagesStorePageRequest extends FormRequest
                 'string',
                 'max:255',
                 'regex:/^[a-z0-9\-]*$/',
-                Rule::unique('plg_dixlase_pages', 'slug')->whereNull('deleted_at'),
+                UniqueContentSlug::for('plg_dixlase_pages'),
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
@@ -173,7 +174,6 @@ class DixlasePagesStorePageRequest extends FormRequest
             'title.required' => __('dixlase-pages::admin/pages/validation.title_required'),
             'title.max' => __('dixlase-pages::admin/pages/validation.title_max'),
             'slug.regex' => __('dixlase-pages::admin/pages/validation.slug_format'),
-            'slug.unique' => __('dixlase-pages::admin/pages/validation.slug_unique'),
             'content.required' => __('dixlase-pages::admin/pages/validation.content_required'),
             'status.required' => __('dixlase-pages::admin/pages/validation.status_required'),
             'published_at.date' => __('dixlase-pages::admin/pages/validation.published_at_date'),
