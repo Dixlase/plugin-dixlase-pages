@@ -98,7 +98,7 @@ class DixlasePagesAdminPagesController extends Controller
             ->withQueryString();
 
         // ページディレクトリ設定をデータベースから取得
-        $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        $pagesDirectory = DixlasePagesPageSetting::getValue('url_directory', 'pages');
 
         // 各ページにURLを追加
         $pages->getCollection()->transform(function ($page) use ($pagesDirectory) {
@@ -127,7 +127,7 @@ class DixlasePagesAdminPagesController extends Controller
         $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
 
         // ページディレクトリ設定
-        $pagesDirectory = DixlasePagesPageSetting::getValue('pages_directory', config('custom.pages_directory', 'pages'));
+        $pagesDirectory = DixlasePagesPageSetting::getValue('url_directory', 'pages');
         $slugBaseUrl = config('app.url').'/'.$pagesDirectory.'/';
 
         // ストレージ保存方法オプション（form-select用）

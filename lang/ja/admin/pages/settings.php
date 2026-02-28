@@ -25,8 +25,8 @@ return [
     'description' => 'ページ管理のディレクトリ、デフォルト値、機能の設定を行います。',
     'basic' => [
         'title' => '基本設定',
-        'pages_directory' => 'ページディレクトリ',
-        'pages_directory_help' => 'ページのURLに使用するディレクトリ名',
+        'url_directory' => 'URLディレクトリ',
+        'url_directory_help' => 'ページのURLに使用するディレクトリ名',
         'default_status' => 'デフォルトステータス',
         'default_editor_type' => 'デフォルトエディタタイプ',
         'default_editor_type_help' => '新規ページ作成時のデフォルトエディタタイプ。',
