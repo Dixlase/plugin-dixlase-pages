@@ -93,6 +93,7 @@ class DixlasePagesPageFactory extends Factory
         return [
             'title' => $title,
             'slug' => Str::slug($title . '-' . $this->faker->unique()->numberBetween(1, 9999)), // 重複を避けるため番号追加
+            'lang' => config('language.default', 'en'), // 言語コード
             'status' => $this->faker->randomElement(['draft', 'published', 'scheduled']), // Enumに対応
             'published_at' => $this->faker->boolean(70) ? now() : null, // 70%の確率で公開日時を設定
             'content' => $content,

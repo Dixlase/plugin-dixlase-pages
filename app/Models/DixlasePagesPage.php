@@ -25,11 +25,15 @@ namespace Plugins\DixlasePages\App\Models;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
+/**
+ * @property string $lang 言語コード
+ */
 class DixlasePagesPage extends Model
 {
     use HasFactory, SoftDeletes;
@@ -46,6 +50,7 @@ class DixlasePagesPage extends Model
      */
     protected $fillable = [
         'slug',
+        'lang',
         'title',
         'content',
         'storage_type',
@@ -141,6 +146,14 @@ class DixlasePagesPage extends Model
     public function scopeScheduled($query)
     {
         return $query->where('status', ContentStatus::SCHEDULED->value);
+    }
+
+    /**
+     * 指定言語のページを取得するスコープ
+     */
+    public function scopeForLang(Builder $query, string $lang): Builder
+    {
+        return $query->where('lang', $lang);
     }
 
     /**

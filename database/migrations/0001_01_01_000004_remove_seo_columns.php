@@ -35,7 +35,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('plg_dixlase_pages', function (Blueprint $table) {
-            $table->dropForeign(['ogp_image_id']);
+            $table->dropIndex(['ogp_image_id']);
             $table->dropColumn(['meta_description', 'ogp_image_id']);
         });
     }
@@ -45,7 +45,7 @@ return new class extends Migration
         Schema::table('plg_dixlase_pages', function (Blueprint $table) {
             $table->text('meta_description')->nullable()->after('content');
             $table->unsignedBigInteger('ogp_image_id')->nullable()->after('meta_description');
-            $table->foreign('ogp_image_id')->references('id')->on('media')->onDelete('set null');
+            $table->index('ogp_image_id');
         });
     }
 };

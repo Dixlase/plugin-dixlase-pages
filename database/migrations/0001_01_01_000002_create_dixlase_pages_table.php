@@ -40,6 +40,7 @@ return new class extends Migration
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
             $table->string('slug'); // ページのURL（スラッグ）
+            $table->string('lang', 10)->comment('言語コード'); // 言語コード
             $table->string('title')->nullable(); // タイトル
             $table->text('content')->nullable(); // コンテンツ（汎用）
             $table->text('content_markdown')->nullable(); // Markdownエディタ用
@@ -47,21 +48,17 @@ return new class extends Migration
             $table->text('content_blade')->nullable(); // Bladeエディタ用
             $table->text('meta_description')->nullable(); // メタディスクリプション
             $table->unsignedBigInteger('ogp_image_id')->nullable(); // OGP画像
-            $table->string('storage_type', 20)->default('database'); // 保存方法（database/file）
-            $table->string('editor_type', 20)->default('html'); // エディタタイプ（gui/markdown/html/blade）
-            $table->enum('status', ['draft', 'published', 'scheduled'])->default('draft'); // ステータス
+            $table->tinyInteger('storage_type')->default(0); // 保存方法（0=database, 1=file）
+            $table->tinyInteger('editor_type')->default(3); // エディタタイプ（1=gui, 2=markdown, 3=html, 4=blade）
+            $table->tinyInteger('status')->default(0); // ステータス（0=draft, 1=published, 2=scheduled）
             $table->timestamp('published_at')->nullable(); // 公開日時
             $table->timestamps();
             $table->softDeletes();
             
-            // ソフトデリート対応のユニーク制約
-            $table->unique(['slug', 'deleted_at'], 'plg_dixlase_pages_slug_deleted_at_unique');
-            
-            // 外部キー制約
-            $table->foreign('ogp_image_id')
-                ->references('id')
-                ->on('media')
-                ->onDelete('set null');
+            // ソフトデリート対応のユニーク制約（slug + lang + deleted_at）
+            $table->unique(['slug', 'lang', 'deleted_at'], 'plg_dixlase_pages_slug_lang_del_unique');
+            $table->index('lang');
+            $table->index('ogp_image_id');
         });
     }
 
