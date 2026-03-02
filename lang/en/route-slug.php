@@ -2,6 +2,6 @@
 
 return [
     'owners' => [
-        'url_directory' => 'Pages URL Directory',
+        'route_slug' => 'Pages URL Slug',
     ],
 ];

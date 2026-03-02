@@ -164,7 +164,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                     </td>
                                     <td class="admin-table__cell" data-label="{{ __('common.status') }}" role="gridcell">
                                         @include('components::ui-status-badge', [
-                                            'status' => $page->status->value,
+                                            'status' => $page->status->slug(),
                                             'label' => $page->status->label(),
                                             'variant' => $page->status->cssClass(),
                                         ])

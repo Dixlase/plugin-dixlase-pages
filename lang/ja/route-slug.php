@@ -2,6 +2,6 @@
 
 return [
     'owners' => [
-        'url_directory' => 'ページURLディレクトリ',
+        'route_slug' => 'ページURLスラッグ',
     ],
 ];

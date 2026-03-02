@@ -29,11 +29,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.basic.title') }}</h2>
 
             <div class="grid grid-cols-1 gap-6">
-                {{-- URLディレクトリ --}}
+                {{-- URLスラッグ --}}
                 <div>
                     <x-form-label
-                        for="url_directory"
-                        :text="__('dixlase-pages::admin/pages/settings.basic.url_directory')"
+                        for="route_slug"
+                        :text="__('dixlase-pages::admin/pages/settings.basic.route_slug')"
                         :required="true"
                     />
                     <div class="mt-1 flex items-center">
@@ -42,15 +42,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         </span>
                         <input
                             type="text"
-                            name="url_directory"
-                            id="url_directory"
-                            value="{{ old('url_directory', $settings['url_directory'] ?? 'pages') }}"
+                            name="route_slug"
+                            id="route_slug"
+                            value="{{ old('route_slug', $settings['route_slug'] ?? 'pages') }}"
                             class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-blue-500 focus:border-blue-500"
                             required
                         />
                     </div>
-                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.url_directory_help')" />
-                    <x-form-error name="url_directory" />
+                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.route_slug_help')" />
+                    <x-form-error name="route_slug" />
                 </div>
 
                 {{-- デフォルトステータス --}}

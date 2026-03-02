@@ -33,7 +33,7 @@ class DixlasePagesPageSettingsSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            ['name' => 'url_directory', 'value' => 'content'],
+            ['name' => 'route_slug', 'value' => 'content'],
             ['name' => 'default_status', 'value' => 'published'],
             ['name' => 'seo_enabled', 'value' => '1'],
         ];

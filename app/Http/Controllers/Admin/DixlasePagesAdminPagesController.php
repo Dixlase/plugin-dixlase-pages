@@ -62,9 +62,11 @@ class DixlasePagesAdminPagesController extends Controller
         $page->title = $request->input('title', '');
         $page->slug = $request->input('slug', '');
         $page->content = $request->input('content', '');
-        $page->editor_type = $request->input('editor_type', 'html');
+        $page->editor_type = ContentEditorType::tryFromSlug(
+            $request->input('editor_type', 'html')
+        ) ?? ContentEditorType::HTML;
         // プレビューでは常にdatabaseとして扱い、POSTされたcontentを直接表示する
-        $page->storage_type = 'database';
+        $page->storage_type = ContentStorageType::DATABASE;
         $page->status = $request->input('status', 'draft');
         $page->published_at = $request->input('published_at') ?: null;
 
@@ -117,7 +119,7 @@ class DixlasePagesAdminPagesController extends Controller
             ->withQueryString();
 
         // ページディレクトリ設定をデータベースから取得
-        $pagesDirectory = DixlasePagesPageSetting::getValue('url_directory', 'pages');
+        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
 
         // 各ページにURLを追加
         $pages->getCollection()->transform(function ($page) use ($pagesDirectory) {
@@ -146,7 +148,7 @@ class DixlasePagesAdminPagesController extends Controller
         $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
 
         // ページディレクトリ設定
-        $pagesDirectory = DixlasePagesPageSetting::getValue('url_directory', 'pages');
+        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
         $slugBaseUrl = config('app.url').'/'.$pagesDirectory.'/';
 
         // ストレージ保存方法オプション（form-select用）
@@ -186,11 +188,11 @@ class DixlasePagesAdminPagesController extends Controller
         ];
 
         // old()込みのステータス値（Alpine.js初期化用）
-        $statusValue = old('status', $page->status->value);
+        $statusValue = old('status', $page->status->slug());
         $publishedAtValue = old('published_at', $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '');
 
         // ファイル保存時の表示用ベースパス
-        $fileStorageBasePath = 'storage/app/private/' . $this->contentService->getBasePath();
+        $fileStorageBasePath = 'storage/app/private/'.$this->contentService->getBasePath();
 
         // プレビューURL
         $previewUrl = Route::has('dixlase-pages::admin.pages.preview')
@@ -220,10 +222,14 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $page = new DixlasePagesPage();
 
-        // 設定のデフォルト値を適用
+        // 設定のデフォルト値を適用（int-backed enumにはslugから変換が必要）
         $page->status = DixlasePagesPageSetting::getValue('default_status', 'draft');
-        $page->editor_type = DixlasePagesPageSetting::getValue('default_editor_type', 'html');
-        $page->storage_type = DixlasePagesPageSetting::getValue('default_storage_type', 'database');
+        $page->editor_type = ContentEditorType::tryFromSlug(
+            DixlasePagesPageSetting::getValue('default_editor_type', 'html')
+        ) ?? ContentEditorType::HTML;
+        $page->storage_type = ContentStorageType::tryFromSlug(
+            DixlasePagesPageSetting::getValue('default_storage_type', 'database')
+        ) ?? ContentStorageType::DATABASE;
 
         $formData = $this->prepareFormData($page);
 
@@ -241,25 +247,30 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $validated = $request->validated();
 
-        $storageType = $validated['storage_type'];
+        $storageTypeSlug = $validated['storage_type'];
+        $editorTypeSlug = $validated['editor_type'];
         $content = $validated['content'] ?? '';
 
         // ファイル保存の場合はファイルにも保存
-        if ($storageType === 'file') {
+        if ($storageTypeSlug === 'file') {
             $this->contentService->saveToFile(
                 $validated['slug'],
                 app()->getLocale(),
-                $validated['editor_type'],
+                $editorTypeSlug,
                 $content
             );
         }
+
+        // スラッグからenumインスタンスに変換（int-backed enumはslugから変換が必要）
+        $storageType = ContentStorageType::tryFromSlug($storageTypeSlug) ?? ContentStorageType::DATABASE;
+        $editorType = ContentEditorType::tryFromSlug($editorTypeSlug) ?? ContentEditorType::HTML;
 
         // ページを作成（常にDBにもコンテンツを保存 = バックアップ）
         $page = DixlasePagesPage::create([
             'slug' => $validated['slug'],
             'title' => $validated['title'] ?? null,
             'storage_type' => $storageType,
-            'editor_type' => $validated['editor_type'],
+            'editor_type' => $editorType,
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
             'content' => $content,
@@ -285,11 +296,11 @@ class DixlasePagesAdminPagesController extends Controller
     {
         // ファイル保存の場合、ファイルからコンテンツを読み込む
         $fileContents = null;
-        if ($page->storage_type->value === 'file') {
+        if ($page->storage_type === ContentStorageType::FILE) {
             $fileContents = $this->contentService->loadFromFile(
                 $page->slug,
                 app()->getLocale(),
-                $page->editor_type->value
+                $page->editor_type->slug()
             );
         }
 
@@ -310,34 +321,35 @@ class DixlasePagesAdminPagesController extends Controller
         $validated = $request->validated();
 
         // editor_type はモデルの既存値を維持（編集時は変更不可）
-        $editorType = $page->editor_type->value;
-        $storageType = $validated['storage_type'];
+        $editorTypeSlug = $page->editor_type->slug();
+        $storageTypeSlug = $validated['storage_type'];
+        $newStorageType = ContentStorageType::tryFromSlug($storageTypeSlug) ?? ContentStorageType::DATABASE;
 
         $oldSlug = $page->slug;
-        $oldStorageType = $page->storage_type->value;
+        $oldStorageType = $page->storage_type;
         $locale = app()->getLocale();
 
         // スラッグが変更された場合、ファイルをリネーム
-        if ($oldStorageType === 'file' && $oldSlug !== $validated['slug']) {
-            $this->contentService->renameFile($oldSlug, $validated['slug'], $editorType, $locale);
+        if ($oldStorageType === ContentStorageType::FILE && $oldSlug !== $validated['slug']) {
+            $this->contentService->renameFile($oldSlug, $validated['slug'], $editorTypeSlug, $locale);
         }
 
         $content = $validated['content'] ?? '';
 
         // 保存方法が変更された場合の処理
-        if ($oldStorageType !== $storageType) {
-            if ($oldStorageType === 'file' && $storageType === 'database') {
+        if ($oldStorageType !== $newStorageType) {
+            if ($oldStorageType === ContentStorageType::FILE && $newStorageType === ContentStorageType::DATABASE) {
                 // ファイル→DB: ファイルを削除（DBには常にバックアップがあるため読み込み不要）
-                $this->contentService->deleteFile($validated['slug'], $locale, $editorType);
+                $this->contentService->deleteFile($validated['slug'], $locale, $editorTypeSlug);
             }
         }
 
         // ファイル保存の場合はファイルにも保存
-        if ($storageType === 'file') {
+        if ($newStorageType === ContentStorageType::FILE) {
             $this->contentService->saveToFile(
                 $validated['slug'],
                 $locale,
-                $editorType,
+                $editorTypeSlug,
                 $content
             );
         }
@@ -346,7 +358,7 @@ class DixlasePagesAdminPagesController extends Controller
         $page->update([
             'slug' => $validated['slug'],
             'title' => $validated['title'] ?? null,
-            'storage_type' => $storageType,
+            'storage_type' => $newStorageType,
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
             'content' => $content,
@@ -362,8 +374,8 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function destroy(DixlasePagesPage $page)
     {
-        // ファイル保存の場合、関連ディレクトリも削除
-        if ($page->storage_type->value === 'file') {
+        // ファイル保存の場合、関連ファイルも削除
+        if ($page->storage_type === ContentStorageType::FILE) {
             $this->contentService->deleteDirectory($page->slug);
         }
 
@@ -390,11 +402,12 @@ class DixlasePagesAdminPagesController extends Controller
         ];
         $statusCardOptions = [];
         foreach ([ContentStatus::DRAFT, ContentStatus::PUBLISHED, ContentStatus::SCHEDULED] as $status) {
+            $slug = $status->slug();
             $statusCardOptions[] = [
-                'value' => $status->value,
+                'value' => $slug,
                 'label' => $status->label(),
                 'description' => $status->description(),
-                'icon' => $statusIcons[$status->value],
+                'icon' => $statusIcons[$slug],
                 'color' => $status->cssClass(),
             ];
         }
@@ -416,12 +429,13 @@ class DixlasePagesAdminPagesController extends Controller
             if ($type === ContentEditorType::BLADE) {
                 continue;
             }
+            $slug = $type->slug();
             $editorTypeCardOptions[] = [
-                'value' => $type->value,
+                'value' => $slug,
                 'label' => __($type->translationKey()),
                 'description' => __($type->descriptionKey()),
-                'icon' => $editorIcons[$type->value] ?? 'fas fa-file',
-                'color' => $editorColors[$type->value] ?? 'gray',
+                'icon' => $editorIcons[$slug] ?? 'fas fa-file',
+                'color' => $editorColors[$slug] ?? 'gray',
             ];
         }
 
@@ -436,12 +450,13 @@ class DixlasePagesAdminPagesController extends Controller
         ];
         $storageTypeCardOptions = [];
         foreach (ContentStorageType::cases() as $type) {
+            $slug = $type->slug();
             $storageTypeCardOptions[] = [
-                'value' => $type->value,
+                'value' => $slug,
                 'label' => __($type->translationKey()),
                 'description' => __($type->descriptionKey()),
-                'icon' => $storageIcons[$type->value],
-                'color' => $storageColors[$type->value],
+                'icon' => $storageIcons[$slug],
+                'color' => $storageColors[$slug],
             ];
         }
 
@@ -478,7 +493,7 @@ class DixlasePagesAdminPagesController extends Controller
     public function getFileContent(DixlasePagesPage $page, string $editorType)
     {
         // ファイル保存でない場合は空を返す
-        if ($page->storage_type->value !== 'file') {
+        if ($page->storage_type !== ContentStorageType::FILE) {
             return response()->json(['content' => '']);
         }
 

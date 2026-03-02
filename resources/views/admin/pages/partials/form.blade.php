@@ -20,8 +20,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <x-dixlase-pages::page-content-editor
     :title="$page->title ?? ''"
-    :storageType="$page->storage_type?->value ?? 'database'"
-    :editorType="$page->editor_type?->value ?? 'html'"
+    :storageType="$page->storage_type?->slug() ?? 'database'"
+    :editorType="$page->editor_type?->slug() ?? 'html'"
     :content="$content"
     :identifier="$page->slug ?? ''"
     :pageId="$page->id ?? null"

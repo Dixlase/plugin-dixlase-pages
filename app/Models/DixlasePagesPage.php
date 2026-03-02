@@ -85,7 +85,7 @@ class DixlasePagesPage extends Model
     public function getStatusAttribute($value): ContentStatus
     {
         // 古いデータの変換
-        return match($value) {
+        return match ($value) {
             '0', 0, 'draft', null => ContentStatus::DRAFT,
             '1', 1, 'published' => ContentStatus::PUBLISHED,
             '2', 2, 'scheduled' => ContentStatus::SCHEDULED,
@@ -100,9 +100,12 @@ class DixlasePagesPage extends Model
     {
         if ($value instanceof ContentStatus) {
             $this->attributes['status'] = $value->value;
-        } else {
-            // 文字列の場合はそのまま保存
+        } elseif (is_int($value)) {
             $this->attributes['status'] = $value;
+        } else {
+            // スラッグ文字列の場合はenumに変換してint値を保存
+            $enum = ContentStatus::tryFromSlug((string) $value);
+            $this->attributes['status'] = $enum ? $enum->value : ContentStatus::DRAFT->value;
         }
     }
 
@@ -111,7 +114,7 @@ class DixlasePagesPage extends Model
      */
     public function isPublished(): bool
     {
-        return match($this->status) {
+        return match ($this->status) {
             ContentStatus::PUBLISHED => true,
             ContentStatus::SCHEDULED => $this->published_at && $this->published_at->isPast(),
             ContentStatus::DRAFT => false,
@@ -125,10 +128,10 @@ class DixlasePagesPage extends Model
     {
         return $query->where(function ($q) {
             $q->where('status', ContentStatus::PUBLISHED->value)
-              ->orWhere(function ($sq) {
-                  $sq->where('status', ContentStatus::SCHEDULED->value)
-                     ->where('published_at', '<=', now());
-              });
+                ->orWhere(function ($sq) {
+                    $sq->where('status', ContentStatus::SCHEDULED->value)
+                        ->where('published_at', '<=', now());
+                });
         });
     }
 
@@ -164,13 +167,13 @@ class DixlasePagesPage extends Model
     public function getContentByEditorType(): ?string
     {
         // ファイル保存の場合
-        if ($this->storage_type && $this->storage_type->value === 'file') {
+        if ($this->storage_type === ContentStorageType::FILE) {
             $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
 
             return $contentService->loadFromFile(
                 $this->slug,
                 app()->getLocale(),
-                $this->editor_type->value ?? 'html'
+                $this->editor_type?->slug() ?? 'html'
             );
         }
 
@@ -183,8 +186,9 @@ class DixlasePagesPage extends Model
      */
     public function getPageUrlAttribute(): string
     {
-        $pagesDirectory = DixlasePagesPageSetting::getValue('url_directory', 'pages');
-        return url($pagesDirectory . '/' . $this->slug);
+        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+
+        return url($pagesDirectory.'/'.$this->slug);
     }
 
     /**

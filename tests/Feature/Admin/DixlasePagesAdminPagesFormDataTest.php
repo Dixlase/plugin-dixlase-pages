@@ -22,6 +22,9 @@
 
 namespace Plugins\DixlasePages\Tests\Feature\Admin;
 
+use App\Enums\ContentEditorType;
+use App\Enums\ContentStatus;
+use App\Enums\ContentStorageType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesController;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
@@ -141,8 +144,8 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     public function test_prepare_form_data_returns_correct_status_for_existing_page(): void
     {
         $page = DixlasePagesPage::factory()->published()->create([
-            'storage_type' => 'database',
-            'editor_type' => 'html',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
             'content' => '<p>テスト</p>',
         ]);
 
@@ -157,8 +160,8 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     public function test_prepare_form_data_returns_correct_content_from_database(): void
     {
         $page = DixlasePagesPage::factory()->create([
-            'storage_type' => 'database',
-            'editor_type' => 'html',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
             'content' => '<h1>DBコンテンツ</h1>',
         ]);
 
@@ -173,8 +176,8 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     public function test_prepare_form_data_prefers_file_contents_over_model(): void
     {
         $page = DixlasePagesPage::factory()->create([
-            'storage_type' => 'file',
-            'editor_type' => 'html',
+            'storage_type' => ContentStorageType::FILE,
+            'editor_type' => ContentEditorType::HTML,
             'content' => '<p>DB content</p>',
         ]);
 
@@ -241,9 +244,9 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     {
         $publishedAt = now()->startOfMinute();
         $page = DixlasePagesPage::factory()->create([
-            'storage_type' => 'database',
-            'editor_type' => 'html',
-            'status' => 'scheduled',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'status' => ContentStatus::SCHEDULED,
             'published_at' => $publishedAt,
         ]);
 
