@@ -267,8 +267,19 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
              :style="rightSidebarReady ? 'transition: transform 300ms ease-in-out' : ''"
              >
 
-            {{-- 4. スラッグ --}}
+            {{-- 6. プレビュー --}}
             <div>
+                <x-form-button
+                    variant="tertiary"
+                    icon="fas fa-external-link-alt"
+                    :label="__('dixlase-pages::components/page-content-editor.preview')"
+                    class="w-full"
+                    x-click="openPreview()"
+                />
+            </div>
+
+            {{-- 4. スラッグ --}}
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 @include('components::form-label', [
                     'for' => 'slug',
                     'text' => __('dixlase-pages::components/page-content-editor.slug'),
@@ -332,16 +343,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-error', ['name' => 'storage_type'])
             </div>
 
-            {{-- 6. プレビュー --}}
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <x-form-button
-                    variant="tertiary"
-                    icon="fas fa-external-link-alt"
-                    :label="__('dixlase-pages::components/page-content-editor.preview')"
-                    class="w-full"
-                    x-click="openPreview()"
-                />
-            </div>
+            
 
             {{-- 7. 公開設定 --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">

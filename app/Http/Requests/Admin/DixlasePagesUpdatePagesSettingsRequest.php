@@ -46,10 +46,10 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'url_directory' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:url_directory')],
+            'route_slug' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:route_slug')],
             'default_status' => 'required|in:published,draft,scheduled',
-            'default_editor_type' => ['required', Rule::enum(ContentEditorType::class)],
-            'default_storage_type' => ['required', Rule::enum(ContentStorageType::class)],
+            'default_editor_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentEditorType::cases()))],
+            'default_storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
         ];
     }
 
@@ -61,7 +61,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'url_directory' => __('dixlase-pages::admin/pages/settings.basic.url_directory'),
+            'route_slug' => __('dixlase-pages::admin/pages/settings.basic.route_slug'),
             'default_status' => __('dixlase-pages::admin/pages/settings.basic.default_status'),
             'default_editor_type' => __('dixlase-pages::admin/pages/settings.basic.default_editor_type'),
             'default_storage_type' => __('dixlase-pages::admin/pages/settings.basic.default_storage_type'),
@@ -76,8 +76,8 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'url_directory.required' => __('dixlase-pages::admin/pages/validation.url_directory_required'),
-            'url_directory.alpha_dash' => __('dixlase-pages::admin/pages/validation.url_directory_alpha_dash'),
+            'route_slug.required' => __('dixlase-pages::admin/pages/validation.route_slug_required'),
+            'route_slug.alpha_dash' => __('dixlase-pages::admin/pages/validation.route_slug_alpha_dash'),
             'default_status.required' => __('dixlase-pages::admin/pages/validation.default_status_required'),
             'default_status.in' => __('dixlase-pages::admin/pages/validation.default_status_in'),
         ];

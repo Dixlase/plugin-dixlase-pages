@@ -20,10 +20,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 namespace Plugins\DixlasePages\Database\Factories;
 
-
+use App\Enums\ContentEditorType;
+use App\Enums\ContentStatus;
+use App\Enums\ContentStorageType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
@@ -33,7 +34,6 @@ use Plugins\DixlasePages\App\Models\DixlasePagesPage;
  */
 class DixlasePagesPageFactory extends Factory
 {
-
     protected $model = DixlasePagesPage::class;
 
     /**
@@ -79,11 +79,11 @@ class DixlasePagesPageFactory extends Factory
         ];
 
         // 基本設定の言語に応じてタイトルを選択（80%の確率でメイン言語、20%で他言語）
-        $isJapanese = $isJapaneseLocale 
-            ? $this->faker->boolean(80) 
+        $isJapanese = $isJapaneseLocale
+            ? $this->faker->boolean(80)
             : $this->faker->boolean(20);
-        
-        $title = $isJapanese 
+
+        $title = $isJapanese
             ? $this->faker->randomElement($japaneseTitles)
             : $this->faker->randomElement($englishTitles);
 
@@ -92,9 +92,11 @@ class DixlasePagesPageFactory extends Factory
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title . '-' . $this->faker->unique()->numberBetween(1, 9999)), // 重複を避けるため番号追加
+            'slug' => Str::slug($title.'-'.$this->faker->unique()->numberBetween(1, 9999)), // 重複を避けるため番号追加
             'lang' => config('language.default', 'en'), // 言語コード
-            'status' => $this->faker->randomElement(['draft', 'published', 'scheduled']), // Enumに対応
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'status' => $this->faker->randomElement([ContentStatus::DRAFT, ContentStatus::PUBLISHED, ContentStatus::SCHEDULED]),
             'published_at' => $this->faker->boolean(70) ? now() : null, // 70%の確率で公開日時を設定
             'content' => $content,
             'created_at' => now(),
@@ -128,8 +130,8 @@ class DixlasePagesPageFactory extends Factory
 
         for ($i = 0; $i < $totalParagraphs; $i++) {
             // プライマリ言語を70%、セカンダリ言語を30%の確率で選択
-            $useJapanese = $primaryJapanese 
-                ? $this->faker->boolean(70) 
+            $useJapanese = $primaryJapanese
+                ? $this->faker->boolean(70)
                 : $this->faker->boolean(30);
 
             if ($useJapanese) {
@@ -147,8 +149,8 @@ class DixlasePagesPageFactory extends Factory
      */
     public function published(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'status' => 'published',
+        return $this->state(fn (array $attributes) => [
+            'status' => ContentStatus::PUBLISHED,
             'published_at' => now(),
         ]);
     }
@@ -158,8 +160,8 @@ class DixlasePagesPageFactory extends Factory
      */
     public function draft(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'status' => 'draft',
+        return $this->state(fn (array $attributes) => [
+            'status' => ContentStatus::DRAFT,
             'published_at' => null,
         ]);
     }
@@ -169,8 +171,8 @@ class DixlasePagesPageFactory extends Factory
      */
     public function scheduled(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'status' => 'scheduled',
+        return $this->state(fn (array $attributes) => [
+            'status' => ContentStatus::SCHEDULED,
             'published_at' => $this->faker->dateTimeBetween('now', '+1 month'),
         ]);
     }
@@ -183,7 +185,7 @@ class DixlasePagesPageFactory extends Factory
         return $this->state(function (array $attributes) {
             $japaneseTitles = [
                 'お知らせ',
-                'サービス紹介', 
+                'サービス紹介',
                 '会社概要',
                 'よくある質問',
                 'お問い合わせ',
@@ -195,12 +197,12 @@ class DixlasePagesPageFactory extends Factory
                 '採用情報',
                 'メディア掲載',
             ];
-            
+
             $title = $this->faker->randomElement($japaneseTitles);
-            
+
             return [
                 'title' => $title,
-                'slug' => Str::slug($title . '-' . $this->faker->unique()->numberBetween(1, 9999)),
+                'slug' => Str::slug($title.'-'.$this->faker->unique()->numberBetween(1, 9999)),
                 'content' => $this->generateMixedContent(true),
             ];
         });
@@ -226,12 +228,12 @@ class DixlasePagesPageFactory extends Factory
                 'Career Opportunities',
                 'Media Coverage',
             ];
-            
+
             $title = $this->faker->randomElement($englishTitles);
-            
+
             return [
                 'title' => $title,
-                'slug' => Str::slug($title . '-' . $this->faker->unique()->numberBetween(1, 9999)),
+                'slug' => Str::slug($title.'-'.$this->faker->unique()->numberBetween(1, 9999)),
                 'content' => $this->generateMixedContent(false),
             ];
         });

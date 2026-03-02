@@ -59,9 +59,9 @@ class DixlasePagesStorePageRequest extends FormRequest
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
-            'storage_type' => ['required', Rule::enum(ContentStorageType::class)],
-            'editor_type' => ['required', Rule::enum(ContentEditorType::class)],
-            'status' => ['required', Rule::enum(ContentStatus::class)],
+            'storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
+            'editor_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentEditorType::cases()))],
+            'status' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStatus::cases()))],
             'published_at' => ['required_if:status,scheduled', 'nullable', 'date', 'after_or_equal:now'],
         ];
     }
@@ -89,12 +89,12 @@ class DixlasePagesStorePageRequest extends FormRequest
         }
 
         // 日付指定以外の場合はpublished_atをクリア
-        if ($this->status !== ContentStatus::SCHEDULED->value) {
+        if ($this->status !== ContentStatus::SCHEDULED->slug()) {
             $this->merge(['published_at' => null]);
         }
 
         // 公開ステータスの場合は現在時刻を設定
-        if ($this->status === ContentStatus::PUBLISHED->value) {
+        if ($this->status === ContentStatus::PUBLISHED->slug()) {
             $this->merge(['published_at' => now()]);
         }
     }

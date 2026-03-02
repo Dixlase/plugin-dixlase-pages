@@ -26,7 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     <div class="dixlase-page">
         <!-- プレビューモード表示 -->
         @auth('member')
-            @if($page->status->value !== 'published' || ($page->status->value === 'scheduled' && $page->published_at && $page->published_at->isFuture()))
+            @if($page->status->slug() !== 'published' || ($page->status->slug() === 'scheduled' && $page->published_at && $page->published_at->isFuture()))
                 <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
                     <div class="max-w-7xl mx-auto flex items-center">
                         <i class="fas fa-eye mr-3"></i>
@@ -74,7 +74,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 <div class="px-6 py-8">
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         @php
-                            $editorType = $page->editor_type->value ?? 'html';
+                            $editorType = $page->editor_type->slug() ?? 'html';
                             $content = $page->getContentByEditorType() ?? '';
                         @endphp
 

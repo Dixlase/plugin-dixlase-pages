@@ -38,19 +38,19 @@ class PageStatus
     public const SCHEDULED = ContentStatus::SCHEDULED;
 
     /**
-     * ContentStatusインスタンスを取得
+     * スラッグ文字列からContentStatusインスタンスを取得
      */
     public static function from(string $value): ContentStatus
     {
-        return ContentStatus::from($value);
+        return ContentStatus::fromSlug($value);
     }
 
     /**
-     * ContentStatusインスタンスを取得（失敗時はnull）
+     * スラッグ文字列からContentStatusインスタンスを取得（失敗時はnull）
      */
     public static function tryFrom(string $value): ?ContentStatus
     {
-        return ContentStatus::tryFrom($value);
+        return ContentStatus::tryFromSlug($value);
     }
 
     /**

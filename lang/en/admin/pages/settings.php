@@ -25,8 +25,8 @@ return [
     'description' => 'Configure page management settings including directory, defaults, and features.',
     'basic' => [
         'title' => 'Basic Settings',
-        'url_directory' => 'URL Directory',
-        'url_directory_help' => 'Directory name used in page URLs',
+        'route_slug' => 'URL Slug',
+        'route_slug_help' => 'URL slug used as the directory path for pages',
         'default_status' => 'Default Status',
         'default_editor_type' => 'Default Editor Type',
         'default_editor_type_help' => 'Default editor type when creating new pages.',

@@ -80,7 +80,7 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
     public function getRouteSlugs(): array
     {
         try {
-            $slug = DixlasePagesPageSetting::getValue('url_directory', 'pages');
+            $slug = DixlasePagesPageSetting::getValue('route_slug', 'pages');
         } catch (\Exception $e) {
             $slug = 'pages';
         }
@@ -88,8 +88,8 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
         return [
             new RegisteredSlug(
                 slug: $slug,
-                owner: 'dixlase-pages:url_directory',
-                label: 'dixlase-pages::route-slug.owners.url_directory',
+                owner: 'dixlase-pages:route_slug',
+                label: 'dixlase-pages::route-slug.owners.route_slug',
             ),
         ];
     }
