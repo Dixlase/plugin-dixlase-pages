@@ -268,6 +268,7 @@ class DixlasePagesAdminPagesController extends Controller
         // ページを作成（常にDBにもコンテンツを保存 = バックアップ）
         $page = DixlasePagesPage::create([
             'slug' => $validated['slug'],
+            'lang' => app()->getLocale(),
             'title' => $validated['title'] ?? null,
             'storage_type' => $storageType,
             'editor_type' => $editorType,
