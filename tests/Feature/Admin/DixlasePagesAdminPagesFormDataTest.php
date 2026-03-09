@@ -226,6 +226,71 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     }
 
     /**
+     * customCss/customJsが正しく返されることを確認
+     */
+    public function test_prepare_form_data_returns_custom_css_and_js(): void
+    {
+        $page = new DixlasePagesPage();
+        $result = $this->prepareFormData->invoke($this->controller, $page);
+
+        $this->assertArrayHasKey('customCss', $result);
+        $this->assertArrayHasKey('customJs', $result);
+        $this->assertSame('', $result['customCss']);
+        $this->assertSame('', $result['customJs']);
+    }
+
+    /**
+     * customCss/customJs引数が渡された場合はそちらが優先されることを確認
+     */
+    public function test_prepare_form_data_prefers_passed_custom_css_js_over_model(): void
+    {
+        $page = DixlasePagesPage::factory()->create([
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'custom_css' => 'body { color: red; }',
+            'custom_js' => 'console.log("db");',
+        ]);
+
+        $result = $this->prepareFormData->invoke(
+            $this->controller, $page, null, '.file-css { }', 'alert("file");'
+        );
+
+        $this->assertSame('.file-css { }', $result['customCss']);
+        $this->assertSame('alert("file");', $result['customJs']);
+    }
+
+    /**
+     * 既存ページのcustomCss/customJsがDBから取得されることを確認
+     */
+    public function test_prepare_form_data_returns_custom_css_js_from_model(): void
+    {
+        $page = DixlasePagesPage::factory()->create([
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'custom_css' => 'h1 { font-size: 2em; }',
+            'custom_js' => 'document.title = "test";',
+        ]);
+
+        $result = $this->prepareFormData->invoke($this->controller, $page);
+
+        $this->assertSame('h1 { font-size: 2em; }', $result['customCss']);
+        $this->assertSame('document.title = "test";', $result['customJs']);
+    }
+
+    /**
+     * 言語オプションが返されることを確認
+     */
+    public function test_prepare_form_data_returns_language_options(): void
+    {
+        $page = new DixlasePagesPage();
+        $result = $this->prepareFormData->invoke($this->controller, $page);
+
+        $this->assertArrayHasKey('languageOptions', $result);
+        $this->assertArrayHasKey('langValue', $result);
+        $this->assertIsArray($result['languageOptions']);
+    }
+
+    /**
      * slugBaseUrlにアプリURLが含まれスラッシュで終わることを確認
      */
     public function test_slug_base_url_contains_app_url_and_ends_with_slash(): void

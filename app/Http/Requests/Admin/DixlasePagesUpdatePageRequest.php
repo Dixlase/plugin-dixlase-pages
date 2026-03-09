@@ -63,6 +63,8 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             'storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
             'status' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStatus::cases()))],
             'published_at' => ['required_if:status,scheduled', 'nullable', 'date', 'after_or_equal:now'],
+            'custom_css' => ['nullable', 'string'],
+            'custom_js' => ['nullable', 'string'],
         ];
     }
 

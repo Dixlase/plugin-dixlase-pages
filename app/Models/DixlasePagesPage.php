@@ -53,6 +53,8 @@ class DixlasePagesPage extends Model
         'lang',
         'title',
         'content',
+        'custom_css',
+        'custom_js',
         'storage_type',
         'editor_type',
         'status',

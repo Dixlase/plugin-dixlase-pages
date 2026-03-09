@@ -46,6 +46,8 @@ return new class extends Migration
             $table->text('content_markdown')->nullable(); // Markdownエディタ用
             $table->text('content_html')->nullable(); // HTMLエディタ用
             $table->text('content_blade')->nullable(); // Bladeエディタ用
+            $table->text('custom_css')->nullable(); // カスタムCSS
+            $table->text('custom_js')->nullable(); // カスタムJavaScript
             $table->text('meta_description')->nullable(); // メタディスクリプション
             $table->unsignedBigInteger('ogp_image_id')->nullable(); // OGP画像
             $table->tinyInteger('storage_type')->default(0); // 保存方法（0=database, 1=file）

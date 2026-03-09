@@ -34,4 +34,12 @@ return [
     'sidebar_close' => '設定サイドバーを閉じる',
     'editor_type_help' => 'エディタータイプは新規作成時のみ選択でき、保存後は変更できません。',
     'preview' => 'プレビュー',
+    'preview_help' => '現在の未保存の内容をプレビューします。新しいウィンドウで開きます。',
+    'tab_content' => 'コンテンツ',
+    'tab_css' => 'CSS',
+    'tab_js' => 'JavaScript',
+    'css_placeholder' => 'このページ用のカスタムCSSを入力...',
+    'js_placeholder' => 'このページ用のカスタムJavaScriptを入力...',
+    'lang' => '言語',
+    'lang_help' => 'このページの言語。',
 ];

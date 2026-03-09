@@ -62,6 +62,8 @@ class DixlasePagesAdminPagesController extends Controller
         $page->title = $request->input('title', '');
         $page->slug = $request->input('slug', '');
         $page->content = $request->input('content', '');
+        $page->custom_css = $request->input('custom_css', '');
+        $page->custom_js = $request->input('custom_js', '');
         $page->editor_type = ContentEditorType::tryFromSlug(
             $request->input('editor_type', 'html')
         ) ?? ContentEditorType::HTML;
@@ -70,7 +72,21 @@ class DixlasePagesAdminPagesController extends Controller
         $page->status = $request->input('status', 'draft');
         $page->published_at = $request->input('published_at') ?: null;
 
-        return view('dixlase-pages::front.page', compact('page'));
+        // ビュー変数を準備（@phpブロック禁止のため）
+        $editorType = $page->editor_type->slug() ?? 'html';
+        $content = $page->getContentByEditorType() ?? '';
+        $hasCustomCss = ! empty($page->custom_css);
+        $hasCustomJs = ! empty($page->custom_js);
+        $customAssetVersion = time();
+
+        return view('dixlase-pages::front.page', compact(
+            'page',
+            'editorType',
+            'content',
+            'hasCustomCss',
+            'hasCustomJs',
+            'customAssetVersion',
+        ));
     }
 
     /**
@@ -142,10 +158,14 @@ class DixlasePagesAdminPagesController extends Controller
      * @param  string|null  $fileContents  ファイルから読み込んだコンテンツ
      * @return array<string, mixed> ビューに渡すフォームデータ
      */
-    private function prepareFormData(DixlasePagesPage $page, ?string $fileContents = null): array
+    private function prepareFormData(DixlasePagesPage $page, ?string $fileContents = null, ?string $customCss = null, ?string $customJs = null): array
     {
         // コンテンツ取得（新規ページの場合は空、既存ページはファイルまたはDBから）
         $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
+
+        // カスタムCSS/JS
+        $customCss = $customCss ?? ($page->custom_css ?? '');
+        $customJs = $customJs ?? ($page->custom_js ?? '');
 
         // ページディレクトリ設定
         $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
@@ -199,8 +219,16 @@ class DixlasePagesAdminPagesController extends Controller
             ? route('dixlase-pages::admin.pages.preview')
             : '';
 
+        // 言語オプション
+        $languageOptions = config('language.languages', []);
+
+        // 現在の言語値（既存ページはDBから、新規はアプリ言語）
+        $langValue = old('lang', $page->lang ?? app()->getLocale());
+
         return compact(
             'content',
+            'customCss',
+            'customJs',
             'slugBaseUrl',
             'storageOptions',
             'storageDescriptions',
@@ -212,6 +240,8 @@ class DixlasePagesAdminPagesController extends Controller
             'publishedAtValue',
             'fileStorageBasePath',
             'previewUrl',
+            'languageOptions',
+            'langValue',
         );
     }
 
@@ -250,15 +280,26 @@ class DixlasePagesAdminPagesController extends Controller
         $storageTypeSlug = $validated['storage_type'];
         $editorTypeSlug = $validated['editor_type'];
         $content = $validated['content'] ?? '';
+        $customCss = $validated['custom_css'] ?? '';
+        $customJs = $validated['custom_js'] ?? '';
+        $lang = $validated['lang'] ?? app()->getLocale();
 
         // ファイル保存の場合はファイルにも保存
         if ($storageTypeSlug === 'file') {
             $this->contentService->saveToFile(
                 $validated['slug'],
-                app()->getLocale(),
+                $lang,
                 $editorTypeSlug,
                 $content
             );
+
+            // CSS/JSファイルも保存
+            if (! empty($customCss)) {
+                $this->contentService->saveCssToFile($validated['slug'], $lang, $customCss);
+            }
+            if (! empty($customJs)) {
+                $this->contentService->saveJsToFile($validated['slug'], $lang, $customJs);
+            }
         }
 
         // スラッグからenumインスタンスに変換（int-backed enumはslugから変換が必要）
@@ -268,13 +309,15 @@ class DixlasePagesAdminPagesController extends Controller
         // ページを作成（常にDBにもコンテンツを保存 = バックアップ）
         $page = DixlasePagesPage::create([
             'slug' => $validated['slug'],
-            'lang' => app()->getLocale(),
+            'lang' => $lang,
             'title' => $validated['title'] ?? null,
             'storage_type' => $storageType,
             'editor_type' => $editorType,
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
             'content' => $content,
+            'custom_css' => $customCss,
+            'custom_js' => $customJs,
         ]);
 
         return redirect()
@@ -297,15 +340,21 @@ class DixlasePagesAdminPagesController extends Controller
     {
         // ファイル保存の場合、ファイルからコンテンツを読み込む
         $fileContents = null;
+        $customCss = null;
+        $customJs = null;
+        $locale = app()->getLocale();
+
         if ($page->storage_type === ContentStorageType::FILE) {
             $fileContents = $this->contentService->loadFromFile(
                 $page->slug,
-                app()->getLocale(),
+                $locale,
                 $page->editor_type->slug()
             );
+            $customCss = $this->contentService->getCssContent($page, $locale);
+            $customJs = $this->contentService->getJsContent($page, $locale);
         }
 
-        $formData = $this->prepareFormData($page, $fileContents);
+        $formData = $this->prepareFormData($page, $fileContents, $customCss, $customJs);
 
         return view('dixlase-pages::admin.pages.edit', array_merge(
             $this->viewParams,
@@ -333,15 +382,21 @@ class DixlasePagesAdminPagesController extends Controller
         // スラッグが変更された場合、ファイルをリネーム
         if ($oldStorageType === ContentStorageType::FILE && $oldSlug !== $validated['slug']) {
             $this->contentService->renameFile($oldSlug, $validated['slug'], $editorTypeSlug, $locale);
+            // CSS/JSファイルもリネーム
+            $this->contentService->renameAssetFiles($oldSlug, $validated['slug'], $locale);
         }
 
         $content = $validated['content'] ?? '';
+        $customCss = $validated['custom_css'] ?? '';
+        $customJs = $validated['custom_js'] ?? '';
 
         // 保存方法が変更された場合の処理
         if ($oldStorageType !== $newStorageType) {
             if ($oldStorageType === ContentStorageType::FILE && $newStorageType === ContentStorageType::DATABASE) {
                 // ファイル→DB: ファイルを削除（DBには常にバックアップがあるため読み込み不要）
                 $this->contentService->deleteFile($validated['slug'], $locale, $editorTypeSlug);
+                $this->contentService->deleteCssFile($validated['slug'], $locale);
+                $this->contentService->deleteJsFile($validated['slug'], $locale);
             }
         }
 
@@ -353,6 +408,18 @@ class DixlasePagesAdminPagesController extends Controller
                 $editorTypeSlug,
                 $content
             );
+
+            // CSS/JSファイルも保存
+            if (! empty($customCss)) {
+                $this->contentService->saveCssToFile($validated['slug'], $locale, $customCss);
+            } else {
+                $this->contentService->deleteCssFile($validated['slug'], $locale);
+            }
+            if (! empty($customJs)) {
+                $this->contentService->saveJsToFile($validated['slug'], $locale, $customJs);
+            } else {
+                $this->contentService->deleteJsFile($validated['slug'], $locale);
+            }
         }
 
         // ページを更新（常にDBにもコンテンツを保存 = バックアップ）
@@ -363,6 +430,8 @@ class DixlasePagesAdminPagesController extends Controller
             'status' => $validated['status'],
             'published_at' => $validated['published_at'] ?? null,
             'content' => $content,
+            'custom_css' => $customCss,
+            'custom_js' => $customJs,
         ]);
 
         return redirect()

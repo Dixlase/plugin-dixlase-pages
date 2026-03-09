@@ -28,6 +28,12 @@ document.addEventListener('alpine:init', () => {
         isEditMode: config.isEditMode || false,
         fileStorageBasePath: config.fileStorageBasePath || '',
         previewUrl: config.previewUrl || '',
+        // CSS/JSタブ
+        activeTab: 'content',
+        customCss: config.customCss || '',
+        customJs: config.customJs || '',
+        // 言語
+        lang: config.lang || '',
 
         init() {
             // 右サイドバーの有効化をレイアウトに通知
@@ -123,6 +129,8 @@ document.addEventListener('alpine:init', () => {
                 'storage_type': this.storageType,
                 'status': this.status,
                 'published_at': this.publishedAt,
+                'custom_css': this.customCss,
+                'custom_js': this.customJs,
             };
 
             for (const [key, value] of Object.entries(fields)) {

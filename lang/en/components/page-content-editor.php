@@ -34,4 +34,12 @@ return [
     'sidebar_close' => 'Close settings sidebar',
     'editor_type_help' => 'The editor type can only be selected when creating a new page and cannot be changed after saving.',
     'preview' => 'Preview',
+    'preview_help' => 'Preview the current unsaved content. Opens in a new window.',
+    'tab_content' => 'Content',
+    'tab_css' => 'CSS',
+    'tab_js' => 'JavaScript',
+    'css_placeholder' => 'Enter custom CSS for this page...',
+    'js_placeholder' => 'Enter custom JavaScript for this page...',
+    'lang' => 'Language',
+    'lang_help' => 'Language for this page.',
 ];

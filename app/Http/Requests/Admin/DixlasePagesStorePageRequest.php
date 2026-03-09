@@ -63,6 +63,9 @@ class DixlasePagesStorePageRequest extends FormRequest
             'editor_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentEditorType::cases()))],
             'status' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStatus::cases()))],
             'published_at' => ['required_if:status,scheduled', 'nullable', 'date', 'after_or_equal:now'],
+            'custom_css' => ['nullable', 'string'],
+            'custom_js' => ['nullable', 'string'],
+            'lang' => ['required', 'string', 'max:10'],
         ];
     }
 

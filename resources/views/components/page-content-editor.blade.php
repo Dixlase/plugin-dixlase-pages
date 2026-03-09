@@ -46,6 +46,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     'fileStorageBasePath' => '',
     // プレビューURL
     'previewUrl' => '',
+    // カスタムCSS/JS
+    'customCss' => '',
+    'customJs' => '',
+    // 言語オプション
+    'languageOptions' => [],
+    'langValue' => '',
 ])
 
 {{--
@@ -71,7 +77,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         slugBaseUrl: '{{ $slugBaseUrl }}',
         isEditMode: {{ $isEditMode ? 'true' : 'false' }},
         fileStorageBasePath: '{{ $fileStorageBasePath }}',
-        previewUrl: '{{ $previewUrl }}'
+        previewUrl: '{{ $previewUrl }}',
+        customCss: @js(old('custom_css', $customCss)),
+        customJs: @js(old('custom_js', $customJs)),
+        lang: '{{ $langValue }}'
      })">
 
         {{-- ===== メインコンテンツエリア ===== --}}
@@ -227,15 +236,76 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     </div>
                 </div>
 
-                {{-- HTML エディタ --}}
+                {{-- HTML エディタ（Content / CSS / JS タブ付き） --}}
                 <div x-show="editorType === 'html'" x-cloak>
-                    @include('components::form-textarea', [
-                        'id' => 'content_html',
-                        'name' => 'content',
-                        'value' => $content,
-                        'class' => 'min-h-96 font-mono text-sm',
-                        'xModel' => 'content',
-                    ])
+                    {{-- タブナビゲーション --}}
+                    <nav class="flex border-b border-gray-200 dark:border-gray-600 mb-4" role="tablist">
+                        <button type="button"
+                                @click="activeTab = 'content'"
+                                :class="activeTab === 'content'
+                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                role="tab"
+                                :aria-selected="activeTab === 'content'">
+                            <i class="fas fa-code mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_content') }}
+                        </button>
+                        <button type="button"
+                                @click="activeTab = 'css'"
+                                :class="activeTab === 'css'
+                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                role="tab"
+                                :aria-selected="activeTab === 'css'">
+                            <i class="fab fa-css3-alt mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_css') }}
+                        </button>
+                        <button type="button"
+                                @click="activeTab = 'js'"
+                                :class="activeTab === 'js'
+                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                role="tab"
+                                :aria-selected="activeTab === 'js'">
+                            <i class="fab fa-js mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_js') }}
+                        </button>
+                    </nav>
+
+                    {{-- Content タブ --}}
+                    <div x-show="activeTab === 'content'" role="tabpanel">
+                        @include('components::form-textarea', [
+                            'id' => 'content_html',
+                            'name' => 'content',
+                            'value' => $content,
+                            'class' => 'min-h-96 font-mono text-sm',
+                            'xModel' => 'content',
+                        ])
+                    </div>
+
+                    {{-- CSS タブ --}}
+                    <div x-show="activeTab === 'css'" x-cloak role="tabpanel">
+                        @include('components::form-textarea', [
+                            'id' => 'custom_css',
+                            'name' => 'custom_css',
+                            'value' => $customCss,
+                            'class' => 'min-h-96 font-mono text-sm',
+                            'xModel' => 'customCss',
+                            'placeholder' => __('dixlase-pages::components/page-content-editor.css_placeholder'),
+                        ])
+                    </div>
+
+                    {{-- JS タブ --}}
+                    <div x-show="activeTab === 'js'" x-cloak role="tabpanel">
+                        @include('components::form-textarea', [
+                            'id' => 'custom_js',
+                            'name' => 'custom_js',
+                            'value' => $customJs,
+                            'class' => 'min-h-96 font-mono text-sm',
+                            'xModel' => 'customJs',
+                            'placeholder' => __('dixlase-pages::components/page-content-editor.js_placeholder'),
+                        ])
+                    </div>
                 </div>
 
                 @include('components::form-error', ['name' => 'content'])
@@ -276,6 +346,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     class="w-full"
                     x-click="openPreview()"
                 />
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    {{ __('dixlase-pages::components/page-content-editor.preview_help') }}
+                </p>
             </div>
 
             {{-- 4. スラッグ --}}
@@ -343,7 +417,36 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-error', ['name' => 'storage_type'])
             </div>
 
-            
+
+            {{-- 6.5. 言語選択 --}}
+            <div>
+                @include('components::form-label', [
+                    'for' => 'lang',
+                    'text' => __('dixlase-pages::components/page-content-editor.lang'),
+                ])
+
+                @if ($isEditMode)
+                    {{-- 編集時: 言語表示（変更不可） --}}
+                    <div class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <i class="fas fa-globe text-gray-500"></i>
+                        <span class="font-medium text-gray-900 dark:text-white">
+                            {{ $languageOptions[$langValue] ?? $langValue }}
+                        </span>
+                    </div>
+                    <input type="hidden" name="lang" value="{{ $langValue }}">
+                @else
+                    <x-form-select
+                        name="lang"
+                        :options="$languageOptions"
+                        :value="$langValue"
+                        xModel="lang"
+                    />
+                @endif
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    {{ __('dixlase-pages::components/page-content-editor.lang_help') }}
+                </p>
+                @include('components::form-error', ['name' => 'lang'])
+            </div>
 
             {{-- 7. 公開設定 --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">

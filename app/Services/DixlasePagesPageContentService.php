@@ -22,8 +22,10 @@
 
 namespace Plugins\DixlasePages\App\Services;
 
+use App\Enums\ContentStorageType;
 use App\Traits\ManagesContentFiles;
 use Illuminate\Support\Facades\Storage;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 
 /**
  * ページコンテンツファイル管理サービス
@@ -118,6 +120,181 @@ class DixlasePagesPageContentService
                 if (! Storage::disk($this->disk)->delete($file)) {
                     $success = false;
                 }
+            }
+        }
+
+        return $success;
+    }
+
+    /**
+     * JS ファイルパスを取得する
+     *
+     * @param string $slug スラッグ
+     * @param string $locale 言語コード
+     * @return string ファイルパス
+     */
+    public function getJsFilePath(string $slug, string $locale): string
+    {
+        if ($locale === $this->defaultLocale) {
+            return "{$this->basePath}/{$slug}.js";
+        }
+
+        return "{$this->basePath}/{$slug}.{$locale}.js";
+    }
+
+    /**
+     * CSS ファイルパスを取得する
+     *
+     * @param string $slug スラッグ
+     * @param string $locale 言語コード
+     * @return string ファイルパス
+     */
+    public function getCssFilePath(string $slug, string $locale): string
+    {
+        if ($locale === $this->defaultLocale) {
+            return "{$this->basePath}/{$slug}.css";
+        }
+
+        return "{$this->basePath}/{$slug}.{$locale}.css";
+    }
+
+    /**
+     * JS コンテンツを取得する（DB or ファイル）
+     *
+     * @param DixlasePagesPage $page ページモデル
+     * @param string|null $locale 言語コード（nullの場合は現在の言語）
+     * @return string|null コンテンツ
+     */
+    public function getJsContent(DixlasePagesPage $page, ?string $locale = null): ?string
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        if ($page->storage_type === ContentStorageType::FILE) {
+            $filePath = $this->getJsFilePath($page->slug, $locale);
+
+            if (Storage::disk($this->disk)->exists($filePath)) {
+                return Storage::disk($this->disk)->get($filePath);
+            }
+        }
+
+        return $page->custom_js ?? null;
+    }
+
+    /**
+     * CSS コンテンツを取得する（DB or ファイル）
+     *
+     * @param DixlasePagesPage $page ページモデル
+     * @param string|null $locale 言語コード（nullの場合は現在の言語）
+     * @return string|null コンテンツ
+     */
+    public function getCssContent(DixlasePagesPage $page, ?string $locale = null): ?string
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        if ($page->storage_type === ContentStorageType::FILE) {
+            $filePath = $this->getCssFilePath($page->slug, $locale);
+
+            if (Storage::disk($this->disk)->exists($filePath)) {
+                return Storage::disk($this->disk)->get($filePath);
+            }
+        }
+
+        return $page->custom_css ?? null;
+    }
+
+    /**
+     * JS コンテンツをファイルに保存する
+     *
+     * @param string $slug スラッグ
+     * @param string $locale 言語コード
+     * @param string $content コンテンツ
+     * @return bool 保存成功時はtrue
+     */
+    public function saveJsToFile(string $slug, string $locale, string $content): bool
+    {
+        $filePath = $this->getJsFilePath($slug, $locale);
+
+        return Storage::disk($this->disk)->put($filePath, $content);
+    }
+
+    /**
+     * CSS コンテンツをファイルに保存する
+     *
+     * @param string $slug スラッグ
+     * @param string $locale 言語コード
+     * @param string $content コンテンツ
+     * @return bool 保存成功時はtrue
+     */
+    public function saveCssToFile(string $slug, string $locale, string $content): bool
+    {
+        $filePath = $this->getCssFilePath($slug, $locale);
+
+        return Storage::disk($this->disk)->put($filePath, $content);
+    }
+
+    /**
+     * JS ファイルを削除する
+     *
+     * @param string $slug スラッグ
+     * @param string $locale 言語コード
+     * @return bool 削除成功時はtrue
+     */
+    public function deleteJsFile(string $slug, string $locale): bool
+    {
+        $filePath = $this->getJsFilePath($slug, $locale);
+
+        if (Storage::disk($this->disk)->exists($filePath)) {
+            return Storage::disk($this->disk)->delete($filePath);
+        }
+
+        return true;
+    }
+
+    /**
+     * CSS ファイルを削除する
+     *
+     * @param string $slug スラッグ
+     * @param string $locale 言語コード
+     * @return bool 削除成功時はtrue
+     */
+    public function deleteCssFile(string $slug, string $locale): bool
+    {
+        $filePath = $this->getCssFilePath($slug, $locale);
+
+        if (Storage::disk($this->disk)->exists($filePath)) {
+            return Storage::disk($this->disk)->delete($filePath);
+        }
+
+        return true;
+    }
+
+    /**
+     * スラッグ変更時にCSS/JSファイルをリネームする
+     *
+     * @param string $oldSlug 旧スラッグ
+     * @param string $newSlug 新スラッグ
+     * @param string $locale 言語コード
+     * @return bool リネーム成功時はtrue
+     */
+    public function renameAssetFiles(string $oldSlug, string $newSlug, string $locale): bool
+    {
+        $success = true;
+
+        // JS ファイルのリネーム
+        $oldJsPath = $this->getJsFilePath($oldSlug, $locale);
+        $newJsPath = $this->getJsFilePath($newSlug, $locale);
+        if (Storage::disk($this->disk)->exists($oldJsPath)) {
+            if (! Storage::disk($this->disk)->move($oldJsPath, $newJsPath)) {
+                $success = false;
+            }
+        }
+
+        // CSS ファイルのリネーム
+        $oldCssPath = $this->getCssFilePath($oldSlug, $locale);
+        $newCssPath = $this->getCssFilePath($newSlug, $locale);
+        if (Storage::disk($this->disk)->exists($oldCssPath)) {
+            if (! Storage::disk($this->disk)->move($oldCssPath, $newCssPath)) {
+                $success = false;
             }
         }
 

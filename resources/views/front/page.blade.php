@@ -22,9 +22,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('title', $page->title)
 
+@if(!empty($hasCustomCss))
+    @push('styles')
+        <link rel="stylesheet" href="{{ route('dixlase-pages::page.custom-style', ['slug' => $page->slug]) }}?v={{ $customAssetVersion }}">
+    @endpush
+@endif
+
+@if(!empty($hasCustomJs))
+    @push('scripts')
+        <script src="{{ route('dixlase-pages::page.custom-script', ['slug' => $page->slug]) }}?v={{ $customAssetVersion }}" defer></script>
+    @endpush
+@endif
+
 @section('content')
     <div class="dixlase-page">
-        <!-- プレビューモード表示 -->
+        <!-- Preview mode banner -->
         @auth('member')
             @if($page->status->slug() !== 'published' || ($page->status->slug() === 'scheduled' && $page->published_at && $page->published_at->isFuture()))
                 <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
@@ -32,63 +44,46 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         <i class="fas fa-eye mr-3"></i>
                         <div>
                             <p class="font-bold">
-                                @if(app()->getLocale() === 'ja')
-                                    プレビューモード
-                                @else
-                                    Preview Mode
-                                @endif
+                                {{ __('dixlase-pages::front/page.preview_mode') }}
                             </p>
                             <p class="text-sm">
-                                @if(app()->getLocale() === 'ja')
-                                    このページは管理者のみ閲覧可能です（ステータス: {{ $page->status->label() }}）
-                                @else
-                                    This page is only visible to administrators (Status: {{ $page->status->label() }})
-                                @endif
+                                {{ __('dixlase-pages::front/page.preview_description', ['status' => $page->status->label()]) }}
                             </p>
                         </div>
                     </div>
                 </div>
             @endif
         @endauth
-        
-        <!-- メインコンテンツ -->
+
+        <!-- Main content -->
         <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <article class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                <!-- ページヘッダー -->
+                <!-- Page header -->
                 <header class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
                     <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                         {{ $page->title }}
                     </h1>
                     @if($page->published_at)
                         <time datetime="{{ $page->published_at->toISOString() }}" class="text-sm text-gray-600 dark:text-gray-400">
-                            @if(app()->getLocale() === 'ja')
-                                公開日: {{ $page->published_at->format('Y年m月d日') }}
-                            @else
-                                Published: {{ $page->published_at->format('F d, Y') }}
-                            @endif
+                            {{ __('dixlase-pages::front/page.published_at', ['date' => $page->published_at->translatedFormat(__('dixlase-pages::front/page.date_format'))]) }}
                         </time>
                     @endif
                 </header>
-                
-                <!-- ページコンテンツ -->
+
+                <!-- Page content -->
                 <div class="px-6 py-8">
                     <div class="prose prose-lg dark:prose-invert max-w-none">
-                        @php
-                            $editorType = $page->editor_type->slug() ?? 'html';
-                            $content = $page->getContentByEditorType() ?? '';
-                        @endphp
-
                         @if($editorType === 'markdown')
-                            {{-- Markdownの場合はパースして出力（ショートコード処理付き） --}}
+                            {{-- Markdown: parse and output with shortcode processing --}}
                             {!! shortcode_parse(\Illuminate\Support\Str::markdown($content)) !!}
                         @elseif($editorType === 'html')
-                            {{-- HTMLの場合はショートコード処理して出力 --}}
+                            {{-- HTML: output with shortcode processing --}}
                             {!! shortcode_parse($content) !!}
                         @elseif($editorType === 'blade')
-                            {{-- Bladeの場合はBladeとしてレンダリング（ショートコード処理付き） --}}
+                            {{-- Blade: render as Blade template with shortcode processing --}}
                             {!! shortcode_parse(\Illuminate\Support\Facades\Blade::render($content, ['page' => $page])) !!}
                         @else
-                            {{-- その他の場合はエスケープして出力 --}}
+                            {{-- Other: escape and output --}}
                             {!! nl2br(e($content)) !!}
                         @endif
                     </div>
