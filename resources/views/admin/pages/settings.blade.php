@@ -24,6 +24,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     <form id="pages-settings-form" action="{{ route('dixlase-pages::admin.pages.settings.update') }}" method="POST">
         @csrf
 
+        {{-- Simple mode notice --}}
+        @if($isSimpleMode)
+            <div class="mb-6">
+                <x-ui-message type="info" :message="__('dixlase-pages::admin/pages/settings.simple_mode_notice')" />
+            </div>
+        @endif
+
         {{-- 基本設定 --}}
         <section class="mb-8">
             <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.basic.title') }}</h2>
@@ -80,28 +87,32 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         name="default_editor_type"
                         :options="$editorTypeCardOptions"
                         :value="old('default_editor_type', $settings['default_editor_type'] ?? 'html')"
-                        :columns="3"
+                        :columns="{{ $isSimpleMode ? '2' : '3' }}"
                     />
                     <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_editor_type_help')" />
                     <x-form-error name="default_editor_type" />
                 </div>
 
-                {{-- デフォルト保存方式 --}}
-                <div>
-                    <x-form-label
-                        :text="__('dixlase-pages::admin/pages/settings.basic.default_storage_type')"
-                        :required="true"
-                        class="mb-2"
-                    />
-                    <x-form-radio-card-group
-                        name="default_storage_type"
-                        :options="$storageTypeCardOptions"
-                        :value="old('default_storage_type', $settings['default_storage_type'] ?? 'database')"
-                        :columns="2"
-                    />
-                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_storage_type_help')" />
-                    <x-form-error name="default_storage_type" />
-                </div>
+                {{-- デフォルト保存方式 (hidden in simple mode) --}}
+                @if($isSimpleMode)
+                    <input type="hidden" name="default_storage_type" value="database">
+                @else
+                    <div>
+                        <x-form-label
+                            :text="__('dixlase-pages::admin/pages/settings.basic.default_storage_type')"
+                            :required="true"
+                            class="mb-2"
+                        />
+                        <x-form-radio-card-group
+                            name="default_storage_type"
+                            :options="$storageTypeCardOptions"
+                            :value="old('default_storage_type', $settings['default_storage_type'] ?? 'database')"
+                            :columns="2"
+                        />
+                        <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_storage_type_help')" />
+                        <x-form-error name="default_storage_type" />
+                    </div>
+                @endif
             </div>
         </section>
 

@@ -25,6 +25,7 @@ namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Models\BaseSetting;
 use App\Traits\AdminInterfaceTrait;
 use App\Traits\AdminLoggedInTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -160,6 +161,8 @@ class DixlasePagesAdminPagesController extends Controller
      */
     private function prepareFormData(DixlasePagesPage $page, ?string $fileContents = null, ?string $customCss = null, ?string $customJs = null): array
     {
+        // Determine admin mode (Simple=0, Advanced=1)
+        $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
         // コンテンツ取得（新規ページの場合は空、既存ページはファイルまたはDBから）
         $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
 
@@ -185,27 +188,37 @@ class DixlasePagesAdminPagesController extends Controller
             $statusOptions[$value] = $option['label'];
         }
 
-        // エディター翻訳キー（Alpine.js $t()用）
-        $editorTranslations = [
-            'common.content_editor.gui' => __('common.content_editor.gui'),
-            'common.content_editor.gui_description' => __('common.content_editor.gui_description'),
-            'common.content_editor.markdown' => __('common.content_editor.markdown'),
-            'common.content_editor.markdown_description' => __('common.content_editor.markdown_description'),
-            'common.content_editor.html' => __('common.content_editor.html'),
-            'common.content_editor.html_description' => __('common.content_editor.html_description'),
-        ];
+        // Editor types available based on mode
+        // Simple mode: GUI and Markdown only (unless editing a page with HTML/Blade)
+        $simpleEditorSlugs = ['gui', 'markdown'];
+        $allEditorSlugs = ['gui', 'markdown', 'html'];
 
-        // エディタータイプ別アイコン・色マップ
-        $editorIcons = [
+        // For edit mode, include the page's current editor type even in simple mode (Strategy B)
+        $currentEditorSlug = $page->exists ? $page->editor_type->slug() : null;
+        $isAdvancedEditor = $currentEditorSlug && ! in_array($currentEditorSlug, $simpleEditorSlugs);
+
+        $activeSlugs = $isSimpleMode && ! $isAdvancedEditor ? $simpleEditorSlugs : $allEditorSlugs;
+
+        // Editor translation keys (for Alpine.js $t())
+        $editorTranslations = [];
+        foreach ($activeSlugs as $slug) {
+            $editorTranslations["common.content_editor.{$slug}"] = __("common.content_editor.{$slug}");
+            $editorTranslations["common.content_editor.{$slug}_description"] = __("common.content_editor.{$slug}_description");
+        }
+
+        // Editor type icon/color maps
+        $editorIconsMap = [
             'gui' => 'fas fa-magic',
             'markdown' => 'fab fa-markdown',
             'html' => 'fas fa-code',
         ];
-        $editorColors = [
+        $editorColorsMap = [
             'gui' => 'purple',
             'markdown' => 'blue',
             'html' => 'orange',
         ];
+        $editorIcons = array_intersect_key($editorIconsMap, array_flip($activeSlugs));
+        $editorColors = array_intersect_key($editorColorsMap, array_flip($activeSlugs));
 
         // old()込みのステータス値（Alpine.js初期化用）
         $statusValue = old('status', $page->status->slug());
@@ -242,6 +255,8 @@ class DixlasePagesAdminPagesController extends Controller
             'previewUrl',
             'languageOptions',
             'langValue',
+            'isSimpleMode',
+            'isAdvancedEditor',
         );
     }
 
@@ -252,14 +267,29 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $page = new DixlasePagesPage();
 
+        // Determine admin mode (Simple=0, Advanced=1)
+        $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
+
         // 設定のデフォルト値を適用（int-backed enumにはslugから変換が必要）
         $page->status = DixlasePagesPageSetting::getValue('default_status', 'draft');
-        $page->editor_type = ContentEditorType::tryFromSlug(
-            DixlasePagesPageSetting::getValue('default_editor_type', 'html')
-        ) ?? ContentEditorType::HTML;
-        $page->storage_type = ContentStorageType::tryFromSlug(
-            DixlasePagesPageSetting::getValue('default_storage_type', 'database')
-        ) ?? ContentStorageType::DATABASE;
+
+        if ($isSimpleMode) {
+            // Simple mode: force database storage, use default editor (GUI/Markdown only)
+            $page->storage_type = ContentStorageType::DATABASE;
+            $defaultEditor = DixlasePagesPageSetting::getValue('default_editor_type', 'markdown');
+            $simpleSlugs = ['gui', 'markdown'];
+            // If the saved default is not GUI/MD, fall back to markdown
+            $page->editor_type = in_array($defaultEditor, $simpleSlugs)
+                ? (ContentEditorType::tryFromSlug($defaultEditor) ?? ContentEditorType::MARKDOWN)
+                : ContentEditorType::MARKDOWN;
+        } else {
+            $page->editor_type = ContentEditorType::tryFromSlug(
+                DixlasePagesPageSetting::getValue('default_editor_type', 'html')
+            ) ?? ContentEditorType::HTML;
+            $page->storage_type = ContentStorageType::tryFromSlug(
+                DixlasePagesPageSetting::getValue('default_storage_type', 'database')
+            ) ?? ContentStorageType::DATABASE;
+        }
 
         $formData = $this->prepareFormData($page);
 
@@ -461,6 +491,9 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function settings()
     {
+        // Determine admin mode (Simple=0, Advanced=1)
+        $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
+
         // 設定データを取得
         $settings = DixlasePagesPageSetting::pluck('value', 'name')->toArray();
 
@@ -493,6 +526,9 @@ class DixlasePagesAdminPagesController extends Controller
             'markdown' => 'blue',
             'html' => 'orange',
         ];
+        // Simple mode: only GUI and Markdown editors available
+        $simpleModeEditorSlugs = ['gui', 'markdown'];
+
         $editorTypeCardOptions = [];
         foreach (ContentEditorType::cases() as $type) {
             // Bladeエディタは現バージョンでは無効
@@ -500,6 +536,10 @@ class DixlasePagesAdminPagesController extends Controller
                 continue;
             }
             $slug = $type->slug();
+            // Simple mode: skip HTML editor
+            if ($isSimpleMode && ! in_array($slug, $simpleModeEditorSlugs)) {
+                continue;
+            }
             $editorTypeCardOptions[] = [
                 'value' => $slug,
                 'label' => __($type->translationKey()),
@@ -538,6 +578,7 @@ class DixlasePagesAdminPagesController extends Controller
         $this->viewParams['editorTypeCardOptions'] = $editorTypeCardOptions;
         $this->viewParams['storageTypeCardOptions'] = $storageTypeCardOptions;
         $this->viewParams['siteUrl'] = $siteUrl;
+        $this->viewParams['isSimpleMode'] = $isSimpleMode;
 
         return view('dixlase-pages::admin.pages.settings', $this->viewParams);
     }

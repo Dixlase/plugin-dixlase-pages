@@ -42,4 +42,7 @@ return [
     'js_placeholder' => 'このページ用のカスタムJavaScriptを入力...',
     'lang' => '言語',
     'lang_help' => 'このページの言語。',
+    'simple_mode_notice' => '簡単モードでは一部の設定が自動的に構成されます。すべての設定をカスタマイズするには詳細モードに切り替えてください。',
+    'advanced_editor_notice' => 'このページは上級者向けのエディタタイプを使用しています。引き続き編集できますが、簡単モードでの新規ページはGUIとMarkdownエディタのみに制限されます。',
+    'slug_auto_generated' => 'スラッグはタイトルから自動生成されます。',
 ];

@@ -42,4 +42,7 @@ return [
     'js_placeholder' => 'Enter custom JavaScript for this page...',
     'lang' => 'Language',
     'lang_help' => 'Language for this page.',
+    'simple_mode_notice' => 'Some settings are automatically configured in Simple mode. Switch to Advanced mode to customize all settings.',
+    'advanced_editor_notice' => 'This page uses an advanced editor type. You can continue editing it, but new pages in Simple mode are limited to GUI and Markdown editors.',
+    'slug_auto_generated' => 'The slug will be auto-generated from the title.',
 ];

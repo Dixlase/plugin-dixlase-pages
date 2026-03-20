@@ -34,6 +34,9 @@ document.addEventListener('alpine:init', () => {
         customJs: config.customJs || '',
         // 言語
         lang: config.lang || '',
+        // Simple mode
+        isSimpleMode: config.isSimpleMode || false,
+        isAdvancedEditor: config.isAdvancedEditor || false,
 
         init() {
             // 右サイドバーの有効化をレイアウトに通知
@@ -50,6 +53,7 @@ document.addEventListener('alpine:init', () => {
         /**
          * 現在のストレージタイプで利用可能なエディター一覧を返す
          * 編集時は現在のエディタータイプのみ返す
+         * 簡単モードではGUI/Markdownのみ（ただし既存のHTML/Bladeページは例外）
          */
         get availableEditors() {
             if (this.isEditMode) {
@@ -59,7 +63,12 @@ document.addEventListener('alpine:init', () => {
                 'database': ['gui', 'markdown', 'html'],
                 'file': ['gui', 'markdown', 'html'],
             };
-            return editors[this.storageType] || [];
+            let available = editors[this.storageType] || [];
+            // Simple mode: restrict to GUI and Markdown only (for new pages)
+            if (this.isSimpleMode && !this.isAdvancedEditor) {
+                available = available.filter(e => ['gui', 'markdown'].includes(e));
+            }
+            return available;
         },
 
         /**
