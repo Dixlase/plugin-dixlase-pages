@@ -52,6 +52,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     // 言語オプション
     'languageOptions' => [],
     'langValue' => '',
+    // 簡単モード
+    'isSimpleMode' => false,
+    'isAdvancedEditor' => false,
 ])
 
 {{--
@@ -80,7 +83,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         previewUrl: '{{ $previewUrl }}',
         customCss: @js(old('custom_css', $customCss)),
         customJs: @js(old('custom_js', $customJs)),
-        lang: '{{ $langValue }}'
+        lang: '{{ $langValue }}',
+        isSimpleMode: {{ $isSimpleMode ? 'true' : 'false' }},
+        isAdvancedEditor: {{ $isAdvancedEditor ? 'true' : 'false' }}
      })">
 
         {{-- ===== メインコンテンツエリア ===== --}}
@@ -238,42 +243,44 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
                 {{-- HTML エディタ（Content / CSS / JS タブ付き） --}}
                 <div x-show="editorType === 'html'" x-cloak>
-                    {{-- タブナビゲーション --}}
-                    <nav class="flex border-b border-gray-200 dark:border-gray-600 mb-4" role="tablist">
-                        <button type="button"
-                                @click="activeTab = 'content'"
-                                :class="activeTab === 'content'
-                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                role="tab"
-                                :aria-selected="activeTab === 'content'">
-                            <i class="fas fa-code mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_content') }}
-                        </button>
-                        <button type="button"
-                                @click="activeTab = 'css'"
-                                :class="activeTab === 'css'
-                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                role="tab"
-                                :aria-selected="activeTab === 'css'">
-                            <i class="fab fa-css3-alt mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_css') }}
-                        </button>
-                        <button type="button"
-                                @click="activeTab = 'js'"
-                                :class="activeTab === 'js'
-                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                role="tab"
-                                :aria-selected="activeTab === 'js'">
-                            <i class="fab fa-js mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_js') }}
-                        </button>
-                    </nav>
+                    @if(!$isSimpleMode)
+                        {{-- タブナビゲーション (advanced mode only) --}}
+                        <nav class="flex border-b border-gray-200 dark:border-gray-600 mb-4" role="tablist">
+                            <button type="button"
+                                    @click="activeTab = 'content'"
+                                    :class="activeTab === 'content'
+                                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                    class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                    role="tab"
+                                    :aria-selected="activeTab === 'content'">
+                                <i class="fas fa-code mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_content') }}
+                            </button>
+                            <button type="button"
+                                    @click="activeTab = 'css'"
+                                    :class="activeTab === 'css'
+                                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                    class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                    role="tab"
+                                    :aria-selected="activeTab === 'css'">
+                                <i class="fab fa-css3-alt mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_css') }}
+                            </button>
+                            <button type="button"
+                                    @click="activeTab = 'js'"
+                                    :class="activeTab === 'js'
+                                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                    class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                    role="tab"
+                                    :aria-selected="activeTab === 'js'">
+                                <i class="fab fa-js mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_js') }}
+                            </button>
+                        </nav>
+                    @endif
 
                     {{-- Content タブ --}}
-                    <div x-show="activeTab === 'content'" role="tabpanel">
+                    <div @if(!$isSimpleMode) x-show="activeTab === 'content'" @endif role="tabpanel">
                         @include('components::form-textarea', [
                             'id' => 'content_html',
                             'name' => 'content',
@@ -283,29 +290,31 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         ])
                     </div>
 
-                    {{-- CSS タブ --}}
-                    <div x-show="activeTab === 'css'" x-cloak role="tabpanel">
-                        @include('components::form-textarea', [
-                            'id' => 'custom_css',
-                            'name' => 'custom_css',
-                            'value' => $customCss,
-                            'class' => 'min-h-96 font-mono text-sm',
-                            'xModel' => 'customCss',
-                            'placeholder' => __('dixlase-pages::components/page-content-editor.css_placeholder'),
-                        ])
-                    </div>
+                    @if(!$isSimpleMode)
+                        {{-- CSS タブ --}}
+                        <div x-show="activeTab === 'css'" x-cloak role="tabpanel">
+                            @include('components::form-textarea', [
+                                'id' => 'custom_css',
+                                'name' => 'custom_css',
+                                'value' => $customCss,
+                                'class' => 'min-h-96 font-mono text-sm',
+                                'xModel' => 'customCss',
+                                'placeholder' => __('dixlase-pages::components/page-content-editor.css_placeholder'),
+                            ])
+                        </div>
 
-                    {{-- JS タブ --}}
-                    <div x-show="activeTab === 'js'" x-cloak role="tabpanel">
-                        @include('components::form-textarea', [
-                            'id' => 'custom_js',
-                            'name' => 'custom_js',
-                            'value' => $customJs,
-                            'class' => 'min-h-96 font-mono text-sm',
-                            'xModel' => 'customJs',
-                            'placeholder' => __('dixlase-pages::components/page-content-editor.js_placeholder'),
-                        ])
-                    </div>
+                        {{-- JS タブ --}}
+                        <div x-show="activeTab === 'js'" x-cloak role="tabpanel">
+                            @include('components::form-textarea', [
+                                'id' => 'custom_js',
+                                'name' => 'custom_js',
+                                'value' => $customJs,
+                                'class' => 'min-h-96 font-mono text-sm',
+                                'xModel' => 'customJs',
+                                'placeholder' => __('dixlase-pages::components/page-content-editor.js_placeholder'),
+                            ])
+                        </div>
+                    @endif
                 </div>
 
                 @include('components::form-error', ['name' => 'content'])
@@ -337,6 +346,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
              :style="rightSidebarReady ? 'transition: transform 300ms ease-in-out' : ''"
              >
 
+            {{-- Simple mode notice --}}
+            @if($isSimpleMode)
+                <x-ui-message type="info" :message="__('dixlase-pages::components/page-content-editor.simple_mode_notice')" textSize="text-xs" />
+            @endif
+
+            {{-- Advanced editor notice (HTML/Blade page in simple mode) --}}
+            @if($isSimpleMode && $isAdvancedEditor)
+                <x-ui-message type="warning" :message="__('dixlase-pages::components/page-content-editor.advanced_editor_notice')" textSize="text-xs" />
+            @endif
+
             {{-- 6. プレビュー --}}
             <div>
                 <x-form-button
@@ -353,69 +372,85 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </div>
 
             {{-- 4. スラッグ --}}
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                @include('components::form-label', [
-                    'for' => 'slug',
-                    'text' => __('dixlase-pages::components/page-content-editor.slug'),
-                ])
-                @include('components::form-text', [
-                    'name' => 'slug',
-                    'value' => $slugValue,
-                    'xModel' => 'slug',
-                ])
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {{ __('dixlase-pages::components/page-content-editor.slug_help') }}
-                </p>
-                {{-- URLプレビュー --}}
-                <div class="mt-2 text-sm" x-show="slug" x-cloak>
-                    <span class="text-gray-500 dark:text-gray-400">{{ __('dixlase-pages::components/page-content-editor.slug_url_preview') }}:</span>
-                    @if ($isEditMode)
-                        <a :href="pageUrl" target="_blank" rel="noopener noreferrer"
-                           class="font-mono text-blue-600 dark:text-blue-400 break-all hover:underline"
-                           x-text="pageUrl"></a>
-                    @else
-                        <span class="font-mono text-blue-600 dark:text-blue-400 break-all" x-text="pageUrl"></span>
-                    @endif
+            @if($isSimpleMode && !$isEditMode)
+                {{-- Simple mode (new page): slug auto-generated from title --}}
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        {{ __('dixlase-pages::components/page-content-editor.slug_auto_generated') }}
+                    </p>
+                    @include('components::form-error', ['name' => 'slug'])
                 </div>
-                @include('components::form-error', ['name' => 'slug'])
-            </div>
+            @else
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    @include('components::form-label', [
+                        'for' => 'slug',
+                        'text' => __('dixlase-pages::components/page-content-editor.slug'),
+                    ])
+                    @include('components::form-text', [
+                        'name' => 'slug',
+                        'value' => $slugValue,
+                        'xModel' => 'slug',
+                    ])
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {{ __('dixlase-pages::components/page-content-editor.slug_help') }}
+                    </p>
+                    {{-- URLプレビュー --}}
+                    <div class="mt-2 text-sm" x-show="slug" x-cloak>
+                        <span class="text-gray-500 dark:text-gray-400">{{ __('dixlase-pages::components/page-content-editor.slug_url_preview') }}:</span>
+                        @if ($isEditMode)
+                            <a :href="pageUrl" target="_blank" rel="noopener noreferrer"
+                               class="font-mono text-blue-600 dark:text-blue-400 break-all hover:underline"
+                               x-text="pageUrl"></a>
+                        @else
+                            <span class="font-mono text-blue-600 dark:text-blue-400 break-all" x-text="pageUrl"></span>
+                        @endif
+                    </div>
+                    @include('components::form-error', ['name' => 'slug'])
+                </div>
+            @endif
 
             {{-- 5. 保存方法選択 --}}
-            <div>
-                @include('components::form-label', [
-                    'for' => 'storage_type',
-                    'text' => __('common.content_storage.label'),
-                ])
+            @if($isSimpleMode)
+                {{-- Simple mode: force database storage --}}
+                <input type="hidden" name="storage_type" value="database">
+            @else
+                <div>
+                    @include('components::form-label', [
+                        'for' => 'storage_type',
+                        'text' => __('common.content_storage.label'),
+                    ])
 
-                <x-form-select
-                    name="storage_type"
-                    :options="$storageOptions"
-                    :value="$storageType"
-                    xModel="storageType"
-                />
-                <ul class="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                    @foreach ($storageDescriptions as $value => $description)
-                        <li><span class="font-medium text-gray-700 dark:text-gray-300">{{ $storageOptions[$value] }}</span> — {{ $description }}</li>
-                    @endforeach
-                </ul>
+                    <x-form-select
+                        name="storage_type"
+                        :options="$storageOptions"
+                        :value="$storageType"
+                        xModel="storageType"
+                    />
+                    <ul class="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
+                        @foreach ($storageDescriptions as $value => $description)
+                            <li><span class="font-medium text-gray-700 dark:text-gray-300">{{ $storageOptions[$value] }}</span> — {{ $description }}</li>
+                        @endforeach
+                    </ul>
 
-                {{-- ファイル保存時の情報表示 --}}
-                <div x-show="isFileStorage" x-cloak class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <div class="flex items-start">
-                        <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
-                        <div class="flex-1">
-                            <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                                {{ __('common.content_storage.file_info_title') }}
-                            </div>
-                            <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                                <p>{{ __('common.content_storage.file_info_description') }}</p>
-                                <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
+                    {{-- ファイル保存時の情報表示 --}}
+                    <div x-show="isFileStorage" x-cloak class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                            <div class="flex-1">
+                                <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
+                                    {{ __('common.content_storage.file_info_title') }}
+                                </div>
+                                <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                                    <p>{{ __('common.content_storage.file_info_description') }}</p>
+                                    <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    @include('components::form-error', ['name' => 'storage_type'])
                 </div>
-                @include('components::form-error', ['name' => 'storage_type'])
-            </div>
+            @endif
 
 
             {{-- 6.5. 言語選択 --}}

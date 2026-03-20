@@ -33,6 +33,7 @@ return [
         'default_storage_type' => 'Default Storage Method',
         'default_storage_type_help' => 'Default content storage method when creating new pages.',
     ],
+    'simple_mode_notice' => 'Some settings are automatically configured in Simple mode. Switch to Advanced mode to customize all settings.',
     'confirm_title' => 'Save Page Settings',
     'confirm_message' => 'Are you sure you want to save the page settings?',
     'success' => 'Page settings have been updated successfully.',

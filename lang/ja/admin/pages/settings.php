@@ -33,6 +33,7 @@ return [
         'default_storage_type' => 'デフォルト保存方式',
         'default_storage_type_help' => '新規ページ作成時のデフォルト保存方式。',
     ],
+    'simple_mode_notice' => '簡単モードでは一部の設定が自動的に構成されます。すべての設定をカスタマイズするには詳細モードに切り替えてください。',
     'confirm_title' => 'ページ設定の保存',
     'confirm_message' => 'ページ設定を保存してもよろしいですか？',
     'success' => 'ページ設定が更新されました。',

@@ -38,4 +38,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     :isEditMode="$page->exists"
     :fileStorageBasePath="$fileStorageBasePath"
     :previewUrl="$previewUrl"
+    :isSimpleMode="$isSimpleMode"
+    :isAdvancedEditor="$isAdvancedEditor"
 />
