@@ -51,11 +51,6 @@ class DixlasePagesPagesTableSeeder extends Seeder
                 ]),
             );
         }
-
-        // Generate factory data in development environment only
-        if (app()->environment('local', 'development')) {
-            DixlasePagesPage::factory()->count(20)->create();
-        }
     }
 
     /**
