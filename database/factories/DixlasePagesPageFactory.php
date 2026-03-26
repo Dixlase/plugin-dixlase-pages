@@ -47,20 +47,20 @@ class DixlasePagesPageFactory extends Factory
         $appLocale = config('app.locale', 'ja');
         $isJapaneseLocale = in_array($appLocale, ['ja', 'ja_JP']);
 
-        // 日本語と英語のタイトル候補（利用規約・プライバシーポリシーは除外）
-        $japaneseTitles = [
-            'お知らせ',
-            'サービス紹介',
-            '会社概要',
-            'よくある質問',
-            'お問い合わせ',
-            'ニュース',
-            'イベント情報',
-            '製品情報',
-            'サポート',
-            'ブログ記事',
-            '採用情報',
-            'メディア掲載',
+        // Japanese title => slug mapping (Str::slug cannot handle Japanese)
+        $japaneseTitleSlugs = [
+            'お知らせ' => 'news',
+            'サービス紹介' => 'services',
+            '会社概要' => 'about',
+            'よくある質問' => 'faq',
+            'お問い合わせ' => 'contact',
+            'ニュース' => 'latest-news',
+            'イベント情報' => 'events',
+            '製品情報' => 'products',
+            'サポート' => 'support',
+            'ブログ記事' => 'blog',
+            '採用情報' => 'careers',
+            'メディア掲載' => 'media',
         ];
 
         $englishTitles = [
@@ -78,26 +78,29 @@ class DixlasePagesPageFactory extends Factory
             'Media Coverage',
         ];
 
-        // 基本設定の言語に応じてタイトルを選択（80%の確率でメイン言語、20%で他言語）
+        // Select title based on locale (80% primary language, 20% other)
         $isJapanese = $isJapaneseLocale
             ? $this->faker->boolean(80)
             : $this->faker->boolean(20);
 
-        $title = $isJapanese
-            ? $this->faker->randomElement($japaneseTitles)
-            : $this->faker->randomElement($englishTitles);
+        if ($isJapanese) {
+            $title = $this->faker->randomElement(array_keys($japaneseTitleSlugs));
+            $slug = $japaneseTitleSlugs[$title].'-'.$this->faker->unique()->numberBetween(1, 9999);
+        } else {
+            $title = $this->faker->randomElement($englishTitles);
+            $slug = Str::slug($title.'-'.$this->faker->unique()->numberBetween(1, 9999));
+        }
 
-        // コンテンツも言語に応じて生成
         $content = $this->generateMixedContent($isJapanese);
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title.'-'.$this->faker->unique()->numberBetween(1, 9999)), // 重複を避けるため番号追加
-            'lang' => config('language.default', 'en'), // 言語コード
+            'slug' => $slug,
+            'lang' => config('app.locale', 'en'),
             'storage_type' => ContentStorageType::DATABASE,
             'editor_type' => ContentEditorType::HTML,
             'status' => $this->faker->randomElement([ContentStatus::DRAFT, ContentStatus::PUBLISHED, ContentStatus::SCHEDULED]),
-            'published_at' => $this->faker->boolean(70) ? now() : null, // 70%の確率で公開日時を設定
+            'published_at' => $this->faker->boolean(70) ? now() : null,
             'content' => $content,
             'created_at' => now(),
             'updated_at' => now(),
@@ -183,26 +186,27 @@ class DixlasePagesPageFactory extends Factory
     public function japanese(): static
     {
         return $this->state(function (array $attributes) {
-            $japaneseTitles = [
-                'お知らせ',
-                'サービス紹介',
-                '会社概要',
-                'よくある質問',
-                'お問い合わせ',
-                'ニュース',
-                'イベント情報',
-                '製品情報',
-                'サポート',
-                'ブログ記事',
-                '採用情報',
-                'メディア掲載',
+            $japaneseTitleSlugs = [
+                'お知らせ' => 'news',
+                'サービス紹介' => 'services',
+                '会社概要' => 'about',
+                'よくある質問' => 'faq',
+                'お問い合わせ' => 'contact',
+                'ニュース' => 'latest-news',
+                'イベント情報' => 'events',
+                '製品情報' => 'products',
+                'サポート' => 'support',
+                'ブログ記事' => 'blog',
+                '採用情報' => 'careers',
+                'メディア掲載' => 'media',
             ];
 
-            $title = $this->faker->randomElement($japaneseTitles);
+            $title = $this->faker->randomElement(array_keys($japaneseTitleSlugs));
 
             return [
                 'title' => $title,
-                'slug' => Str::slug($title.'-'.$this->faker->unique()->numberBetween(1, 9999)),
+                'slug' => $japaneseTitleSlugs[$title].'-'.$this->faker->unique()->numberBetween(1, 9999),
+                'lang' => 'ja',
                 'content' => $this->generateMixedContent(true),
             ];
         });
@@ -234,6 +238,7 @@ class DixlasePagesPageFactory extends Factory
             return [
                 'title' => $title,
                 'slug' => Str::slug($title.'-'.$this->faker->unique()->numberBetween(1, 9999)),
+                'lang' => 'en',
                 'content' => $this->generateMixedContent(false),
             ];
         });
