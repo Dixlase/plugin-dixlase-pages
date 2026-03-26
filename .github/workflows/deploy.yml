@@ -1,0 +1,53 @@
+name: Deploy Plugin
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set deploy target
+        id: target
+        run: |
+          if [ "${{ github.repository }}" = "Dixlase/plugin-pages" ]; then
+            echo "env=production" >> $GITHUB_OUTPUT
+            echo "base_dir=/srv/dixlase" >> $GITHUB_OUTPUT
+          else
+            echo "env=staging" >> $GITHUB_OUTPUT
+            echo "base_dir=/srv/dixlase/staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy plugin via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            BASE="${{ steps.target.outputs.base_dir }}"
+            PLUGIN_DIR="DixlasePages"
+
+            for SITE in brand docs demo keys; do
+              DEST="$BASE/$SITE/plugins/$PLUGIN_DIR"
+              echo "=== Deploying plugin $PLUGIN_DIR to $SITE (${{ steps.target.outputs.env }}) ==="
+
+              if [ ! -d "$DEST" ]; then
+                git clone --branch main git@github.com:${{ github.repository }}.git "$DEST"
+              else
+                cd "$DEST"
+                git fetch origin
+                git reset --hard origin/main
+              fi
+
+              if [ -f "$DEST/composer.json" ]; then
+                cd "$DEST"
+                composer install --no-dev --no-interaction --optimize-autoloader
+              fi
+            done
+
+            echo "=== Plugin deploy complete ==="
