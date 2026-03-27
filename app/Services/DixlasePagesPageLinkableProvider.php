@@ -70,7 +70,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
             ->limit($limit)
             ->get();
 
-        return $pages->map(fn($page) => $this->pageToDTO($page))->toArray();
+        return $pages->map(fn ($page) => $this->pageToDTO($page))->toArray();
     }
 
     /**
@@ -81,12 +81,12 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
         $pages = DixlasePagesPage::published()
             ->where(function ($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
-                  ->orWhere('content', 'like', "%{$query}%");
+                    ->orWhere('content', 'like', "%{$query}%");
             })
             ->limit($limit)
             ->get();
 
-        return $pages->map(fn($page) => $this->pageToDTO($page))->toArray();
+        return $pages->map(fn ($page) => $this->pageToDTO($page))->toArray();
     }
 
     /**
@@ -107,10 +107,20 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
         return new LinkableDTO(
             id: (string) $page->id,
             title: $page->title ?? $page->slug,
-            url: route('dixlase-pages::page.show', ['slug' => $page->slug]),
+            url: $this->generatePageUrl($page),
             type: 'page',
             source: 'dixlase-pages',
             sourceTable: 'plg_dixlase_pages',
         );
+    }
+
+    /**
+     * Generate a relative URL for the page
+     */
+    protected function generatePageUrl(DixlasePagesPage $page): string
+    {
+        $directory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+
+        return '/'.$directory.'/'.$page->slug;
     }
 }
