@@ -25,6 +25,7 @@ namespace Plugins\DixlasePages\App\Services;
 use App\Contracts\PluginIntegration\LinkableProviderInterface;
 use App\DTO\PluginIntegration\LinkableDTO;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
+use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 
 class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
 {
