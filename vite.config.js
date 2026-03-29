@@ -19,25 +19,30 @@
  */
 
 import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+import path from 'path';
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: [
-                'plugins/DixlasePages/resources/src/js/app.js',
-                'plugins/DixlasePages/resources/src/css/style.scss',
-            ],
-            refresh: true,
-        }),
-    ],
     build: {
-        outDir: 'plugins/DixlasePages/resources/assets',
+        outDir: path.resolve(__dirname, 'resources/assets'),
+        emptyOutDir: false,
+        copyPublicDir: false,
+        manifest: 'manifest.json',
         rollupOptions: {
+            input: {
+                app: path.resolve(__dirname, 'resources/src/js/app.js'),
+                style: path.resolve(__dirname, 'resources/src/css/style.scss'),
+            },
             output: {
                 entryFileNames: 'js/[name].js',
                 chunkFileNames: 'js/[name].js',
                 assetFileNames: 'css/[name][extname]',
+            },
+        },
+    },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: 'modern-compiler',
             },
         },
     },
