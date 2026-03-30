@@ -24,6 +24,7 @@ namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStorageType;
+use App\Enums\MemberRole;
 use App\Rules\UniqueRouteSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
