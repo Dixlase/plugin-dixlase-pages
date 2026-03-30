@@ -50,6 +50,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
             'default_status' => 'required|in:published,draft,scheduled',
             'default_editor_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentEditorType::cases()))],
             'default_storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
+            'publish_min_role' => ['required', 'integer', Rule::in(array_map(fn ($case) => $case->value, MemberRole::cases()))],
         ];
     }
 

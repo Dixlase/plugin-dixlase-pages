@@ -34,6 +34,12 @@ return [
         'default_storage_type_help' => 'Default content storage method when creating new pages.',
     ],
     'simple_mode_notice' => 'Some settings are automatically configured in Simple mode. Switch to Advanced mode to customize all settings.',
+    'publish_permission' => [
+        'title' => 'Publish Permission',
+        'description' => 'Set the minimum role required to publish pages. Members below this role can only save pages as drafts.',
+        'min_role' => 'Minimum Role for Publishing',
+        'min_role_help' => 'Members with this role or higher can publish and schedule pages. Members with editing access but below this role can only create drafts.',
+    ],
     'confirm_title' => 'Save Page Settings',
     'confirm_message' => 'Are you sure you want to save the page settings?',
     'success' => 'Page settings have been updated successfully.',

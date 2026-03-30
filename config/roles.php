@@ -24,10 +24,10 @@ use App\Enums\MemberRole;
 
 /**
  * プラグインのデフォルト権限設定
- * 
+ *
  * 各メニュー/機能に対するデフォルトの権限を定義します。
  * 管理画面で変更された場合のみ、role_permission_overrides テーブルに差分が保存されます。
- * 
+ *
  * 構造は config/admin.php の nav 構造と同じネスト形式です。
  */
 

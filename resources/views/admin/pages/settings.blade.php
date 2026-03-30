@@ -116,6 +116,43 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </div>
         </section>
 
+        {{-- 公開権限設定 --}}
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.publish_permission.title') }}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                {{ __('dixlase-pages::admin/pages/settings.publish_permission.description') }}
+            </p>
+
+            <div x-data="{
+                publishIndex: {{ $publishRoleIndex }},
+                roleValues: {{ json_encode(array_values($publishRoleValues)) }},
+                get publishValue() { return this.roleValues[this.publishIndex] || this.roleValues[0]; }
+            }">
+                <x-form-label
+                    :text="__('dixlase-pages::admin/pages/settings.publish_permission.min_role')"
+                    class="mb-2"
+                />
+
+                <input type="hidden" name="publish_min_role" :value="publishValue">
+
+                <x-form-range
+                    id="publish_min_role_range"
+                    name=""
+                    :value="$publishRoleIndex"
+                    :min="0"
+                    :max="$publishMaxIndex"
+                    :step="1"
+                    :labels="$publishRoleLabels"
+                    :showValue="false"
+                    :showLabels="true"
+                    xModel="publishIndex"
+                />
+
+                <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.publish_permission.min_role_help')" />
+                <x-form-error name="publish_min_role" />
+            </div>
+        </section>
+
     </form>
 @endsection
 

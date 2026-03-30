@@ -20,10 +20,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 return [
     // プラグイン設定画面のルート名
     'settings_route' => 'dixlase-pages::admin.pages.settings',
-    
+
     // 注: ナビゲーション設定は config/admin/navigation.php に移動
 ];

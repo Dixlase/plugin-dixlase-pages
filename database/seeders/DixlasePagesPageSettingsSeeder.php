@@ -36,6 +36,7 @@ class DixlasePagesPageSettingsSeeder extends Seeder
             ['name' => 'route_slug', 'value' => 'content'],
             ['name' => 'default_status', 'value' => 'published'],
             ['name' => 'seo_enabled', 'value' => '1'],
+            ['name' => 'publish_min_role', 'value' => '8'], // MemberRole::EDITOR
         ];
 
         foreach ($settings as $setting) {

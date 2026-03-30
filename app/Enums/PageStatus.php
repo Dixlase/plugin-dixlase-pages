@@ -27,14 +27,16 @@ use App\Enums\ContentStatus;
 /**
  * ページステータス
  * コアのContentStatusのエイリアス（後方互換性のため）
- * 
+ *
  * @deprecated 新規コードではApp\Enums\ContentStatusを直接使用してください
  */
 class PageStatus
 {
     // ContentStatusの定数をエイリアス
     public const DRAFT = ContentStatus::DRAFT;
+
     public const PUBLISHED = ContentStatus::PUBLISHED;
+
     public const SCHEDULED = ContentStatus::SCHEDULED;
 
     /**
