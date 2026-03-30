@@ -16,8 +16,7 @@ return [
     'pages' => [
         'text' => 'Page Management',
         'index' => 'Page Master',
-        'create' => 'Create Page',
-        'create_edit' => 'Page Create & Edit',
+        'create' => 'Create New',
         'settings' => 'Page Settings',
     ],
 ];
