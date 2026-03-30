@@ -69,7 +69,7 @@ class DixlasePagesFrontPageTest extends TestCase
         if (! $this->app['view']->getFinder()->hasHintInformation('themes')) {
             $this->app['view']->addNamespace(
                 'themes',
-                base_path('themes/DixlaseDefaultTheme/resources/views')
+                base_path('themes/DixlaseOnePage/resources/views')
             );
         }
 

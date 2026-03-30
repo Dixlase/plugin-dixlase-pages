@@ -20,7 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 use Illuminate\Support\Facades\Route;
 use Plugins\DixlasePages\App\Http\Controllers\Front\DixlasePagesCustomAssetController;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
@@ -33,16 +32,16 @@ Route::middleware(['front.ip'])->group(
         $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
 
         // カスタム CSS/JS アセットルート（ページ表示ルートの前に定義）
-        Route::get($pagesDirectory . '/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
+        Route::get($pagesDirectory.'/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
             ->name('dixlase-pages::page.custom-style')
             ->withoutMiddleware([\App\Http\Middleware\ContentSecurityPolicy::class]);
 
-        Route::get($pagesDirectory . '/{slug}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
+        Route::get($pagesDirectory.'/{slug}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
             ->name('dixlase-pages::page.custom-script')
             ->withoutMiddleware([\App\Http\Middleware\ContentSecurityPolicy::class]);
 
         // ページ表示ルート
-        Route::get($pagesDirectory . '/{slug}', function ($slug) {
+        Route::get($pagesDirectory.'/{slug}', function ($slug) {
             $locale = app()->getLocale();
 
             // 管理画面にログインしている場合は全てのページを表示（プレビュー機能）
@@ -63,6 +62,17 @@ Route::middleware(['front.ip'])->group(
             $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
             $editorType = $page->editor_type->slug() ?? 'html';
             $content = $page->getContentByEditorType() ?? '';
+
+            // GUI editor: render JSON content to HTML for front display
+            if ($editorType === 'gui' && $content) {
+                $editorManager = app(\App\Services\Editor\EditorManager::class);
+                $renderedHtml = $editorManager->renderContent('gui', $content);
+                if ($renderedHtml !== '') {
+                    $content = $renderedHtml;
+                    $editorType = 'html';
+                }
+            }
+
             $hasCustomCss = ! empty($contentService->getCssContent($page, $locale));
             $hasCustomJs = ! empty($contentService->getJsContent($page, $locale));
             $customAssetVersion = $page->updated_at?->timestamp ?? time();
