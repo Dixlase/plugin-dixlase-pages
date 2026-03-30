@@ -40,12 +40,6 @@ return [
                 'icon' => 'fas fa-fw fa-file-circle-plus',
                 'can' => 'admin',
             ],
-            // 権限設定画面用（サイドバーには表示しない）
-            'create_edit' => [
-                'text' => 'dixlase-pages::admin/navigation.pages.create_edit',
-                'icon' => 'fas fa-fw fa-file-pen',
-                'hidden' => true,
-            ],
             'settings' => [
                 'text' => 'dixlase-pages::admin/navigation.pages.settings',
                 'route' => 'dixlase-pages::admin.pages.settings',

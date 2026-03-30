@@ -148,7 +148,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     xModel="publishIndex"
                 />
 
-                <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.publish_permission.min_role_help')" />
+                <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.publish_permission.min_role_help')" class="!mt-4" />
                 <x-form-error name="publish_min_role" />
             </div>
         </section>

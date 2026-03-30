@@ -40,7 +40,7 @@ return [
                     'access_roles' => MemberRole::EDITOR->value,
                     'view_roles' => MemberRole::EDITOR->value,
                 ],
-                'create_edit' => [
+                'create' => [
                     'access_roles' => MemberRole::EDITOR->value,
                     'view_roles' => MemberRole::EDITOR->value,
                 ],
