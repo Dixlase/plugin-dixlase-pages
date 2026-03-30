@@ -87,7 +87,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         name="default_editor_type"
                         :options="$editorTypeCardOptions"
                         :value="old('default_editor_type', $settings['default_editor_type'] ?? 'html')"
-                        :columns="{{ $isSimpleMode ? '2' : '3' }}"
+                        :columns="$isSimpleMode ? 2 : 3"
                     />
                     <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.basic.default_editor_type_help')" />
                     <x-form-error name="default_editor_type" />

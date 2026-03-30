@@ -238,6 +238,11 @@ class DixlasePagesAdminPagesController extends Controller
         // 現在の言語値（既存ページはDBから、新規はアプリ言語）
         $langValue = old('lang', $page->lang ?? app()->getLocale());
 
+        // GUI editor info from plugin
+        $guiEditorInfo = \App\Presenters\Admin\ContentEditorPresenter::guiEditorInfo();
+        $guiEditorAssetHtml = $guiEditorInfo ? \App\Presenters\Admin\ContentEditorPresenter::editorAssetHtml($guiEditorInfo) : '';
+        $hasGuiEditor = $guiEditorInfo !== null;
+
         return compact(
             'content',
             'customCss',
@@ -257,6 +262,9 @@ class DixlasePagesAdminPagesController extends Controller
             'langValue',
             'isSimpleMode',
             'isAdvancedEditor',
+            'guiEditorInfo',
+            'guiEditorAssetHtml',
+            'hasGuiEditor',
         );
     }
 

@@ -55,6 +55,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     // 簡単モード
     'isSimpleMode' => false,
     'isAdvancedEditor' => false,
+    // GUI editor plugin info
+    'guiEditorInfo' => null,
+    'guiEditorAssetHtml' => '',
+    'hasGuiEditor' => false,
 ])
 
 {{--
@@ -85,7 +89,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         customJs: @js(old('custom_js', $customJs)),
         lang: '{{ $langValue }}',
         isSimpleMode: {{ $isSimpleMode ? 'true' : 'false' }},
-        isAdvancedEditor: {{ $isAdvancedEditor ? 'true' : 'false' }}
+        isAdvancedEditor: {{ $isAdvancedEditor ? 'true' : 'false' }},
+        hasGuiEditor: {{ $hasGuiEditor ? 'true' : 'false' }}
      })">
 
         {{-- ===== メインコンテンツエリア ===== --}}
@@ -205,15 +210,22 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     'text' => __('common.content'),
                 ])
 
-                {{-- GUI エディタ（将来実装） --}}
+                {{-- GUI エディタ --}}
                 <div x-show="editorType === 'gui'" x-cloak>
-                    <div class="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center">
-                        <i class="fas fa-magic text-4xl text-gray-400 mb-4"></i>
-                        <p class="text-gray-600 dark:text-gray-400">
-                            {{ __('common.content_editor.gui_coming_soon') }}
-                        </p>
-                    </div>
-                    <input type="hidden" name="content" x-model="content">
+                    @if($guiEditorInfo)
+                        @include($guiEditorInfo->viewName, [
+                            'contentFieldName' => 'content',
+                            'editorInfo' => $guiEditorInfo,
+                        ])
+                    @else
+                        <div class="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center">
+                            <i class="fas fa-paint-brush text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600 dark:text-gray-400">
+                                {{ __('common.content_editor.gui_coming_soon') }}
+                            </p>
+                        </div>
+                        <input type="hidden" name="content" x-model="content">
+                    @endif
                 </div>
 
                 {{-- Markdown エディタ --}}
@@ -526,3 +538,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         </div>
 
 </div>
+
+@if($guiEditorAssetHtml)
+    {!! $guiEditorAssetHtml !!}
+@endif
