@@ -20,7 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 namespace Plugins\DixlasePages\Database\Seeders;
 
 use Illuminate\Database\Seeder;

@@ -20,7 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
 use App\Enums\ContentEditorType;
@@ -87,8 +86,18 @@ class DixlasePagesStorePageRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // スラッグが空の場合、タイトルから自動生成
-        if (empty($this->slug) && !empty($this->title)) {
+        if (empty($this->slug) && ! empty($this->title)) {
             $this->merge(['slug' => $this->convertToSlug($this->title)]);
+        }
+
+        // 公開権限チェック: 権限がないメンバーはステータスを強制的にdraftに
+        $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
+        $member = Auth::guard('member')->user();
+        if ($member && $member->role->value < $publishMinRole) {
+            $this->merge([
+                'status' => ContentStatus::DRAFT->slug(),
+                'published_at' => null,
+            ]);
         }
 
         // 日付指定以外の場合はpublished_atをクリア

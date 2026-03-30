@@ -17,6 +17,7 @@ return [
         'text' => 'ページ管理',
         'index' => 'ページマスター',
         'create' => 'ページ作成',
+        'create_edit' => 'ページ新規作成・編集',
         'settings' => 'ページ設定',
     ],
 ];

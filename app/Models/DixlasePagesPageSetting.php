@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
 class DixlasePagesPageSetting extends Model
 {
     protected $table = 'plg_dixlase_pages_settings';
-    
+
     protected $fillable = [
         'name',
         'value',
@@ -36,21 +36,22 @@ class DixlasePagesPageSetting extends Model
     /**
      * 設定値の取得
      *
-     * @param string $name
-     * @param mixed $default
+     * @param  string  $name
+     * @param  mixed  $default
      * @return mixed
      */
     public static function getValue($name, $default = null)
     {
         $setting = self::where('name', $name)->first();
+
         return $setting ? $setting->value : $default;
     }
 
     /**
      * 設定値の保存
      *
-     * @param string $name
-     * @param mixed $value
+     * @param  string  $name
+     * @param  mixed  $value
      * @return void
      */
     public static function setValue($name, $value)
@@ -63,9 +64,6 @@ class DixlasePagesPageSetting extends Model
 
     /**
      * 複数の設定値を一括保存
-     *
-     * @param array $settings
-     * @return void
      */
     public static function setMany(array $settings): void
     {

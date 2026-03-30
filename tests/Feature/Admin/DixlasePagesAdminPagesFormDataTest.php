@@ -61,11 +61,15 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
 
         // コントローラーを生成（AdminInterfaceTrait初期化を回避）
         $contentService = $this->app->make(DixlasePagesPageContentService::class);
-        $this->controller = new class($contentService) extends DixlasePagesAdminPagesController
+        $member = \App\Models\Member::factory()->create([
+            'role' => \App\Enums\MemberRole::ADMIN,
+        ]);
+        $this->controller = new class($contentService, $member) extends DixlasePagesAdminPagesController
         {
-            public function __construct(DixlasePagesPageContentService $contentService)
+            public function __construct(DixlasePagesPageContentService $contentService, $member)
             {
                 $this->contentService = $contentService;
+                $this->member = $member;
             }
         };
 
@@ -82,7 +86,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_prepare_form_data_returns_correct_defaults_for_new_page(): void
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertArrayHasKey('content', $result);
@@ -107,7 +111,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_storage_options_have_correct_structure(): void
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $storageOptions = $result['storageOptions'];
@@ -128,7 +132,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_status_options_have_correct_structure(): void
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $statusOptions = $result['statusOptions'];
@@ -195,7 +199,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         // Set to advanced mode so all editors are available
         \App\Models\BaseSetting::setValue('admin_mode', 1);
 
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $requiredKeys = [
@@ -220,7 +224,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         // Set to simple mode
         \App\Models\BaseSetting::setValue('admin_mode', 0);
 
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertArrayHasKey('common.content_editor.gui', $result['editorTranslations']);
@@ -236,7 +240,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         // Set to advanced mode so all editors are available
         \App\Models\BaseSetting::setValue('admin_mode', 1);
 
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $requiredEditors = ['gui', 'markdown', 'html'];
@@ -272,7 +276,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_prepare_form_data_returns_custom_css_and_js(): void
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertArrayHasKey('customCss', $result);
@@ -324,7 +328,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_prepare_form_data_returns_language_options(): void
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertArrayHasKey('languageOptions', $result);
@@ -337,7 +341,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_slug_base_url_contains_app_url_and_ends_with_slash(): void
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertStringStartsWith(config('app.url'), $result['slugBaseUrl']);

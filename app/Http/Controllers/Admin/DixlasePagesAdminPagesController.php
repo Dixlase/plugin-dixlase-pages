@@ -25,6 +25,7 @@ namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Enums\MemberRole;
 use App\Models\BaseSetting;
 use App\Traits\AdminInterfaceTrait;
 use App\Traits\AdminLoggedInTrait;
@@ -59,7 +60,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function preview(Request $request)
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
         $page->title = $request->input('title', '');
         $page->slug = $request->input('slug', '');
         $page->content = $request->input('content', '');
@@ -182,9 +183,17 @@ class DixlasePagesAdminPagesController extends Controller
             $storageDescriptions[$value] = $option['description'];
         }
 
+        // 公開権限チェック: 現在のメンバーのロールが publish_min_role 以上か
+        $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
+        $canPublish = $this->member && $this->member->role->value >= $publishMinRole;
+
         // ステータスオプション（form-select用）
+        // 公開権限がないメンバーは下書きのみ
         $statusOptions = [];
         foreach (ContentStatus::optionsWithDescription() as $value => $option) {
+            if (! $canPublish && $value !== ContentStatus::DRAFT->slug()) {
+                continue;
+            }
             $statusOptions[$value] = $option['label'];
         }
 
@@ -262,6 +271,7 @@ class DixlasePagesAdminPagesController extends Controller
             'langValue',
             'isSimpleMode',
             'isAdvancedEditor',
+            'canPublish',
             'guiEditorInfo',
             'guiEditorAssetHtml',
             'hasGuiEditor',
@@ -273,7 +283,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function create()
     {
-        $page = new DixlasePagesPage();
+        $page = new DixlasePagesPage;
 
         // Determine admin mode (Simple=0, Advanced=1)
         $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
@@ -581,12 +591,42 @@ class DixlasePagesAdminPagesController extends Controller
         // ページディレクトリのURL表示用ベースURL
         $siteUrl = config('app.url');
 
+        // 公開権限のロールスライダー用データ
+        // 編集権限以上のロールのみ選択可能（ゲスト/受付/寄稿者は除外）
+        $publishRoleOptions = [];
+        foreach (MemberRole::cases() as $role) {
+            if ($role === MemberRole::GUEST || $role === MemberRole::SUPER_ADMIN) {
+                continue;
+            }
+            $publishRoleOptions[$role->value] = $role->label();
+        }
+        ksort($publishRoleOptions);
+
+        $publishRoleValues = [];
+        $publishRoleLabels = [];
+        $index = 0;
+        foreach ($publishRoleOptions as $value => $label) {
+            $publishRoleValues[$index] = $value;
+            $publishRoleLabels[$index] = $label;
+            $index++;
+        }
+        $publishValueToIndex = array_flip($publishRoleValues);
+        $publishMaxIndex = count($publishRoleValues) - 1;
+
+        // 現在の publish_min_role 設定値
+        $currentPublishMinRole = (int) ($settings['publish_min_role'] ?? MemberRole::EDITOR->value);
+        $publishRoleIndex = $publishValueToIndex[$currentPublishMinRole] ?? 0;
+
         $this->viewParams['settings'] = $settings;
         $this->viewParams['statusCardOptions'] = $statusCardOptions;
         $this->viewParams['editorTypeCardOptions'] = $editorTypeCardOptions;
         $this->viewParams['storageTypeCardOptions'] = $storageTypeCardOptions;
         $this->viewParams['siteUrl'] = $siteUrl;
         $this->viewParams['isSimpleMode'] = $isSimpleMode;
+        $this->viewParams['publishRoleValues'] = $publishRoleValues;
+        $this->viewParams['publishRoleLabels'] = $publishRoleLabels;
+        $this->viewParams['publishMaxIndex'] = $publishMaxIndex;
+        $this->viewParams['publishRoleIndex'] = $publishRoleIndex;
 
         return view('dixlase-pages::admin.pages.settings', $this->viewParams);
     }

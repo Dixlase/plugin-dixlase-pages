@@ -20,7 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
 use App\Enums\ContentStatus;
@@ -85,6 +84,16 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // 公開権限チェック: 権限がないメンバーはステータスを強制的にdraftに
+        $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
+        $member = Auth::guard('member')->user();
+        if ($member && $member->role->value < $publishMinRole) {
+            $this->merge([
+                'status' => ContentStatus::DRAFT->slug(),
+                'published_at' => null,
+            ]);
+        }
+
         // 日付指定以外の場合はpublished_atをクリア
         if ($this->status !== ContentStatus::SCHEDULED->slug()) {
             $this->merge(['published_at' => null]);

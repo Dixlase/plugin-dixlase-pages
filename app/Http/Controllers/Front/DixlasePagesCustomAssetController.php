@@ -103,10 +103,10 @@ class DixlasePagesCustomAssetController extends Controller
      */
     private function buildResponse(string $content, string $contentType): Response
     {
-        $etag = '"' . md5($content) . '"';
+        $etag = '"'.md5($content).'"';
 
         return response($content, 200, [
-            'Content-Type' => $contentType . '; charset=UTF-8',
+            'Content-Type' => $contentType.'; charset=UTF-8',
             'Cache-Control' => 'public, max-age=3600',
             'ETag' => $etag,
         ]);

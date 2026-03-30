@@ -36,17 +36,17 @@ class DixlasePagesPagesRolePermissionSeeder extends Seeder
             [
                 'menu_key' => 'pages.index',
                 'access_roles' => '9,8,7',
-                'view_roles'  => '9,8,7',
+                'view_roles' => '9,8,7',
             ],
             [
                 'menu_key' => 'pages.create',
                 'access_roles' => '9,8,7',
-                'view_roles'  => '9,8,7',
+                'view_roles' => '9,8,7',
             ],
             [
                 'menu_key' => 'pages.settings',
                 'access_roles' => '9',
-                'view_roles'  => '9',
+                'view_roles' => '9',
             ],
         ];
 
@@ -56,7 +56,7 @@ class DixlasePagesPagesRolePermissionSeeder extends Seeder
                 ->where('menu_key', $permission['menu_key'])
                 ->exists();
 
-            if (!$exists) {
+            if (! $exists) {
                 DB::table('members_role_permissions')->insert([
                     'menu_key' => $permission['menu_key'],
                     'access_roles' => $permission['access_roles'],
