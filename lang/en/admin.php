@@ -22,7 +22,6 @@
 
 return [
     'plugin' => [
-        'name' => 'Dixlase Page Management',
         'description' => 'Adds static page management functionality to your website. Features page creation, editing, deletion, SEO settings, publish/draft control, and comprehensive content management tools.',
     ],
 
