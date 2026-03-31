@@ -47,8 +47,8 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
         // ルートスラッグプロバイダーの登録
         $this->registerRouteSlugProvider();
 
-        // ビューの登録
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'dixlase-pages');
+        // ビューの登録（テーマによる上書きを優先）
+        $this->registerPluginViews();
 
         // 翻訳ファイルの登録
         $this->loadTranslationsFrom(__DIR__.'/../../lang', 'dixlase-pages');
@@ -57,6 +57,56 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
 
         // 注: ルート（routes/web.php, routes/admin.php, routes/api.php）はPluginServiceProviderが自動読み込み
+    }
+
+    /**
+     * プラグインビューを登録（custom / テーマによる上書きをサポート）
+     *
+     * 検索優先順位:
+     * 1. /custom/plugins/DixlasePages/resources/views/ — サイト固有カスタマイズ
+     * 2. themes/{有効テーマ}/plugins/DixlasePages/resources/views/ — テーマによる上書き
+     * 3. plugins/DixlasePages/resources/views/ — プラグインのデフォルト
+     */
+    protected function registerPluginViews(): void
+    {
+        $namespace = 'dixlase-pages';
+        $pluginRelativePath = 'plugins/DixlasePages/resources/views';
+
+        // 1. /custom/ からの上書き（最優先）
+        $customPath = base_path("custom/{$pluginRelativePath}");
+        if (is_dir($customPath)) {
+            $this->app['view']->addNamespace($namespace, $customPath);
+        }
+
+        // 2. 有効テーマからの上書き
+        $themePath = $this->getThemeOverridePath($pluginRelativePath);
+        if ($themePath && is_dir($themePath)) {
+            $this->app['view']->addNamespace($namespace, $themePath);
+        }
+
+        // 3. プラグインのデフォルトビュー
+        $this->loadViewsFrom(__DIR__.'/../../resources/views', $namespace);
+    }
+
+    /**
+     * テーマのプラグインビュー上書きパスを取得
+     */
+    protected function getThemeOverridePath(string $pluginRelativePath): ?string
+    {
+        $themeDirectory = config('themes.theme_directory', 'themes');
+
+        try {
+            if (app()->bound(\App\Contracts\Repositories\ThemeRepositoryInterface::class)) {
+                $themeRepo = app(\App\Contracts\Repositories\ThemeRepositoryInterface::class);
+                $enabledTheme = $themeRepo->getEnabledThemeDirectory();
+
+                return base_path("{$themeDirectory}/{$enabledTheme}/{$pluginRelativePath}");
+            }
+        } catch (\Exception $e) {
+            // テーマ未設定時は無視
+        }
+
+        return null;
     }
 
     /**
