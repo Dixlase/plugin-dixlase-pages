@@ -56,7 +56,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         @endauth
 
         <!-- Main content -->
-        <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8">
             <article class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                 <!-- Page header -->
                 <header class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
