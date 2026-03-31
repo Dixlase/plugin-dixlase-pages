@@ -87,6 +87,11 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // 言語が未指定の場合、サイト設定の言語をデフォルトで設定
+        if (empty($this->lang)) {
+            $this->merge(['lang' => app()->getLocale()]);
+        }
+
         // 公開権限チェック: 権限がないメンバーはステータスを強制的にdraftに
         $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
         $member = Auth::guard('member')->user();

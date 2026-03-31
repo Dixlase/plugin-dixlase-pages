@@ -88,6 +88,11 @@ class DixlasePagesStorePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // 言語が未指定の場合、サイト設定の言語をデフォルトで設定
+        if (empty($this->lang)) {
+            $this->merge(['lang' => app()->getLocale()]);
+        }
+
         // スラッグが空の場合、タイトルから自動生成
         if (empty($this->slug) && ! empty($this->title)) {
             $this->merge(['slug' => $this->convertToSlug($this->title)]);
