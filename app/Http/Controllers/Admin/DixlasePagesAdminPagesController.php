@@ -241,8 +241,8 @@ class DixlasePagesAdminPagesController extends Controller
             ? route('dixlase-pages::admin.pages.preview')
             : '';
 
-        // 言語オプション
-        $languageOptions = config('language.languages', []);
+        // 言語オプション（翻訳キーからロケールに応じたラベルを取得）
+        $languageOptions = __('common.languages');
 
         // 現在の言語値（既存ページはDBから、新規はアプリ言語）
         $langValue = old('lang', $page->lang ?? app()->getLocale());
