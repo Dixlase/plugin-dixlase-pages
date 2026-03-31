@@ -25,9 +25,12 @@ namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Enums\MemberRole;
 use App\Rules\UniqueContentSlug;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 
 class DixlasePagesStorePageRequest extends FormRequest
 {
