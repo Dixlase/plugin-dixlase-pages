@@ -98,21 +98,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
         {{-- ===== メインコンテンツエリア ===== --}}
 
-        {{-- 1. タイトル --}}
-        <div class="mb-6">
-            @include('components::form-label', [
-                'for' => 'title',
-                'text' => __('dixlase-pages::components/page-content-editor.title'),
-            ])
-            @include('components::form-text', [
-                'name' => 'title',
-                'value' => $title,
-                'placeholder' => __('dixlase-pages::components/page-content-editor.title_placeholder'),
-            ])
-            @include('components::form-error', ['name' => 'title'])
-        </div>
-
-        {{-- 2. エディタータイプ選択 --}}
+        {{-- 1. エディタータイプ選択 --}}
         <div class="mb-6">
             @include('components::form-label', [
                 'for' => 'editor_type',
@@ -334,6 +320,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <i class="fas fa-info-circle mr-1"></i>
                     {{ __('dixlase-pages::components/page-content-editor.preview_help') }}
                 </p>
+            </div>
+
+            {{-- タイトル --}}
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                @include('components::form-label', [
+                    'for' => 'title',
+                    'text' => __('dixlase-pages::components/page-content-editor.title'),
+                ])
+                @include('components::form-text', [
+                    'name' => 'title',
+                    'value' => $title,
+                    'placeholder' => __('dixlase-pages::components/page-content-editor.title_placeholder'),
+                ])
+                @include('components::form-error', ['name' => 'title'])
             </div>
 
             {{-- 4. スラッグ --}}
