@@ -117,6 +117,25 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
+     * 新規ページ作成用の空プレビューフレーム
+     *
+     * ページIDが存在しない新規作成画面で使用する。
+     * 空のページ構造をテーマのプレビューレイアウトで表示する。
+     */
+    public function previewFrameNew(): View
+    {
+        request()->attributes->set('csp_frame_ancestors_self', true);
+
+        $page = new DixlasePagesPage();
+        $page->title = '';
+
+        return view('dixlase-pages::admin.pages.preview-frame', [
+            'page' => $page,
+            'initialRenderedContent' => '',
+        ]);
+    }
+
+    /**
      * サーバーサイドプレビューレンダリング（Blade/GUI エディタ用）
      *
      * iframe内のリアルタイムプレビューで、クライアント側でレンダリングできない
@@ -283,10 +302,14 @@ class DixlasePagesAdminPagesController extends Controller
             ? route('dixlase-pages::admin.pages.preview')
             : '';
 
-        // iframeプレビューフレームURL（編集時のみ利用可能）
-        $previewFrameUrl = $page->exists && Route::has('dixlase-pages::admin.pages.preview-frame')
-            ? route('dixlase-pages::admin.pages.preview-frame', $page)
-            : '';
+        // iframeプレビューフレームURL（編集時は既存ページ、新規作成時は空フレーム）
+        if ($page->exists && Route::has('dixlase-pages::admin.pages.preview-frame')) {
+            $previewFrameUrl = route('dixlase-pages::admin.pages.preview-frame', $page);
+        } elseif (Route::has('dixlase-pages::admin.pages.preview-frame-new')) {
+            $previewFrameUrl = route('dixlase-pages::admin.pages.preview-frame-new');
+        } else {
+            $previewFrameUrl = '';
+        }
 
         // サーバーサイドレンダリングURL（Blade/GUIエディタ用）
         $previewRenderUrl = Route::has('dixlase-pages::admin.pages.preview-render')
