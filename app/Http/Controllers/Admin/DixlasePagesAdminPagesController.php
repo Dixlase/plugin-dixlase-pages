@@ -27,11 +27,14 @@ use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Models\BaseSetting;
+use App\Services\ContentPreviewService;
 use App\Traits\AdminInterfaceTrait;
 use App\Traits\AdminLoggedInTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesStorePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePageRequest;
@@ -98,12 +101,12 @@ class DixlasePagesAdminPagesController extends Controller
      * テーマの layouts.preview を使用して実際のテーマレイアウトで表示し、
      * postMessage でコンテンツをリアルタイム更新する。
      */
-    public function previewFrame(DixlasePagesPage $page): View
+    public function previewFrame(DixlasePagesPage $page): \Illuminate\View\View
     {
-        // CSP frame-ancestors を 'self' に上書き（iframe埋め込み許可）
         request()->attributes->set('csp_frame_ancestors_self', true);
 
-        // 初期コンテンツをレンダリング
+        $themeSettings = $this->loadThemeSettingsForPreview();
+
         $previewService = app(ContentPreviewService::class);
         $rawContent = $page->getContentByEditorType() ?? '';
         $initialRenderedContent = $rawContent
@@ -112,6 +115,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         return view('dixlase-pages::admin.pages.preview-frame', [
             'page' => $page,
+            'themeSettings' => $themeSettings,
             'initialRenderedContent' => $initialRenderedContent,
         ]);
     }
@@ -122,17 +126,51 @@ class DixlasePagesAdminPagesController extends Controller
      * ページIDが存在しない新規作成画面で使用する。
      * 空のページ構造をテーマのプレビューレイアウトで表示する。
      */
-    public function previewFrameNew(): View
+    public function previewFrameNew(): \Illuminate\View\View
     {
         request()->attributes->set('csp_frame_ancestors_self', true);
+
+        $themeSettings = $this->loadThemeSettingsForPreview();
 
         $page = new DixlasePagesPage();
         $page->title = '';
 
         return view('dixlase-pages::admin.pages.preview-frame', [
             'page' => $page,
+            'themeSettings' => $themeSettings,
             'initialRenderedContent' => '',
         ]);
+    }
+
+    /**
+     * プレビューフレーム用にテーマ設定を読み込む
+     */
+    protected function loadThemeSettingsForPreview(): object
+    {
+        try {
+            $activeThemeId = DB::table('theme_settings')
+                ->where('key', 'enabled_theme_id')
+                ->value('value');
+
+            if (! $activeThemeId) {
+                return (object) [];
+            }
+
+            $theme = DB::table('themes')->find($activeThemeId);
+            if (! $theme) {
+                return (object) [];
+            }
+
+            $settingsTableName = 'thm_'.strtolower(str_replace('-', '_', $theme->slug)).'_settings';
+
+            $settings = DB::table($settingsTableName)
+                ->get()
+                ->pluck('value', 'name');
+
+            return (object) $settings->toArray();
+        } catch (\Exception $e) {
+            return (object) [];
+        }
     }
 
     /**
