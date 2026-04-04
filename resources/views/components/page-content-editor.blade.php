@@ -44,8 +44,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     'isEditMode' => false,
     // ファイル保存時の表示用ベースパス
     'fileStorageBasePath' => '',
-    // プレビューURL
+    // プレビューURL（別タブ）
     'previewUrl' => '',
+    // iframeプレビューフレームURL
+    'previewFrameUrl' => '',
+    // サーバーサイドレンダリングURL
+    'previewRenderUrl' => '',
     // カスタムCSS/JS
     'customCss' => '',
     'customJs' => '',
@@ -85,6 +89,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         isEditMode: {{ $isEditMode ? 'true' : 'false' }},
         fileStorageBasePath: '{{ $fileStorageBasePath }}',
         previewUrl: '{{ $previewUrl }}',
+        previewFrameUrl: '{{ $previewFrameUrl }}',
+        previewRenderUrl: '{{ $previewRenderUrl }}',
         customCss: @js(old('custom_css', $customCss)),
         customJs: @js(old('custom_js', $customJs)),
         lang: '{{ $langValue }}',
@@ -94,245 +100,248 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
      })">
 
         {{-- ===== メインコンテンツエリア ===== --}}
-        <div class="space-y-6">
 
-            {{-- 1. タイトル --}}
-            <div>
-                @include('components::form-label', [
-                    'for' => 'title',
-                    'text' => __('dixlase-pages::components/page-content-editor.title'),
-                ])
-                @include('components::form-text', [
-                    'name' => 'title',
-                    'value' => $title,
-                    'placeholder' => __('dixlase-pages::components/page-content-editor.title_placeholder'),
-                ])
-                @include('components::form-error', ['name' => 'title'])
-            </div>
+        {{-- 1. タイトル --}}
+        <div class="mb-6">
+            @include('components::form-label', [
+                'for' => 'title',
+                'text' => __('dixlase-pages::components/page-content-editor.title'),
+            ])
+            @include('components::form-text', [
+                'name' => 'title',
+                'value' => $title,
+                'placeholder' => __('dixlase-pages::components/page-content-editor.title_placeholder'),
+            ])
+            @include('components::form-error', ['name' => 'title'])
+        </div>
 
-            {{-- 2. エディタータイプ選択 --}}
-            <div>
-                @include('components::form-label', [
-                    'for' => 'editor_type',
-                    'text' => __('common.content_editor.label'),
-                ])
+        {{-- 2. エディタータイプ選択 --}}
+        <div class="mb-6">
+            @include('components::form-label', [
+                'for' => 'editor_type',
+                'text' => __('common.content_editor.label'),
+            ])
 
-                @if ($isEditMode)
-                    {{-- 編集時: エディタータイプ表示（変更不可） --}}
-                    <div class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-                        <i class="{{ $editorIcons[$editorType] ?? 'fas fa-file' }} text-lg"
+            @if ($isEditMode)
+                {{-- 編集時: エディタータイプバッジ + プレビュートグル --}}
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                        <i class="{{ $editorIcons[$editorType] ?? 'fas fa-file' }}"
                            style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
-                        <div>
-                            <div class="font-medium text-gray-900 dark:text-white">
-                                {{ $editorTranslations["common.content_editor.{$editorType}"] ?? $editorType }}
-                            </div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $editorTranslations["common.content_editor.{$editorType}_description"] ?? '' }}
-                            </div>
-                        </div>
-                    </div>
-                    <input type="hidden" name="editor_type" value="{{ $editorType }}">
-                @else
-                    {{-- 作成時: ラジオカード選択 --}}
-                    <div x-data="{
-                        editorIcons: {{ Js::from($editorIcons) }},
-                        editorColors: {{ Js::from($editorColors) }},
-                        editorOptions: [],
-                        updateEditorOptions() {
-                            this.editorOptions = this.availableEditors.map(editor => ({
-                                value: editor,
-                                label: this.$t(`common.content_editor.${editor}`),
-                                description: this.$t(`common.content_editor.${editor}_description`),
-                                icon: this.editorIcons[editor] || 'fas fa-file',
-                                color: this.editorColors[editor] || 'gray',
-                            }));
-                        }
-                    }" x-init="updateEditorOptions(); $watch('availableEditors', () => updateEditorOptions())">
-                        <template x-if="editorOptions.length > 0">
-                            <div class="grid gap-4 grid-cols-1 sm:grid-cols-3">
-                                <template x-for="option in editorOptions" :key="option.value">
-                                    <label class="relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-all duration-150"
-                                           :class="[
-                                               editorType === option.value
-                                                   ? 'border-blue-600 dark:border-blue-500 ring-3 ring-blue-600 dark:ring-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                                                   : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500'
-                                           ]"
-                                           @click="editorType = option.value">
-                                        <input type="radio"
-                                               name="editor_type"
-                                               :value="option.value"
-                                               x-model="editorType"
-                                               class="sr-only">
-
-                                        <span class="flex flex-1">
-                                            <span class="flex flex-col justify-center">
-                                                <span class="flex items-center gap-2 text-sm font-medium"
-                                                      :class="editorType === option.value ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'">
-                                                    <i :class="option.icon"></i>
-                                                    <span x-text="option.label"></span>
-                                                </span>
-                                                <span class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-text="option.description"></span>
-                                            </span>
-                                        </span>
-
-                                        <span class="absolute top-3 right-3 flex items-center justify-center"
-                                              x-show="editorType === option.value"
-                                              x-transition:enter="transition ease-out duration-100"
-                                              x-transition:enter-start="opacity-0 scale-75"
-                                              x-transition:enter-end="opacity-100 scale-100"
-                                              x-transition:leave="transition ease-in duration-75"
-                                              x-transition:leave-start="opacity-100 scale-100"
-                                              x-transition:leave-end="opacity-0 scale-75">
-                                            <i class="fas fa-check-circle text-lg text-blue-600 dark:text-blue-400"></i>
-                                        </span>
-
-                                        <span class="pointer-events-none absolute -inset-px rounded-lg"
-                                              :class="editorType === option.value ? 'border-2 border-blue-600 dark:border-blue-500' : 'border border-transparent'"
-                                              aria-hidden="true"></span>
-                                    </label>
-                                </template>
-                            </div>
-                        </template>
-                    </div>
-                @endif
-
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
-                </p>
-                @include('components::form-error', ['name' => 'editor_type'])
-            </div>
-
-            {{-- 3. コンテンツエディタ --}}
-            <div>
-                @include('components::form-label', [
-                    'for' => 'content',
-                    'text' => __('common.content'),
-                ])
-
-                {{-- GUI エディタ --}}
-                <div x-show="editorType === 'gui'" x-cloak>
-                    @if($guiEditorInfo)
-                        @include($guiEditorInfo->viewName, [
-                            'contentFieldName' => 'content',
-                            'editorInfo' => $guiEditorInfo,
-                        ])
-                    @else
-                        <div class="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center">
-                            <i class="fas fa-paint-brush text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 dark:text-gray-400">
-                                {{ __('common.content_editor.gui_coming_soon') }}
-                            </p>
-                        </div>
-                        <input type="hidden" name="content" x-model="content">
+                        {{ $editorTranslations["common.content_editor.{$editorType}"] ?? $editorType }}
+                    </span>
+                    @if($previewFrameUrl)
+                        <button type="button" @click="togglePreview()"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-colors"
+                            :class="previewVisible
+                                ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-700'
+                                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300'"
+                            :title="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'">
+                            <i class="fas" :class="previewVisible ? 'fa-eye' : 'fa-eye-slash'"></i>
+                            <span x-text="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'"></span>
+                        </button>
                     @endif
                 </div>
+                <input type="hidden" name="editor_type" value="{{ $editorType }}">
+            @else
+                {{-- 作成時: ラジオカード選択 --}}
+                <div x-data="{
+                    editorIcons: {{ Js::from($editorIcons) }},
+                    editorColors: {{ Js::from($editorColors) }},
+                    editorOptions: [],
+                    updateEditorOptions() {
+                        this.editorOptions = this.availableEditors.map(editor => ({
+                            value: editor,
+                            label: this.$t(`common.content_editor.${editor}`),
+                            description: this.$t(`common.content_editor.${editor}_description`),
+                            icon: this.editorIcons[editor] || 'fas fa-file',
+                            color: this.editorColors[editor] || 'gray',
+                        }));
+                    }
+                }" x-init="updateEditorOptions(); $watch('availableEditors', () => updateEditorOptions())">
+                    <template x-if="editorOptions.length > 0">
+                        <div class="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                            <template x-for="option in editorOptions" :key="option.value">
+                                <label class="relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-all duration-150"
+                                       :class="[
+                                           editorType === option.value
+                                               ? 'border-blue-600 dark:border-blue-500 ring-3 ring-blue-600 dark:ring-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                                               : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500'
+                                       ]"
+                                       @click="editorType = option.value">
+                                    <input type="radio"
+                                           name="editor_type"
+                                           :value="option.value"
+                                           x-model="editorType"
+                                           class="sr-only">
 
-                {{-- Markdown エディタ --}}
-                <div x-show="editorType === 'markdown'" x-cloak>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('common.content_editor.markdown_editor') }}
+                                    <span class="flex flex-1">
+                                        <span class="flex flex-col justify-center">
+                                            <span class="flex items-center gap-2 text-sm font-medium"
+                                                  :class="editorType === option.value ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'">
+                                                <i :class="option.icon"></i>
+                                                <span x-text="option.label"></span>
+                                            </span>
+                                            <span class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-text="option.description"></span>
+                                        </span>
+                                    </span>
+
+                                    <span class="absolute top-3 right-3 flex items-center justify-center"
+                                          x-show="editorType === option.value"
+                                          x-transition:enter="transition ease-out duration-100"
+                                          x-transition:enter-start="opacity-0 scale-75"
+                                          x-transition:enter-end="opacity-100 scale-100"
+                                          x-transition:leave="transition ease-in duration-75"
+                                          x-transition:leave-start="opacity-100 scale-100"
+                                          x-transition:leave-end="opacity-0 scale-75">
+                                        <i class="fas fa-check-circle text-lg text-blue-600 dark:text-blue-400"></i>
+                                    </span>
+
+                                    <span class="pointer-events-none absolute -inset-px rounded-lg"
+                                          :class="editorType === option.value ? 'border-2 border-blue-600 dark:border-blue-500' : 'border border-transparent'"
+                                          aria-hidden="true"></span>
+                                </label>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            @endif
+
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <i class="fas fa-info-circle mr-1"></i>
+                {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
+            </p>
+            @include('components::form-error', ['name' => 'editor_type'])
+        </div>
+
+        {{-- 3. コンテンツエディタ（スプリットペイン） --}}
+        <div x-ref="splitContainer"
+             class="flex gap-4 overflow-hidden"
+             :class="[
+                 isHorizontal ? 'flex-row' : 'flex-col',
+                 (isDragging || isResizingPreview) ? 'select-none' : ''
+             ]">
+
+            {{-- エディタペイン --}}
+            <div x-ref="editorPane"
+                 class="w-full min-w-0"
+                 :class="isHorizontal && previewVisible ? 'overflow-y-auto' : ''"
+                 :style="isHorizontal && previewVisible ? { width: (splitRatio * 100) + '%', maxHeight: 'calc(100vh - 160px)' } : {}">
+
+                <div class="space-y-4">
+                    @include('components::form-label', [
+                        'for' => 'content',
+                        'text' => __('common.content'),
+                    ])
+
+                    {{-- GUI エディタ --}}
+                    <div x-show="editorType === 'gui'" x-cloak>
+                        @if($guiEditorInfo)
+                            @include($guiEditorInfo->viewName, [
+                                'contentFieldName' => 'content',
+                                'editorInfo' => $guiEditorInfo,
+                            ])
+                        @else
+                            <div class="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center">
+                                <i class="fas fa-paint-brush text-4xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    {{ __('common.content_editor.gui_coming_soon') }}
+                                </p>
                             </div>
+                            <input type="hidden" name="content" x-model="content">
+                        @endif
+                    </div>
+
+                    {{-- テキストエディタ（HTML / Markdown 共通） --}}
+                    <div x-show="editorType !== 'gui'" x-cloak>
+                        @if(!$isSimpleMode)
+                            {{-- タブナビゲーション（HTMLエディタ時のみ） --}}
+                            <nav x-show="editorType === 'html'" class="flex border-b border-gray-200 dark:border-gray-600 mb-4" role="tablist">
+                                <button type="button"
+                                        @click="activeTab = 'content'"
+                                        :class="activeTab === 'content'
+                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                        class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'content'">
+                                    <i class="fas fa-code mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_content') }}
+                                </button>
+                                <button type="button"
+                                        @click="activeTab = 'css'"
+                                        :class="activeTab === 'css'
+                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                        class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'css'">
+                                    <i class="fab fa-css3-alt mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_css') }}
+                                </button>
+                                <button type="button"
+                                        @click="activeTab = 'js'"
+                                        :class="activeTab === 'js'
+                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                                        class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'js'">
+                                    <i class="fab fa-js mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_js') }}
+                                </button>
+                            </nav>
+                        @endif
+
+                        {{-- Content textarea --}}
+                        <div x-show="activeTab === 'content' || editorType !== 'html'" role="tabpanel">
                             @include('components::form-textarea', [
-                                'id' => 'content_markdown',
+                                'id' => 'content',
                                 'name' => 'content',
                                 'value' => $content,
-                                'class' => 'min-h-96 font-mono text-sm',
+                                'class' => 'font-mono text-sm',
                                 'xModel' => 'content',
                             ])
                         </div>
-                        <div>
-                            <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('common.content_editor.preview') }}
+
+                        @if(!$isSimpleMode)
+                            {{-- CSS タブ（HTMLエディタ時のみ） --}}
+                            <div x-show="activeTab === 'css' && editorType === 'html'" x-cloak role="tabpanel">
+                                @include('components::form-textarea', [
+                                    'id' => 'custom_css',
+                                    'name' => 'custom_css',
+                                    'value' => $customCss,
+                                    'class' => 'font-mono text-sm',
+                                    'xModel' => 'customCss',
+                                    'placeholder' => __('dixlase-pages::components/page-content-editor.css_placeholder'),
+                                ])
                             </div>
-                            <div class="min-h-96 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 prose dark:prose-invert max-w-none overflow-auto"
-                                 x-html="marked.parse(content || '')"></div>
-                        </div>
-                    </div>
-                </div>
 
-                {{-- HTML エディタ（Content / CSS / JS タブ付き） --}}
-                <div x-show="editorType === 'html'" x-cloak>
-                    @if(!$isSimpleMode)
-                        {{-- タブナビゲーション (advanced mode only) --}}
-                        <nav class="flex border-b border-gray-200 dark:border-gray-600 mb-4" role="tablist">
-                            <button type="button"
-                                    @click="activeTab = 'content'"
-                                    :class="activeTab === 'content'
-                                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                    class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                    role="tab"
-                                    :aria-selected="activeTab === 'content'">
-                                <i class="fas fa-code mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_content') }}
-                            </button>
-                            <button type="button"
-                                    @click="activeTab = 'css'"
-                                    :class="activeTab === 'css'
-                                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                    class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                    role="tab"
-                                    :aria-selected="activeTab === 'css'">
-                                <i class="fab fa-css3-alt mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_css') }}
-                            </button>
-                            <button type="button"
-                                    @click="activeTab = 'js'"
-                                    :class="activeTab === 'js'
-                                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                    class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                    role="tab"
-                                    :aria-selected="activeTab === 'js'">
-                                <i class="fab fa-js mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_js') }}
-                            </button>
-                        </nav>
-                    @endif
-
-                    {{-- Content タブ --}}
-                    <div @if(!$isSimpleMode) x-show="activeTab === 'content'" @endif role="tabpanel">
-                        @include('components::form-textarea', [
-                            'id' => 'content_html',
-                            'name' => 'content',
-                            'value' => $content,
-                            'class' => 'min-h-96 font-mono text-sm',
-                            'xModel' => 'content',
-                        ])
+                            {{-- JS タブ（HTMLエディタ時のみ） --}}
+                            <div x-show="activeTab === 'js' && editorType === 'html'" x-cloak role="tabpanel">
+                                @include('components::form-textarea', [
+                                    'id' => 'custom_js',
+                                    'name' => 'custom_js',
+                                    'value' => $customJs,
+                                    'class' => 'font-mono text-sm',
+                                    'xModel' => 'customJs',
+                                    'placeholder' => __('dixlase-pages::components/page-content-editor.js_placeholder'),
+                                ])
+                            </div>
+                        @endif
                     </div>
 
-                    @if(!$isSimpleMode)
-                        {{-- CSS タブ --}}
-                        <div x-show="activeTab === 'css'" x-cloak role="tabpanel">
-                            @include('components::form-textarea', [
-                                'id' => 'custom_css',
-                                'name' => 'custom_css',
-                                'value' => $customCss,
-                                'class' => 'min-h-96 font-mono text-sm',
-                                'xModel' => 'customCss',
-                                'placeholder' => __('dixlase-pages::components/page-content-editor.css_placeholder'),
-                            ])
-                        </div>
-
-                        {{-- JS タブ --}}
-                        <div x-show="activeTab === 'js'" x-cloak role="tabpanel">
-                            @include('components::form-textarea', [
-                                'id' => 'custom_js',
-                                'name' => 'custom_js',
-                                'value' => $customJs,
-                                'class' => 'min-h-96 font-mono text-sm',
-                                'xModel' => 'customJs',
-                                'placeholder' => __('dixlase-pages::components/page-content-editor.js_placeholder'),
-                            ])
-                        </div>
-                    @endif
+                    @include('components::form-error', ['name' => 'content'])
                 </div>
-
-                @include('components::form-error', ['name' => 'content'])
             </div>
 
+            {{-- プレビューペイン（編集時のみ） --}}
+            @if($isEditMode && $previewFrameUrl)
+                @include('components.content-editor.preview-pane')
+            @endif
         </div>
+
+        {{-- スクロールボタン（編集時のみ） --}}
+        @if($isEditMode && $previewFrameUrl)
+            @include('components.content-editor.scroll-buttons')
+        @endif
 
         {{-- ===== 右サイドバー ===== --}}
         <x-admin.right-sidebar

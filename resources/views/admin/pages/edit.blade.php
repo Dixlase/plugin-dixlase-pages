@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
-<form id="pageUpdateForm" action="{{ route('dixlase-pages::admin.pages.update', ['page' => $page->id] ) }}" method="POST">
+<form id="pageUpdateForm" action="{{ route('dixlase-pages::admin.pages.update', ['page' => $page->id] ) }}" method="POST" class="min-w-0 overflow-hidden">
     @csrf
     @method('PATCH')
 
@@ -42,6 +42,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 </form>
 @endsection
+
+@push('styles')
+<style @cspNonce>
+/* メインコンテンツがflexbox min-width:autoで縮小しない問題を修正 */
+#admin-main-content { min-width: 0; }
+</style>
+@endpush
 
 <!-- 保存ボタンとモーダル -->
 @section('save')
