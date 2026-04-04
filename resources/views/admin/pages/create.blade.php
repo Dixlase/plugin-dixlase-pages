@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
-<form id="pageCreateForm" action="{{ route('dixlase-pages::admin.pages.store') }}" method="POST">
+<form id="pageCreateForm" action="{{ route('dixlase-pages::admin.pages.store') }}" method="POST" class="min-w-0 overflow-hidden">
     @csrf
     <!-- フォーム -->
     @include('dixlase-pages::admin.pages.partials.form', [
@@ -31,6 +31,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ])
 </form>
 @endsection
+
+@push('styles')
+<style @cspNonce>
+#admin-main-content { min-width: 0; }
+</style>
+@endpush
 
 <!-- 保存ボタンとモーダル -->
 @section('save')

@@ -207,6 +207,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
+            {{-- プレビュートグルボタン（作成・編集共通） --}}
+            @if($previewFrameUrl && !$isEditMode)
+                <div class="mt-3">
+                    <button type="button" @click="togglePreview()"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-colors text-xs"
+                        :class="previewVisible
+                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-700'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300'"
+                        :title="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'">
+                        <i class="fas" :class="previewVisible ? 'fa-eye' : 'fa-eye-slash'"></i>
+                        <span x-text="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'"></span>
+                    </button>
+                </div>
+            @endif
+
             <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 <i class="fas fa-info-circle mr-1"></i>
                 {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
@@ -333,13 +348,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </div>
 
             {{-- プレビューペイン（編集時のみ） --}}
-            @if($isEditMode && $previewFrameUrl)
+            @if($previewFrameUrl)
                 @include('components.content-editor.preview-pane')
             @endif
         </div>
 
         {{-- スクロールボタン（編集時のみ） --}}
-        @if($isEditMode && $previewFrameUrl)
+        @if($previewFrameUrl)
             @include('components.content-editor.scroll-buttons')
         @endif
 

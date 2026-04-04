@@ -48,6 +48,7 @@ Route::prefix('pages')
         Route::get('/new', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
         Route::get('/settings', [DixlasePagesAdminPagesController::class, 'settings'])->name('settings');
         Route::post('/settings', [DixlasePagesAdminPagesController::class, 'updateSettings'])->name('settings.update');
+        Route::get('/preview-frame', [DixlasePagesAdminPagesController::class, 'previewFrameNew'])->name('preview-frame-new');
         Route::post('/preview', [DixlasePagesAdminPagesController::class, 'preview'])->name('preview');
         Route::post('/preview-render', [DixlasePagesAdminPagesController::class, 'previewRender'])->name('preview-render');
         Route::post('/', [DixlasePagesAdminPagesController::class, 'store'])->name('store');
