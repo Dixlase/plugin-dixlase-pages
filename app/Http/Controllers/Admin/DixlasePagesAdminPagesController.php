@@ -261,34 +261,22 @@ class DixlasePagesAdminPagesController extends Controller
         // Editor types available based on mode
         // Simple mode: GUI and Markdown only (unless editing a page with HTML/Blade)
         $simpleEditorSlugs = ['gui', 'markdown'];
-        $allEditorSlugs = ['gui', 'markdown', 'html'];
 
         // For edit mode, include the page's current editor type even in simple mode (Strategy B)
         $currentEditorSlug = $page->exists ? $page->editor_type->slug() : null;
         $isAdvancedEditor = $currentEditorSlug && ! in_array($currentEditorSlug, $simpleEditorSlugs);
 
-        $activeSlugs = $isSimpleMode && ! $isAdvancedEditor ? $simpleEditorSlugs : $allEditorSlugs;
+        // Simple mode で除外するエディタースラッグ
+        $excludeSlugs = $isSimpleMode && ! $isAdvancedEditor ? ['html', 'blade'] : ['blade'];
 
-        // Editor translation keys (for Alpine.js $t())
-        $editorTranslations = [];
-        foreach ($activeSlugs as $slug) {
-            $editorTranslations["common.content_editor.{$slug}"] = __("common.content_editor.{$slug}");
-            $editorTranslations["common.content_editor.{$slug}_description"] = __("common.content_editor.{$slug}_description");
-        }
-
-        // Editor type icon/color maps
-        $editorIconsMap = [
-            'gui' => 'fas fa-magic',
-            'markdown' => 'fab fa-markdown',
-            'html' => 'fas fa-code',
-        ];
-        $editorColorsMap = [
-            'gui' => 'purple',
-            'markdown' => 'blue',
-            'html' => 'orange',
-        ];
-        $editorIcons = array_intersect_key($editorIconsMap, array_flip($activeSlugs));
-        $editorColors = array_intersect_key($editorColorsMap, array_flip($activeSlugs));
+        // エディタータイプのラジオカードオプション（共通コンポーネント用）
+        $editorManager = app(\App\Services\Editor\EditorManager::class);
+        $enabledByPlugin = $editorManager->getAvailableEditorTypes();
+        $editorCardOptions = ContentEditorType::radioCardOptions(
+            null,
+            $excludeSlugs,
+            $enabledByPlugin
+        );
 
         // old()込みのステータス値（Alpine.js初期化用）
         $statusValue = old('status', $page->status->slug());
@@ -335,9 +323,7 @@ class DixlasePagesAdminPagesController extends Controller
             'storageOptions',
             'storageDescriptions',
             'statusOptions',
-            'editorTranslations',
-            'editorIcons',
-            'editorColors',
+            'editorCardOptions',
             'statusValue',
             'publishedAtValue',
             'fileStorageBasePath',

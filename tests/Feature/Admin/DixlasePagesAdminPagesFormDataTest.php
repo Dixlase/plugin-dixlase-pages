@@ -86,16 +86,14 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_prepare_form_data_returns_correct_defaults_for_new_page(): void
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertArrayHasKey('content', $result);
         $this->assertArrayHasKey('slugBaseUrl', $result);
         $this->assertArrayHasKey('storageOptions', $result);
         $this->assertArrayHasKey('statusOptions', $result);
-        $this->assertArrayHasKey('editorTranslations', $result);
-        $this->assertArrayHasKey('editorIcons', $result);
-        $this->assertArrayHasKey('editorColors', $result);
+        $this->assertArrayHasKey('editorCardOptions', $result);
         $this->assertArrayHasKey('statusValue', $result);
         $this->assertArrayHasKey('publishedAtValue', $result);
         $this->assertArrayHasKey('fileStorageBasePath', $result);
@@ -111,7 +109,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_storage_options_have_correct_structure(): void
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $storageOptions = $result['storageOptions'];
@@ -132,7 +130,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_status_options_have_correct_structure(): void
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $statusOptions = $result['statusOptions'];
@@ -192,62 +190,61 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     }
 
     /**
-     * エディター翻訳キーが全て含まれることを確認（詳細モード）
+     * エディターカードオプションが全エディタータイプを含むことを確認（詳細モード）
      */
-    public function test_editor_translations_contain_all_required_keys(): void
+    public function test_editor_card_options_contain_all_required_types(): void
     {
         // Set to advanced mode so all editors are available
         \App\Models\BaseSetting::setValue('admin_mode', 1);
 
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
-        $requiredKeys = [
-            'common.content_editor.gui',
-            'common.content_editor.gui_description',
-            'common.content_editor.markdown',
-            'common.content_editor.markdown_description',
-            'common.content_editor.html',
-            'common.content_editor.html_description',
-        ];
+        $values = array_column($result['editorCardOptions'], 'value');
+        $this->assertContains('gui', $values);
+        $this->assertContains('markdown', $values);
+        $this->assertContains('html', $values);
 
-        foreach ($requiredKeys as $key) {
-            $this->assertArrayHasKey($key, $result['editorTranslations']);
+        // 各オプションに必要なキーがあることを確認
+        foreach ($result['editorCardOptions'] as $option) {
+            $this->assertArrayHasKey('value', $option);
+            $this->assertArrayHasKey('label', $option);
+            $this->assertArrayHasKey('icon', $option);
+            $this->assertArrayHasKey('description', $option);
         }
     }
 
     /**
-     * 簡単モードではGUI/Markdown翻訳キーのみ含まれることを確認
+     * 簡単モードではGUI/Markdownのみ含まれることを確認
      */
-    public function test_editor_translations_in_simple_mode_contain_only_gui_and_markdown(): void
+    public function test_editor_card_options_in_simple_mode_contain_only_gui_and_markdown(): void
     {
         // Set to simple mode
         \App\Models\BaseSetting::setValue('admin_mode', 0);
 
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
-        $this->assertArrayHasKey('common.content_editor.gui', $result['editorTranslations']);
-        $this->assertArrayHasKey('common.content_editor.markdown', $result['editorTranslations']);
-        $this->assertArrayNotHasKey('common.content_editor.html', $result['editorTranslations']);
+        $values = array_column($result['editorCardOptions'], 'value');
+        $this->assertContains('gui', $values);
+        $this->assertContains('markdown', $values);
+        $this->assertNotContains('html', $values);
     }
 
     /**
-     * エディターアイコン・色マップが全エディタータイプを含むことを確認（詳細モード）
+     * エディターカードオプションにアイコンと説明が含まれることを確認（詳細モード）
      */
-    public function test_editor_icons_and_colors_contain_all_editor_types(): void
+    public function test_editor_card_options_have_icons_and_descriptions(): void
     {
         // Set to advanced mode so all editors are available
         \App\Models\BaseSetting::setValue('admin_mode', 1);
 
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
-        $requiredEditors = ['gui', 'markdown', 'html'];
-
-        foreach ($requiredEditors as $editor) {
-            $this->assertArrayHasKey($editor, $result['editorIcons']);
-            $this->assertArrayHasKey($editor, $result['editorColors']);
+        foreach ($result['editorCardOptions'] as $option) {
+            $this->assertNotEmpty($option['icon'], "Icon should not be empty for {$option['value']}");
+            $this->assertNotEmpty($option['label'], "Label should not be empty for {$option['value']}");
         }
     }
 
@@ -266,8 +263,8 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         // HTML editor should be available for existing HTML pages even in simple mode
-        $this->assertArrayHasKey('common.content_editor.html', $result['editorTranslations']);
-        $this->assertArrayHasKey('html', $result['editorIcons']);
+        $values = array_column($result['editorCardOptions'], 'value');
+        $this->assertContains('html', $values);
         $this->assertTrue($result['isAdvancedEditor']);
     }
 
@@ -276,7 +273,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_prepare_form_data_returns_custom_css_and_js(): void
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertArrayHasKey('customCss', $result);
@@ -328,7 +325,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_prepare_form_data_returns_language_options(): void
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertArrayHasKey('languageOptions', $result);
@@ -341,7 +338,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
      */
     public function test_slug_base_url_contains_app_url_and_ends_with_slash(): void
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
 
         $this->assertStringStartsWith(config('app.url'), $result['slugBaseUrl']);
