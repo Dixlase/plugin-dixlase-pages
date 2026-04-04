@@ -334,29 +334,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
         </div>
 
-        {{-- ===== 右サイドバートグルボタン ===== --}}
-        <button type="button"
-                @click="toggleRightSidebar()"
-                class="flex fixed top-14 right-0 z-50 items-center backdrop-blur-sm dark:bg-gray-900/75 bg-white/75 text-blue-400 dark:text-white px-1.5 py-4 rounded-l-lg shadow-md border border-r-0 border-gray-300 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                :class="{
-                    'translate-x-0': rightSidebarCollapsed,
-                    '-translate-x-80': !rightSidebarCollapsed
-                }"
-                :style="rightSidebarReady ? 'transition: transform 200ms ease-in-out' : ''"
-                :aria-label="rightSidebarCollapsed
-                    ? '{{ __('dixlase-pages::components/page-content-editor.sidebar_open') }}'
-                    : '{{ __('dixlase-pages::components/page-content-editor.sidebar_close') }}'">
-            <i class="fas text-sm" :class="rightSidebarCollapsed ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
-        </button>
-
         {{-- ===== 右サイドバー ===== --}}
-        <div class="page-editor-right-sidebar space-y-6 fixed top-12 right-0 bottom-0 w-80 z-50 overflow-y-auto bg-white/75 dark:bg-gray-900/75 backdrop-blur-sm border-l border-gray-200 dark:border-gray-600 shadow-md px-6 py-6"
-             :class="{
-                 'translate-x-80': rightSidebarCollapsed,
-                 'translate-x-0': !rightSidebarCollapsed
-             }"
-             :style="rightSidebarReady ? 'transition: transform 300ms ease-in-out' : ''"
-             >
+        <x-admin.right-sidebar
+            :openLabel="__('dixlase-pages::components/page-content-editor.sidebar_open')"
+            :closeLabel="__('dixlase-pages::components/page-content-editor.sidebar_close')"
+            panelClass="page-editor-right-sidebar"
+        >
 
             {{-- Simple mode notice --}}
             @if($isSimpleMode)
@@ -535,7 +518,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             </div>
 
-        </div>
+        </x-admin.right-sidebar>
 
 </div>
 
