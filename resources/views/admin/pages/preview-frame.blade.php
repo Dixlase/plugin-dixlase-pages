@@ -92,6 +92,7 @@ iframe[src*="turnstile"] {
  */
 (function() {
     var contentArea = document.getElementById('preview-content-area');
+    var titleArea = document.getElementById('preview-title-area');
 
     window.addEventListener('message', function(event) {
         if (event.origin !== window.location.origin) return;
@@ -101,6 +102,12 @@ iframe[src*="turnstile"] {
             case 'updateContent':
                 if (contentArea) {
                     contentArea.innerHTML = event.data.html || '';
+                }
+                break;
+
+            case 'updateTitle':
+                if (titleArea) {
+                    titleArea.textContent = event.data.title || '';
                 }
                 break;
 
