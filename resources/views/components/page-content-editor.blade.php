@@ -26,11 +26,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     'editorType' => 'html',
     'content' => '',
     'identifier' => '',
-    'editorTranslations' => [],
+    'editorCardOptions' => [],
     'storageOptions' => [],
     'storageDescriptions' => [],
-    'editorIcons' => [],
-    'editorColors' => [],
     // スラッグ
     'slugValue' => '',
     'slugBaseUrl' => '',
@@ -76,8 +74,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 +----------------------------------+---+----------------+
 --}}
 
-<div data-translations='@json($editorTranslations)'
-     x-data="pageEditor({
+<div x-data="pageEditor({
         storageType: '{{ old('storage_type', $storageType) }}',
         editorType: '{{ old('editor_type', $editorType) }}',
         content: @js(old('content', $content)),
@@ -124,11 +121,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
             @if ($isEditMode)
                 {{-- 編集時: エディタータイプバッジ + プレビュートグル --}}
+                @php
+                    $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
+                @endphp
                 <div class="flex flex-wrap items-center gap-3 text-xs">
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                        <i class="{{ $editorIcons[$editorType] ?? 'fas fa-file' }}"
-                           style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
-                        {{ $editorTranslations["common.content_editor.{$editorType}"] ?? $editorType }}
+                        <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}"></i>
+                        {{ $currentCard['label'] ?? $editorType }}
                     </span>
                     @if($previewFrameUrl)
                         <button type="button" @click="togglePreview()"
@@ -144,70 +143,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
                 <input type="hidden" name="editor_type" value="{{ $editorType }}">
             @else
-                {{-- 作成時: ラジオカード選択 --}}
-                <div x-data="{
-                    editorIcons: {{ Js::from($editorIcons) }},
-                    editorColors: {{ Js::from($editorColors) }},
-                    editorOptions: [],
-                    updateEditorOptions() {
-                        this.editorOptions = this.availableEditors.map(editor => ({
-                            value: editor,
-                            label: this.$t(`common.content_editor.${editor}`),
-                            description: this.$t(`common.content_editor.${editor}_description`),
-                            icon: this.editorIcons[editor] || 'fas fa-file',
-                            color: this.editorColors[editor] || 'gray',
-                        }));
-                    }
-                }" x-init="updateEditorOptions(); $watch('availableEditors', () => updateEditorOptions())">
-                    <template x-if="editorOptions.length > 0">
-                        <div class="grid gap-4 grid-cols-1 sm:grid-cols-3">
-                            <template x-for="option in editorOptions" :key="option.value">
-                                <label class="relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-all duration-150"
-                                       :class="[
-                                           editorType === option.value
-                                               ? 'border-blue-600 dark:border-blue-500 ring-3 ring-blue-600 dark:ring-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                                               : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500'
-                                       ]"
-                                       @click="editorType = option.value">
-                                    <input type="radio"
-                                           name="editor_type"
-                                           :value="option.value"
-                                           x-model="editorType"
-                                           class="sr-only">
-
-                                    <span class="flex flex-1">
-                                        <span class="flex flex-col justify-center">
-                                            <span class="flex items-center gap-2 text-sm font-medium"
-                                                  :class="editorType === option.value ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'">
-                                                <i :class="option.icon"></i>
-                                                <span x-text="option.label"></span>
-                                            </span>
-                                            <span class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-text="option.description"></span>
-                                        </span>
-                                    </span>
-
-                                    <span class="absolute top-3 right-3 flex items-center justify-center"
-                                          x-show="editorType === option.value"
-                                          x-transition:enter="transition ease-out duration-100"
-                                          x-transition:enter-start="opacity-0 scale-75"
-                                          x-transition:enter-end="opacity-100 scale-100"
-                                          x-transition:leave="transition ease-in duration-75"
-                                          x-transition:leave-start="opacity-100 scale-100"
-                                          x-transition:leave-end="opacity-0 scale-75">
-                                        <i class="fas fa-check-circle text-lg text-blue-600 dark:text-blue-400"></i>
-                                    </span>
-
-                                    <span class="pointer-events-none absolute -inset-px rounded-lg"
-                                          :class="editorType === option.value ? 'border-2 border-blue-600 dark:border-blue-500' : 'border border-transparent'"
-                                          aria-hidden="true"></span>
-                                </label>
-                            </template>
-                        </div>
-                    </template>
-                </div>
+                {{-- 作成時: ラジオカード選択（共通コンポーネント使用） --}}
+                <x-form-radio-card-group
+                    name="editor_type"
+                    :options="$editorCardOptions"
+                    :value="old('editor_type', $editorType)"
+                    :columns="3"
+                    xModel="editorType"
+                />
             @endif
 
-            {{-- プレビュートグルボタン（作成・編集共通） --}}
+            {{-- プレビュートグルボタン（作成時） --}}
             @if($previewFrameUrl && !$isEditMode)
                 <div class="mt-3">
                     <button type="button" @click="togglePreview()"
