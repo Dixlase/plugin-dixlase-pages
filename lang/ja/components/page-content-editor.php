@@ -34,7 +34,7 @@ return [
     'sidebar_close' => '設定サイドバーを閉じる',
     'editor_type_help' => 'エディタータイプは新規作成時のみ選択でき、保存後は変更できません。',
     'preview' => 'プレビュー',
-    'preview_help' => '現在の未保存の内容をプレビューします。新しいウィンドウで開きます。',
+    'preview_help' => '現在の内容を保存前に新しいウィンドウでプレビューします。',
     'tab_content' => 'コンテンツ',
     'tab_css' => 'CSS',
     'tab_js' => 'JavaScript',
