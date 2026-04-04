@@ -153,6 +153,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 />
             @endif
 
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <i class="fas fa-info-circle mr-1"></i>
+                {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
+            </p>
+            @include('components::form-error', ['name' => 'editor_type'])
+
             {{-- プレビュートグルボタン（作成時） --}}
             @if($previewFrameUrl && !$isEditMode)
                 <div class="mt-3">
@@ -167,12 +173,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     </button>
                 </div>
             @endif
-
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                <i class="fas fa-info-circle mr-1"></i>
-                {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
-            </p>
-            @include('components::form-error', ['name' => 'editor_type'])
         </div>
 
         {{-- 3. コンテンツエディタ（スプリットペイン） --}}
