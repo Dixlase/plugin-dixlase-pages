@@ -195,6 +195,11 @@ document.addEventListener('alpine:init', () => {
 
             // --- コンテンツ監視（プレビュー用） ---
             watchContentChanges() {
+                const titleEl = document.getElementById('title');
+                if (titleEl) {
+                    titleEl.addEventListener('input', () => this.onTitleChange());
+                }
+
                 const contentEl = document.getElementById('content');
                 if (contentEl) {
                     contentEl.addEventListener('input', () => this.onContentChange());
@@ -203,6 +208,13 @@ document.addEventListener('alpine:init', () => {
                 const cssEl = document.getElementById('custom_css');
                 if (cssEl) {
                     cssEl.addEventListener('input', () => this.onCssChange());
+                }
+            },
+
+            onTitleChange() {
+                const title = document.getElementById('title')?.value || '';
+                if (this.previewReady) {
+                    this.postToIframe('updateTitle', { title });
                 }
             },
 
