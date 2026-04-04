@@ -60,7 +60,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function preview(Request $request)
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
         $page->title = $request->input('title', '');
         $page->slug = $request->input('slug', '');
         $page->content = $request->input('content', '');
@@ -89,6 +89,48 @@ class DixlasePagesAdminPagesController extends Controller
             'hasCustomJs',
             'customAssetVersion',
         ));
+    }
+
+    /**
+     * iframe用プレビューフレーム（テーマレイアウトでページを表示）
+     *
+     * 管理画面のページ編集画面内iframeに読み込まれる。
+     * テーマの layouts.preview を使用して実際のテーマレイアウトで表示し、
+     * postMessage でコンテンツをリアルタイム更新する。
+     */
+    public function previewFrame(DixlasePagesPage $page): View
+    {
+        // CSP frame-ancestors を 'self' に上書き（iframe埋め込み許可）
+        request()->attributes->set('csp_frame_ancestors_self', true);
+
+        // 初期コンテンツをレンダリング
+        $previewService = app(ContentPreviewService::class);
+        $rawContent = $page->getContentByEditorType() ?? '';
+        $initialRenderedContent = $rawContent
+            ? $previewService->render($rawContent, $page->editor_type)
+            : '';
+
+        return view('dixlase-pages::admin.pages.preview-frame', [
+            'page' => $page,
+            'initialRenderedContent' => $initialRenderedContent,
+        ]);
+    }
+
+    /**
+     * サーバーサイドプレビューレンダリング（Blade/GUI エディタ用）
+     *
+     * iframe内のリアルタイムプレビューで、クライアント側でレンダリングできない
+     * エディタタイプ（Blade、GUI）のコンテンツをHTMLに変換して返す。
+     */
+    public function previewRender(Request $request): JsonResponse
+    {
+        $content = $request->input('content', '');
+        $editorTypeSlug = $request->input('editor_type', 'html');
+
+        $previewService = app(ContentPreviewService::class);
+        $html = $previewService->renderFromSlug($content, $editorTypeSlug);
+
+        return response()->json(['html' => $html]);
     }
 
     /**
@@ -236,9 +278,19 @@ class DixlasePagesAdminPagesController extends Controller
         // ファイル保存時の表示用ベースパス
         $fileStorageBasePath = 'storage/app/private/'.$this->contentService->getBasePath();
 
-        // プレビューURL
+        // プレビューURL（別タブプレビュー）
         $previewUrl = Route::has('dixlase-pages::admin.pages.preview')
             ? route('dixlase-pages::admin.pages.preview')
+            : '';
+
+        // iframeプレビューフレームURL（編集時のみ利用可能）
+        $previewFrameUrl = $page->exists && Route::has('dixlase-pages::admin.pages.preview-frame')
+            ? route('dixlase-pages::admin.pages.preview-frame', $page)
+            : '';
+
+        // サーバーサイドレンダリングURL（Blade/GUIエディタ用）
+        $previewRenderUrl = Route::has('dixlase-pages::admin.pages.preview-render')
+            ? route('dixlase-pages::admin.pages.preview-render')
             : '';
 
         // 言語オプション（翻訳キーからロケールに応じたラベルを取得）
@@ -267,6 +319,8 @@ class DixlasePagesAdminPagesController extends Controller
             'publishedAtValue',
             'fileStorageBasePath',
             'previewUrl',
+            'previewFrameUrl',
+            'previewRenderUrl',
             'languageOptions',
             'langValue',
             'isSimpleMode',
@@ -283,7 +337,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function create()
     {
-        $page = new DixlasePagesPage;
+        $page = new DixlasePagesPage();
 
         // Determine admin mode (Simple=0, Advanced=1)
         $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
