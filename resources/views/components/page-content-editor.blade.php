@@ -105,14 +105,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             ])
 
             @if ($isEditMode)
-                {{-- 編集時: エディタータイプバッジ + プレビュートグル --}}
+                {{-- 編集時: エディタータイプバッジ + 言語バッジ + プレビュートグル --}}
                 @php
                     $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
                 @endphp
                 <div class="flex flex-wrap items-center gap-3 text-xs">
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                        <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}"></i>
+                        <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
                         {{ $currentCard['label'] ?? $editorType }}
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                        <i class="fas fa-globe"></i>
+                        {{ $languageOptions[$langValue] ?? $langValue }}
                     </span>
                     @if($previewFrameUrl)
                         <button type="button" @click="togglePreview()"
@@ -238,38 +242,43 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
                         {{-- Content textarea --}}
                         <div x-show="activeTab === 'content' || editorType !== 'html'" role="tabpanel">
-                            @include('components::form-textarea', [
-                                'id' => 'content',
-                                'name' => 'content',
-                                'value' => $content,
-                                'class' => 'font-mono text-sm',
-                                'xModel' => 'content',
-                            ])
+                            <x-form-textarea
+                                id="content"
+                                name="content"
+                                :value="$content"
+                                rows="6"
+                                class="font-mono text-sm !bg-gray-950 !text-gray-200 !border-gray-600 focus:!border-blue-500"
+                                xModel="content"
+                            />
                         </div>
 
                         @if(!$isSimpleMode)
                             {{-- CSS タブ（HTMLエディタ時のみ） --}}
                             <div x-show="activeTab === 'css' && editorType === 'html'" x-cloak role="tabpanel">
-                                @include('components::form-textarea', [
-                                    'id' => 'custom_css',
-                                    'name' => 'custom_css',
-                                    'value' => $customCss,
-                                    'class' => 'font-mono text-sm',
-                                    'xModel' => 'customCss',
-                                    'placeholder' => __('dixlase-pages::components/page-content-editor.css_placeholder'),
-                                ])
+                                <x-form-textarea
+                                    id="custom_css"
+                                    name="custom_css"
+                                    :value="$customCss"
+                                    rows="6"
+                                    :placeholder="__('dixlase-pages::components/page-content-editor.css_placeholder')"
+                                    class="font-mono text-sm !bg-gray-950 !text-gray-200 !border-gray-600 focus:!border-blue-500 !overflow-hidden !resize-none"
+                                    xModel="customCss"
+                                    data-auto-resize
+                                />
                             </div>
 
                             {{-- JS タブ（HTMLエディタ時のみ） --}}
                             <div x-show="activeTab === 'js' && editorType === 'html'" x-cloak role="tabpanel">
-                                @include('components::form-textarea', [
-                                    'id' => 'custom_js',
-                                    'name' => 'custom_js',
-                                    'value' => $customJs,
-                                    'class' => 'font-mono text-sm',
-                                    'xModel' => 'customJs',
-                                    'placeholder' => __('dixlase-pages::components/page-content-editor.js_placeholder'),
-                                ])
+                                <x-form-textarea
+                                    id="custom_js"
+                                    name="custom_js"
+                                    :value="$customJs"
+                                    rows="6"
+                                    :placeholder="__('dixlase-pages::components/page-content-editor.js_placeholder')"
+                                    class="font-mono text-sm !bg-gray-950 !text-gray-200 !border-gray-600 focus:!border-blue-500 !overflow-hidden !resize-none"
+                                    xModel="customJs"
+                                    data-auto-resize
+                                />
                             </div>
                         @endif
                     </div>
