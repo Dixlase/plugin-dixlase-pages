@@ -85,7 +85,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         slugBaseUrl: '{{ $slugBaseUrl }}',
         isEditMode: {{ $isEditMode ? 'true' : 'false' }},
         fileStorageBasePath: '{{ $fileStorageBasePath }}',
-        previewUrl: '{{ $previewUrl }}',
         previewFrameUrl: '{{ $previewFrameUrl }}',
         previewRenderUrl: '{{ $previewRenderUrl }}',
         customCss: @js(old('custom_css', $customCss)),
@@ -307,20 +306,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 <x-ui-message type="warning" :message="__('dixlase-pages::components/page-content-editor.advanced_editor_notice')" textSize="text-xs" />
             @endif
 
-            {{-- 6. プレビュー --}}
-            <div>
-                <x-form-button
-                    variant="tertiary"
-                    icon="fas fa-external-link-alt"
-                    :label="__('dixlase-pages::components/page-content-editor.preview')"
-                    class="w-full"
-                    x-click="openPreview()"
-                />
-                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    {{ __('dixlase-pages::components/page-content-editor.preview_help') }}
-                </p>
-            </div>
+            {{-- 別タブプレビュー --}}
+            <x-content-editor.new-tab-preview :url="$previewUrl" />
 
             {{-- タイトル --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">

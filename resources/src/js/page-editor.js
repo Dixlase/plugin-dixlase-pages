@@ -43,7 +43,6 @@ document.addEventListener('alpine:init', () => {
             slugBaseUrl: config.slugBaseUrl || '',
             isEditMode: config.isEditMode || false,
             fileStorageBasePath: config.fileStorageBasePath || '',
-            previewUrl: config.previewUrl || '',
             // CSS/JSタブ
             activeTab: 'content',
             customCss: config.customCss || '',
@@ -149,49 +148,6 @@ document.addEventListener('alpine:init', () => {
                 }
             },
 
-            /**
-             * 保存前プレビューを新しいタブで開く
-             */
-            openPreview() {
-                if (!this.previewUrl) {
-                    return;
-                }
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = this.previewUrl;
-                form.target = '_blank';
-                form.style.display = 'none';
-
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
-                    || document.querySelector('input[name="_token"]')?.value;
-
-                const fields = {
-                    '_token': csrfToken,
-                    'title': this.$root.querySelector('[name="title"]')?.value || '',
-                    'slug': this.slug,
-                    'content': this.content,
-                    'editor_type': this.editorType,
-                    'storage_type': this.storageType,
-                    'status': this.status,
-                    'published_at': this.publishedAt,
-                    'custom_css': this.customCss,
-                    'custom_js': this.customJs,
-                };
-
-                for (const [key, value] of Object.entries(fields)) {
-                    if (value !== null && value !== undefined) {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = value;
-                        form.appendChild(input);
-                    }
-                }
-
-                document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
-            },
 
             // --- コンテンツ監視（プレビュー用） ---
             watchContentChanges() {
