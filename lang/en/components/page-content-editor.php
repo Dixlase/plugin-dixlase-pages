@@ -24,6 +24,7 @@ return [
     'publish_section' => 'Publish Settings',
     'title' => 'Title',
     'title_placeholder' => 'Enter page title',
+    'title_required_help' => 'Title is required.',
     'slug' => 'Slug',
     'slug_help' => 'URL identifier. Only lowercase letters, numbers, and hyphens. Auto-generated from title if empty.',
     'slug_url_preview' => 'Page URL',

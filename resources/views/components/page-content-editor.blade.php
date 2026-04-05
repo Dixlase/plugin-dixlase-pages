@@ -311,16 +311,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
             {{-- タイトル --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                @include('components::form-label', [
-                    'for' => 'title',
-                    'text' => __('dixlase-pages::components/page-content-editor.title'),
-                    'required' => true,
-                ])
+                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {{ __('dixlase-pages::components/page-content-editor.title') }}<x-form-required-badge />
+                </label>
                 @include('components::form-text', [
                     'name' => 'title',
                     'value' => $title,
                     'placeholder' => __('dixlase-pages::components/page-content-editor.title_placeholder'),
                 ])
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    {{ __('dixlase-pages::components/page-content-editor.title_required_help') }}
+                </p>
                 @include('components::form-error', ['name' => 'title'])
             </div>
 
