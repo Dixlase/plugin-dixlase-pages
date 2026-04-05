@@ -314,6 +314,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-label', [
                     'for' => 'title',
                     'text' => __('dixlase-pages::components/page-content-editor.title'),
+                    'required' => true,
                 ])
                 @include('components::form-text', [
                     'name' => 'title',
