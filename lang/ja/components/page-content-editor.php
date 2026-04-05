@@ -24,6 +24,7 @@ return [
     'publish_section' => '公開設定',
     'title' => 'タイトル',
     'title_placeholder' => 'ページタイトルを入力',
+    'title_required_help' => 'タイトルは必須です。',
     'slug' => 'スラッグ',
     'slug_help' => 'URLに使用される識別子。半角英数字とハイフンのみ。空欄の場合はタイトルから自動生成されます。',
     'slug_url_preview' => 'ページURL',

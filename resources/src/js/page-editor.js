@@ -62,6 +62,11 @@ document.addEventListener('alpine:init', () => {
                 // 右サイドバーの有効化をレイアウトに通知
                 this.$dispatch('right-sidebar-active');
 
+                // 新規作成時はモバイル/タブレットでも右サイドバーを開く
+                if (!this.isEditMode) {
+                    window.dispatchEvent(new CustomEvent('right-sidebar-force-open'));
+                }
+
                 // プレビューミックスイン初期化（編集モードのみ）
                 if (hasPreview) {
                     this.initPreview();
