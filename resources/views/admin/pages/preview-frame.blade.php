@@ -50,23 +50,6 @@ postMessage でコンテンツ・カスタムCSSの更新を受け取る。
     </div>
 </div>
 
-{{-- お問い合わせフォームセクション（プラグイン有効時のみ） --}}
-@if(function_exists('dls_inquiry_enabled') && dls_inquiry_enabled())
-<section class="inquiry-section py-16 bg-gray-100 dark:bg-gray-800">
-    <div class="container mx-auto px-4">
-        <div class="max-w-2xl mx-auto">
-            @php $inquirySettings = function_exists('dls_inquiry_settings') ? dls_inquiry_settings() : null; @endphp
-            @if(!empty($inquirySettings->form_heading))
-                <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-3">{{ $inquirySettings->form_heading }}</h2>
-            @endif
-            @if(!empty($inquirySettings->form_description))
-                <p class="text-center text-gray-600 dark:text-gray-400 mb-8 max-w-lg mx-auto">{{ $inquirySettings->form_description }}</p>
-            @endif
-            {!! dls_inquiry_form() !!}
-        </div>
-    </div>
-</section>
-@endif
 @endsection
 
 @push('styles')
