@@ -2,7 +2,7 @@
 This file is part of Dixlase Pages.
 
 Copyright (C) 2026 exc-D inc.
-Website: https://exc-d.com
+https://exc-d.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,13 +16,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-iframe用プレビューフレーム。
-管理画面のページ編集画面でiframeとして読み込まれ、
-テーマの実際のレイアウトでコンテンツをリアルタイムプレビューする。
-postMessage でコンテンツ・カスタムCSSの更新を受け取る。
-軽量プレビューレイアウト（layouts.preview）を使用し、JSバンドルを読み込まない。
-ページプラグインのフロント表示テンプレート（front/page.blade.php）と同じ構造を使用。
 --}}
 
 @extends('themes::layouts.preview')

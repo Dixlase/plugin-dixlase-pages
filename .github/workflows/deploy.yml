@@ -32,9 +32,14 @@ jobs:
             BASE="${{ steps.target.outputs.base_dir }}"
             PLUGIN_DIR="DixlasePages"
 
-            for SITE in brand docs demo keys; do
+            for SITE in brand; do
               DEST="$BASE/$SITE/plugins/$PLUGIN_DIR"
               echo "=== Deploying plugin $PLUGIN_DIR to $SITE (${{ steps.target.outputs.env }}) ==="
+
+              # deploy ユーザーが操作できるよう所有権を戻す
+              if [ -d "$DEST" ]; then
+                docker exec compose-php-1 chown -R 1001:1001 /var/www/apps/$SITE/plugins/$PLUGIN_DIR
+              fi
 
               if [ ! -d "$DEST" ]; then
                 git clone --branch main git@github.com:${{ github.repository }}.git "$DEST"
@@ -45,8 +50,7 @@ jobs:
               fi
 
               if [ -f "$DEST/composer.json" ]; then
-                cd "$DEST"
-                composer install --no-dev --no-interaction --optimize-autoloader
+                docker exec compose-php-1 bash -c "cd /var/www/apps/$SITE && composer dump-autoload --no-dev --optimize"
               fi
             done
 
