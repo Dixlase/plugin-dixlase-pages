@@ -59,19 +59,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         <div class="container mx-auto pt-32 pb-24 px-6 sm:px-8 lg:px-12">
             <article class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                 <!-- Page header -->
-                <header class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
-                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                <header class="px-8 sm:px-10 lg:px-12 pt-10 pb-14 border-b border-gray-200 dark:border-gray-700">
+                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
                         {{ $page->title }}
                     </h1>
-                    @if($page->published_at)
-                        <time datetime="{{ $page->published_at->toISOString() }}" class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('dixlase-pages::front/page.published_at', ['date' => $page->published_at->translatedFormat(__('dixlase-pages::front/page.date_format'))]) }}
-                        </time>
-                    @endif
                 </header>
 
                 <!-- Page content -->
-                <div class="px-6 py-8">
+                <div class="px-8 sm:px-10 lg:px-12 py-10">
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         @if($editorType === 'markdown')
                             {{-- Markdown: parse and output with shortcode processing --}}
