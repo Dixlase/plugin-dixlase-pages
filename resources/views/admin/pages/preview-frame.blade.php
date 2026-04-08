@@ -31,7 +31,7 @@ postMessage でコンテンツ・カスタムCSSの更新を受け取る。
 
 @section('content')
 <div class="dixlase-page">
-    <div class="container mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div class="container mx-auto pt-32 pb-24 px-6 sm:px-8 lg:px-12">
         <article class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
             {{-- ページヘッダー --}}
             <header class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
