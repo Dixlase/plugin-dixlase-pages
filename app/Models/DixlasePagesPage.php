@@ -22,9 +22,11 @@
 
 namespace Plugins\DixlasePages\App\Models;
 
+use App\Contracts\Revisionable;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Traits\HasRevisions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,9 +36,9 @@ use Illuminate\Support\Str;
 /**
  * @property string $lang 言語コード
  */
-class DixlasePagesPage extends Model
+class DixlasePagesPage extends Model implements Revisionable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasRevisions, SoftDeletes;
 
     /**
      * テーブル名
@@ -199,5 +201,34 @@ class DixlasePagesPage extends Model
     protected static function newFactory()
     {
         return \Plugins\DixlasePages\Database\Factories\DixlasePagesPageFactory::new();
+    }
+
+    public function revisionModel(): string
+    {
+        return DixlasePagesPageRevision::class;
+    }
+
+    public function revisionForeignKey(): string
+    {
+        return 'page_id';
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function revisionableFields(): array
+    {
+        return [
+            'slug',
+            'lang',
+            'title',
+            'content',
+            'custom_css',
+            'custom_js',
+            'storage_type',
+            'editor_type',
+            'status',
+            'published_at',
+        ];
     }
 }
