@@ -92,6 +92,12 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             $this->merge(['lang' => app()->getLocale()]);
         }
 
+        // 保存形式は作成後ロック：編集時は既存のページの値で上書き
+        $page = $this->route('page');
+        if ($page instanceof \Plugins\DixlasePages\App\Models\DixlasePagesPage && $page->exists) {
+            $this->merge(['storage_type' => $page->storage_type->slug()]);
+        }
+
         // 公開権限チェック: 権限がないメンバーはステータスを強制的にdraftに
         $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
         $member = Auth::guard('member')->user();
