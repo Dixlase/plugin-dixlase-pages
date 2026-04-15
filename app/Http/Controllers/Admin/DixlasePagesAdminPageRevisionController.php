@@ -22,12 +22,17 @@
 
 namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
+use App\Actors\MemberActor;
+use App\Helpers\AdminHelper;
 use App\Http\Controllers\Admin\AdminLoggedInController;
 use App\Presenters\Admin\RevisionDiffPresenter;
 use App\Services\RevisionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Plugins\DixlasePages\App\Actions\Page\RestoreDixlasePagesPageRevisionAction;
+use Plugins\DixlasePages\App\Actions\Page\ToggleDixlasePagesPageRevisionProtectionAction;
+use Plugins\DixlasePages\App\Actions\Page\UpdateDixlasePagesPageRevisionNoteAction;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageRevision;
 
@@ -113,7 +118,9 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
             ->where('page_id', $page->id)
             ->findOrFail($id);
 
-        $this->revisionService->restore($revision, userId: $this->member?->id);
+        $actor = new MemberActor(AdminHelper::getMember());
+        (new RestoreDixlasePagesPageRevisionAction($revision, $this->revisionService))
+            ->execute($actor, []);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.revisions.index', $page)
@@ -129,11 +136,13 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
             ->where('page_id', $page->id)
             ->findOrFail($id);
 
-        $revision->update(['is_protected' => ! $revision->is_protected]);
+        $actor = new MemberActor(AdminHelper::getMember());
+        (new ToggleDixlasePagesPageRevisionProtectionAction($revision))
+            ->execute($actor, []);
 
         return back()->with(
             'success',
-            $revision->is_protected
+            $revision->fresh()->is_protected
                 ? __('dixlase-pages::admin/pages/revisions.protect_enabled')
                 : __('dixlase-pages::admin/pages/revisions.protect_disabled')
         );
@@ -152,7 +161,9 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
             ->where('page_id', $page->id)
             ->findOrFail($id);
 
-        $revision->update(['note' => $data['note'] ?? null]);
+        $actor = new MemberActor(AdminHelper::getMember());
+        (new UpdateDixlasePagesPageRevisionNoteAction($revision))
+            ->execute($actor, $data);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.revisions.show', ['page' => $page, 'id' => $revision->id])

@@ -378,7 +378,46 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             @if($isSimpleMode)
                 {{-- Simple mode: force database storage --}}
                 <input type="hidden" name="storage_type" value="database">
+            @elseif($isEditMode)
+                {{-- 編集時: 保存形式は作成後ロック（変更不可） --}}
+                <div>
+                    @include('components::form-label', [
+                        'for' => 'storage_type',
+                        'text' => __('common.content_storage.label'),
+                    ])
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-lg text-gray-500"></i>
+                        <div>
+                            <div class="font-medium text-gray-900 dark:text-white">
+                                {{ $storageOptions[$storageType] ?? $storageType }}
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ $storageDescriptions[$storageType] ?? '' }}
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="storage_type" value="{{ $storageType }}">
+
+                    {{-- ファイル保存時の情報表示 --}}
+                    @if($storageType === 'file')
+                        <div class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                <div class="flex-1">
+                                    <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
+                                        {{ __('common.content_storage.file_info_title') }}
+                                    </div>
+                                    <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                                        <p>{{ __('common.content_storage.file_info_description') }}</p>
+                                        <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
             @else
+                {{-- 作成時: 保存形式を選択可能 --}}
                 <div>
                     @include('components::form-label', [
                         'for' => 'storage_type',
