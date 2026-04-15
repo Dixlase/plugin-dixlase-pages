@@ -21,6 +21,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPageRevisionController;
 use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesController;
 
 /*
@@ -57,4 +58,17 @@ Route::prefix('pages')
         Route::get('/{page}/preview-frame', [DixlasePagesAdminPagesController::class, 'previewFrame'])->name('preview-frame');
         Route::patch('/{page}', [DixlasePagesAdminPagesController::class, 'update'])->name('update');
         Route::delete('/{page}', [DixlasePagesAdminPagesController::class, 'destroy'])->name('destroy');
+
+        // リビジョン（閲覧・差分表示・復元）
+        Route::get('/{page}/revisions', [DixlasePagesAdminPageRevisionController::class, 'index'])->name('revisions.index');
+        Route::get('/{page}/revisions/{id}', [DixlasePagesAdminPageRevisionController::class, 'show'])->whereNumber('id')->name('revisions.show');
+        Route::post('/{page}/revisions/{id}/restore', [DixlasePagesAdminPageRevisionController::class, 'restore'])
+            ->whereNumber('id')
+            ->name('revisions.restore');
+        Route::post('/{page}/revisions/{id}/note', [DixlasePagesAdminPageRevisionController::class, 'updateNote'])
+            ->whereNumber('id')
+            ->name('revisions.note');
+        Route::post('/{page}/revisions/{id}/protect', [DixlasePagesAdminPageRevisionController::class, 'toggleProtection'])
+            ->whereNumber('id')
+            ->name('revisions.protect');
     });

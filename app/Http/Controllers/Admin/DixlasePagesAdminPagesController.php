@@ -28,6 +28,7 @@ use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Models\BaseSetting;
 use App\Services\ContentPreviewService;
+use App\Services\RevisionService;
 use App\Traits\AdminInterfaceTrait;
 use App\Traits\AdminLoggedInTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -51,9 +52,14 @@ class DixlasePagesAdminPagesController extends Controller
 
     protected DixlasePagesPageContentService $contentService;
 
-    public function __construct(DixlasePagesPageContentService $contentService)
-    {
+    protected RevisionService $revisionService;
+
+    public function __construct(
+        DixlasePagesPageContentService $contentService,
+        RevisionService $revisionService
+    ) {
         $this->contentService = $contentService;
+        $this->revisionService = $revisionService;
         $this->initialize();
         $this->initializeAfterLogin();
     }
@@ -469,6 +475,13 @@ class DixlasePagesAdminPagesController extends Controller
             'custom_js' => $customJs,
         ]);
 
+        // リビジョン記録（ユーザーの明示保存なので manual）
+        $this->revisionService->record(
+            $page->fresh() ?? $page,
+            type: RevisionService::TYPE_MANUAL,
+            userId: $this->member?->id,
+        );
+
         return redirect()
             ->route('dixlase-pages::admin.pages.edit', $page)
             ->with('success', __('dixlase-pages::admin/pages/create.success'));
@@ -574,6 +587,7 @@ class DixlasePagesAdminPagesController extends Controller
         // ページを更新（常にDBにもコンテンツを保存 = バックアップ）
         $page->update([
             'slug' => $validated['slug'],
+            'lang' => $validated['lang'] ?? app()->getLocale(),
             'title' => $validated['title'] ?? null,
             'storage_type' => $newStorageType,
             'status' => $validated['status'],
@@ -582,6 +596,14 @@ class DixlasePagesAdminPagesController extends Controller
             'custom_css' => $customCss,
             'custom_js' => $customJs,
         ]);
+
+        // リビジョン記録（ユーザーの明示保存なので manual）
+        // 直前リビジョンと差分がない場合はスキップされる
+        $this->revisionService->record(
+            $page->fresh() ?? $page,
+            type: RevisionService::TYPE_MANUAL,
+            userId: $this->member?->id,
+        );
 
         return redirect()
             ->route('dixlase-pages::admin.pages.edit', $page)
