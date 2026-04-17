@@ -25,6 +25,9 @@
         "content",
         "cms"
     ],
+    "capabilities": [
+        "seo-meta"
+    ],
     "requires": {
         "dixlase": ">=1.0.0",
         "php": ">=8.0"
