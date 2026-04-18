@@ -9,7 +9,7 @@
     },
     "author": "exc-D inc.",
     "author_id": "exc-d-inc",
-    "publisher_key_id": "dixlase-authority-2026",
+    "authority_key_id": "dixlase-authority-2026",
     "email": "office@exc-d.com",
     "url": "https://exc-d.com",
     "license": "GPL-3.0",
@@ -26,7 +26,8 @@
         "cms"
     ],
     "capabilities": [
-        "seo-meta"
+        "seo-meta",
+        "linkable"
     ],
     "requires": {
         "dixlase": ">=1.0.0",
@@ -84,8 +85,8 @@
             "bulk_send": false
         },
         "content": {
-            "read_other_plugins": [],
-            "write_other_plugins": []
+            "read_other_plugins": ["dixlase-seo"],
+            "write_other_plugins": ["dixlase-seo"]
         },
         "system": {
             "register_shortcodes": false,
