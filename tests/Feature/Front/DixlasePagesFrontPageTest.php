@@ -96,13 +96,13 @@ class DixlasePagesFrontPageTest extends TestCase
 
         Route::middleware(['front.ip'])
             ->group(function () use ($dir) {
-                Route::get($dir . '/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
+                Route::get($dir.'/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
                     ->name('dixlase-pages::page.custom-style');
 
-                Route::get($dir . '/{slug}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
+                Route::get($dir.'/{slug}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
                     ->name('dixlase-pages::page.custom-script');
 
-                Route::get($dir . '/{slug}', function ($slug) {
+                Route::get($dir.'/{slug}', function ($slug) {
                     $locale = app()->getLocale();
 
                     if (auth('member')->check()) {
@@ -149,7 +149,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => app()->getLocale(),
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/test-page');
+        $response = $this->get('/'.$this->pagesDirectory.'/test-page');
 
         $response->assertStatus(200);
         $response->assertSee('Test Page');
@@ -168,7 +168,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => app()->getLocale(),
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/draft-page');
+        $response = $this->get('/'.$this->pagesDirectory.'/draft-page');
 
         $response->assertStatus(404);
     }
@@ -185,7 +185,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => 'fr',
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/lang-test');
+        $response = $this->get('/'.$this->pagesDirectory.'/lang-test');
 
         $response->assertStatus(404);
     }
@@ -203,7 +203,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => app()->getLocale(),
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/css-test/custom-style.css');
+        $response = $this->get('/'.$this->pagesDirectory.'/css-test/custom-style.css');
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/css; charset=UTF-8');
@@ -223,7 +223,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => app()->getLocale(),
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/js-test/custom-script.js');
+        $response = $this->get('/'.$this->pagesDirectory.'/js-test/custom-script.js');
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/javascript; charset=UTF-8');
@@ -243,7 +243,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => app()->getLocale(),
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/no-css/custom-style.css');
+        $response = $this->get('/'.$this->pagesDirectory.'/no-css/custom-style.css');
 
         $response->assertStatus(404);
     }
@@ -261,7 +261,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => app()->getLocale(),
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/cache-test/custom-style.css');
+        $response = $this->get('/'.$this->pagesDirectory.'/cache-test/custom-style.css');
 
         $response->assertStatus(200);
         $response->assertHeader('Cache-Control');
@@ -281,7 +281,7 @@ class DixlasePagesFrontPageTest extends TestCase
             'lang' => app()->getLocale(),
         ]);
 
-        $response = $this->get('/' . $this->pagesDirectory . '/view-test');
+        $response = $this->get('/'.$this->pagesDirectory.'/view-test');
 
         $response->assertStatus(200);
         $response->assertViewHas('editorType', 'html');

@@ -61,6 +61,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     'guiEditorInfo' => null,
     'guiEditorAssetHtml' => '',
     'hasGuiEditor' => false,
+    // SEOメタ（SEOプラグイン連携、optional依存）
+    'seoMetaEnabled' => false,
+    'seoMeta' => null,
+    'seoOgpMedia' => null,
 ])
 
 {{--
@@ -371,6 +375,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         @endif
                     </div>
                     @include('components::form-error', ['name' => 'slug'])
+                </div>
+            @endif
+
+            {{-- 4.5 SEOメタ設定（SEOプラグイン有効時のみ） --}}
+            @if($seoMetaEnabled)
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <x-dixlase-seo::meta-fields
+                        :description="$seoMeta?->description"
+                        :ogpMediaId="$seoMeta?->ogpMediaId"
+                        :ogpMedia="$seoOgpMedia"
+                    />
                 </div>
             @endif
 
