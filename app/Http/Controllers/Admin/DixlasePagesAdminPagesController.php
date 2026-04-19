@@ -22,11 +22,14 @@
 
 namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
+use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
+use App\DTO\PluginIntegration\SeoMetaDTO;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Models\BaseSetting;
+use App\Models\Media;
 use App\Services\ContentPreviewService;
 use App\Services\RevisionService;
 use App\Traits\AdminInterfaceTrait;
@@ -259,6 +262,30 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
+     * SEOメタ情報をSEOプラグイン経由で保存する（optional依存）
+     *
+     * @param  array<string, mixed>  $validated  バリデーション済みフォームデータ
+     */
+    private function saveSeoMeta(DixlasePagesPage $page, array $validated): void
+    {
+        if (! app()->has(SeoMetaProviderInterface::class)) {
+            return;
+        }
+
+        $provider = app(SeoMetaProviderInterface::class);
+        if (! $provider->isEnabledForPlugin('dixlase-pages')) {
+            return;
+        }
+
+        $metaInput = $validated['seo_meta'] ?? [];
+        $dto = new SeoMetaDTO(
+            description: $metaInput['description'] ?? null,
+            ogpMediaId: isset($metaInput['ogp_media_id']) ? (int) $metaInput['ogp_media_id'] : null,
+        );
+        $provider->saveMeta('dixlase-pages', (string) $page->id, $dto);
+    }
+
+    /**
      * フォーム表示に必要なデータを準備する
      *
      * @param  DixlasePagesPage  $page  ページモデル
@@ -359,6 +386,24 @@ class DixlasePagesAdminPagesController extends Controller
         $guiEditorAssetHtml = $guiEditorInfo ? \App\Presenters\Admin\ContentEditorPresenter::editorAssetHtml($guiEditorInfo) : '';
         $hasGuiEditor = $guiEditorInfo !== null;
 
+        // SEOメタ情報（SEOプラグインが有効かつ capability が宣言されている場合のみ）
+        $seoMetaEnabled = false;
+        $seoMeta = null;
+        $seoOgpMedia = null;
+
+        if (app()->has(SeoMetaProviderInterface::class)) {
+            $provider = app(SeoMetaProviderInterface::class);
+            if ($provider->isEnabledForPlugin('dixlase-pages')) {
+                $seoMetaEnabled = true;
+                if ($page->exists) {
+                    $seoMeta = $provider->getMeta('dixlase-pages', (string) $page->id);
+                    if ($seoMeta?->ogpMediaId) {
+                        $seoOgpMedia = Media::find($seoMeta->ogpMediaId);
+                    }
+                }
+            }
+        }
+
         return compact(
             'content',
             'customCss',
@@ -382,6 +427,9 @@ class DixlasePagesAdminPagesController extends Controller
             'guiEditorInfo',
             'guiEditorAssetHtml',
             'hasGuiEditor',
+            'seoMetaEnabled',
+            'seoMeta',
+            'seoOgpMedia',
         );
     }
 
@@ -481,6 +529,9 @@ class DixlasePagesAdminPagesController extends Controller
             type: RevisionService::TYPE_MANUAL,
             userId: $this->member?->id,
         );
+
+        // SEOメタ保存（SEOプラグイン有効時のみ）
+        $this->saveSeoMeta($page, $validated);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.edit', $page)
@@ -604,6 +655,9 @@ class DixlasePagesAdminPagesController extends Controller
             type: RevisionService::TYPE_MANUAL,
             userId: $this->member?->id,
         );
+
+        // SEOメタ保存（SEOプラグイン有効時のみ）
+        $this->saveSeoMeta($page, $validated);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.edit', $page)

@@ -22,6 +22,7 @@
 
 namespace Plugins\DixlasePages\App\Models;
 
+use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
 use App\Contracts\Revisionable;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
@@ -79,6 +80,14 @@ class DixlasePagesPage extends Model implements Revisionable
         static::creating(function ($page) {
             if (empty($page->slug)) {
                 $page->slug = Str::slug($page->title);
+            }
+        });
+
+        // ページ強制削除時にSEOメタ情報もカスケード削除（SoftDeletes時は消さない）
+        static::forceDeleted(function (self $page) {
+            if (app()->has(SeoMetaProviderInterface::class)) {
+                app(SeoMetaProviderInterface::class)
+                    ->deleteMeta('dixlase-pages', (string) $page->id);
             }
         });
     }

@@ -45,4 +45,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     :isSimpleMode="$isSimpleMode"
     :isAdvancedEditor="$isAdvancedEditor"
     :canPublish="$canPublish"
+    :seoMetaEnabled="$seoMetaEnabled ?? false"
+    :seoMeta="$seoMeta ?? null"
+    :seoOgpMedia="$seoOgpMedia ?? null"
 />

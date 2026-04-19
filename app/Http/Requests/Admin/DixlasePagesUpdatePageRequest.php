@@ -67,6 +67,11 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             'published_at' => ['required_if:status,scheduled', 'nullable', 'date', 'after_or_equal:now'],
             'custom_css' => ['nullable', 'string'],
             'custom_js' => ['nullable', 'string'],
+            'lang' => ['required', 'string', 'max:10'],
+            // SEOメタ（optional依存、SEOプラグインが無効でも検証は通過）
+            'seo_meta' => ['nullable', 'array'],
+            'seo_meta.description' => ['nullable', 'string', 'max:300'],
+            'seo_meta.ogp_media_id' => ['nullable', 'integer', 'exists:media,id'],
         ];
     }
 
