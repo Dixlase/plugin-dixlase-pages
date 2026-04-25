@@ -30,7 +30,7 @@
         "linkable"
     ],
     "requires": {
-        "dixlase": ">=1.0.0",
+        "dixlase": "^0.1.0",
         "php": ">=8.0"
     },
     "provides": {
