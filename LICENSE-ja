@@ -4,24 +4,27 @@
 
     Copyright (C) 2026 exc-D inc. <https://exc-d.com>
 
-    Dixlase Pages is dual-licensed. You may use it under either:
+    Dixlase Pages はデュアルライセンス方式で配布されています。
+    以下のいずれかの条件で利用することができます:
 
-      (a) the GNU General Public License version 3 or later, as
-          published by the Free Software Foundation; or
+      (a) Free Software Foundation が公開する GNU General Public
+          License バージョン 3 またはそれ以降の条項; または
 
-      (b) a commercial license agreement obtained from exc-D inc.
-          (see LICENSE.commercial for details, or contact
-          office@exc-d.com).
+      (b) exc-D inc. から提供される商用ライセンス
+          (詳細は LICENSE.commercial、または
+          office@exc-d.com までお問い合わせください)。
 
-    Contributions to this plugin repository are governed by the
-    Dixlase Copyright Policy and the Dixlase Contributor License
-    Agreement (see CONTRIBUTING.md, which links to the canonical
-    CLA in the Dixlase Core repository).
+    本プラグインリポジトリへのコントリビューションは、Dixlase
+    コピーライトポリシーおよび Dixlase コントリビューターライセンス
+    契約に従います(CONTRIBUTING.md をご参照ください。同ファイルは
+    Dixlase Core リポジトリ上の正本 CLA をリンクしています)。
 
-    Unless you have entered into a commercial license agreement,
-    this file is governed by the GPL terms below.
+    商用ライセンス契約を締結していない場合、本ファイルは以下の
+    GPL の条項の下で配布されます。
 
-    The full text of the GNU General Public License follows.
+    以下、GNU General Public License の全文です(英語原文)。
+
+    GPL の日本語参考訳: https://gpl.mhatta.org/gpl.ja.html
 
 =======================================================================
 
