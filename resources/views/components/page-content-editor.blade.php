@@ -319,6 +319,57 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             {{-- 別タブプレビュー --}}
             <x-content-editor.new-tab-preview :url="$previewUrl" />
 
+            {{-- メタ情報（編集時：プレビューの直下、タイトルの上に配置） --}}
+            @if($isEditMode)
+                @php
+                    $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
+                @endphp
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        {{ __('dixlase-pages::components/page-content-editor.meta_section') }}
+                    </h3>
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
+                            {{ $currentCard['label'] ?? $editorType }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            <i class="fas fa-globe"></i>
+                            {{ $languageOptions[$langValue] ?? $langValue }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-gray-500 dark:text-gray-400"></i>
+                            {{ $storageOptions[$storageType] ?? $storageType }}
+                        </span>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
+                    </p>
+
+                    {{-- 編集時はメタ情報を hidden input で送信 --}}
+                    <input type="hidden" name="storage_type" value="{{ $storageType }}">
+                    <input type="hidden" name="lang" value="{{ $langValue }}">
+
+                    {{-- ファイル保存時の情報表示 --}}
+                    @if($storageType === 'file')
+                        <div class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                <div class="flex-1">
+                                    <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
+                                        {{ __('common.content_storage.file_info_title') }}
+                                    </div>
+                                    <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                                        <p>{{ __('common.content_storage.file_info_description') }}</p>
+                                        <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             {{-- タイトル --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -388,60 +439,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- 5. 保存方法 / 言語 / メタ情報 --}}
-            @if($isEditMode)
-                {{-- 編集時: メタ情報セクション（エディタータイプ・言語・保存形式バッジ） --}}
-                @php
-                    $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
-                @endphp
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                        {{ __('dixlase-pages::components/page-content-editor.meta_section') }}
-                    </h3>
-                    <div class="flex flex-wrap items-center gap-2 text-xs">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                            <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
-                            {{ $currentCard['label'] ?? $editorType }}
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                            <i class="fas fa-globe"></i>
-                            {{ $languageOptions[$langValue] ?? $langValue }}
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                            <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-gray-500 dark:text-gray-400"></i>
-                            {{ $storageOptions[$storageType] ?? $storageType }}
-                        </span>
-                    </div>
-                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                        {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
-                    </p>
-
-                    {{-- 編集時はメタ情報を hidden input で送信 --}}
-                    <input type="hidden" name="storage_type" value="{{ $storageType }}">
-                    <input type="hidden" name="lang" value="{{ $langValue }}">
-
-                    {{-- ファイル保存時の情報表示 --}}
-                    @if($storageType === 'file')
-                        <div class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                            <div class="flex items-start">
-                                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
-                                <div class="flex-1">
-                                    <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                                        {{ __('common.content_storage.file_info_title') }}
-                                    </div>
-                                    <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                                        <p>{{ __('common.content_storage.file_info_description') }}</p>
-                                        <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            @elseif($isSimpleMode)
-                {{-- Simple mode: 保存形式と言語を hidden input で固定 --}}
+            {{-- 5. 保存方法（作成時のみ：編集時はプレビュー直下のメタ情報セクションに統合済み） --}}
+            @if($isSimpleMode)
+                {{-- Simple mode: 保存形式を hidden input で固定 --}}
                 <input type="hidden" name="storage_type" value="database">
-            @else
+            @elseif(! $isEditMode)
                 {{-- 作成時: 保存形式を選択可能 --}}
                 <div>
                     @include('components::form-label', [
