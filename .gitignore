@@ -27,6 +27,7 @@ package-lock.json
 
 # Claude Code / AI assistant configs
 CLAUDE.md
+CLAUDE.ja.md
 /.claude/
 /.mcp.json
 

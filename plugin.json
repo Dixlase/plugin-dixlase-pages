@@ -116,7 +116,6 @@
         }
     },
     "files": {
-        "CLAUDE.ja.md": "sha256:a514c16565f8ba5beba0f485078381331550a6c1c507d2ec5f999bee59b8dd22",
         "CONTRIBUTING.ja.md": "sha256:1c8f8c8ef3d1e46c1e30a028737d55859acd17db66a76f227644af3bc6c66022",
         "CONTRIBUTING.md": "sha256:07daca2f78740f335c049c8934d70131f859efd6535893686e7de9825cb6791e",
         "COPYRIGHT-POLICY.ja.md": "sha256:8b140af603e06c10b9cdd449e1ea498d4050b643469a0788c169a1485baf29cf",
@@ -208,6 +207,6 @@
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-04-30T08:15:34+00:00"
+        "signed_at": "2026-04-30T08:26:35+00:00"
     }
 }
