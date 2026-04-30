@@ -58,4 +58,7 @@ return [
     'slug_auto_generated' => 'The slug will be auto-generated from the title.',
     'meta_section' => 'Meta Information',
     'meta_locked_help' => 'Editor type, language, and storage method can only be selected at initial creation. To change them, create a new page.',
+    'revisions_section' => 'Revisions',
+    'revisions_button' => 'Revision History',
+    'revisions_help' => 'View save history and restore a previous version.',
 ];

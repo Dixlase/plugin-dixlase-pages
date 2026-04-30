@@ -67,6 +67,8 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
 
         $revisions = $page->revisions()->with('creator')->paginate(20);
 
+        $this->applyBreadcrumbs($page);
+
         $this->viewParams['page'] = $page;
         $this->viewParams['revisions'] = $revisions;
         $this->viewParams['typeLabels'] = $this->typeLabels();
@@ -108,6 +110,8 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
                 $metaDiffs[$field] = ['old' => $left, 'new' => $right];
             }
         }
+
+        $this->applyBreadcrumbs($page, $revision->id);
 
         $this->viewParams['page'] = $page;
         $this->viewParams['revision'] = $revision;
@@ -178,6 +182,31 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
         return redirect()
             ->route('dixlase-pages::admin.pages.revisions.show', ['page' => $page, 'id' => $revision->id])
             ->with('success', __('dixlase-pages::admin/pages/revisions.note_updated'));
+    }
+
+    /**
+     * パンくずリストを設定する（リビジョンルートには {page} パラメータが必須）
+     */
+    private function applyBreadcrumbs(DixlasePagesPage $page, ?int $revisionId = null): void
+    {
+        $pageLabel = $page->title ?: $page->slug;
+        $breadcrumbs = [
+            ['label' => __('dixlase-pages::admin/navigation.pages.index'), 'route' => 'dixlase-pages::admin.pages.index'],
+            ['label' => $pageLabel, 'route' => 'dixlase-pages::admin.pages.edit', 'params' => ['page' => $page->id]],
+        ];
+
+        if ($revisionId !== null) {
+            $breadcrumbs[] = [
+                'label' => __('dixlase-pages::admin/pages/revisions.index.heading'),
+                'route' => 'dixlase-pages::admin.pages.revisions.index',
+                'params' => ['page' => $page->id],
+            ];
+            $breadcrumbs[] = ['label' => __('dixlase-pages::admin/pages/revisions.show.heading')];
+        } else {
+            $breadcrumbs[] = ['label' => __('dixlase-pages::admin/pages/revisions.index.heading')];
+        }
+
+        $this->viewParams['breadcrumbs'] = $breadcrumbs;
     }
 
     /**

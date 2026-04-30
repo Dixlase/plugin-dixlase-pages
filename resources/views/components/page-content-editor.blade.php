@@ -503,6 +503,26 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
+            {{-- リビジョン履歴（編集時のみ） --}}
+            @if($isEditMode && $pageId)
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                        {{ __('dixlase-pages::components/page-content-editor.revisions_section') }}
+                    </h3>
+                    <x-form-button
+                        type="link"
+                        icon="fas fa-clock-rotate-left"
+                        variant="secondary"
+                        size="sm"
+                        :href="route('dixlase-pages::admin.pages.revisions.index', ['page' => $pageId])"
+                        class="w-full"
+                    >
+                        {{ __('dixlase-pages::components/page-content-editor.revisions_button') }}
+                    </x-form-button>
+                    <x-form-help-text :text="__('dixlase-pages::components/page-content-editor.revisions_help')" />
+                </div>
+            @endif
+
             {{-- 7. 公開設定 --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
