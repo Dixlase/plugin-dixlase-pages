@@ -113,26 +113,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
         {{-- 1. エディタータイプ選択 --}}
         <div class="mb-6">
-            @include('components::form-label', [
-                'for' => 'editor_type',
-                'text' => __('common.content_editor.label'),
-            ])
-
             @if ($isEditMode)
-                {{-- 編集時: エディタータイプバッジ + 言語バッジ + プレビュートグル --}}
-                @php
-                    $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
-                @endphp
-                <div class="flex flex-wrap items-center gap-3 text-xs">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                        <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
-                        {{ $currentCard['label'] ?? $editorType }}
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                        <i class="fas fa-globe"></i>
-                        {{ $languageOptions[$langValue] ?? $langValue }}
-                    </span>
-                    @if($previewFrameUrl)
+                {{-- 編集時: プレビュートグルのみ表示（エディタータイプ・言語・保存形式は右カラムのメタ情報に表示） --}}
+                <input type="hidden" name="editor_type" value="{{ $editorType }}">
+                @if($previewFrameUrl)
+                    <div class="flex flex-wrap items-center gap-3 text-xs">
                         <button type="button" @click="togglePreview()"
                             class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-colors"
                             :class="previewVisible
@@ -142,11 +127,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                             <i class="fas" :class="previewVisible ? 'fa-eye' : 'fa-eye-slash'"></i>
                             <span x-text="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'"></span>
                         </button>
-                    @endif
-                </div>
-                <input type="hidden" name="editor_type" value="{{ $editorType }}">
+                    </div>
+                @endif
             @else
-                {{-- 作成時: ラジオカード選択（共通コンポーネント使用） --}}
+                {{-- 作成時: エディタータイプ ラジオカード選択 --}}
+                @include('components::form-label', [
+                    'for' => 'editor_type',
+                    'text' => __('common.content_editor.label'),
+                ])
                 <x-form-radio-card-group
                     name="editor_type"
                     :options="$editorCardOptions"
@@ -154,13 +142,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     :columns="3"
                     xModel="editorType"
                 />
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
+                </p>
+                @include('components::form-error', ['name' => 'editor_type'])
             @endif
-
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                <i class="fas fa-info-circle mr-1"></i>
-                {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
-            </p>
-            @include('components::form-error', ['name' => 'editor_type'])
 
             {{-- プレビュートグルボタン（作成時） --}}
             @if($previewFrameUrl && !$isEditMode)
@@ -388,10 +375,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- 4.5 SEOメタ設定（SEOプラグイン有効時のみ） --}}
+            {{-- 4.5 SEOメタ設定（SEOプラグイン有効 かつ seo-meta capability 宣言時のみ表示） --}}
+            {{-- <x-dynamic-component> は実行時にコンポーネントを解決するため、SEOプラグインが無効でも安全 --}}
             @if($seoMetaEnabled)
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <x-dixlase-seo::meta-fields
+                    <x-dynamic-component
+                        component="dixlase-seo::meta-fields"
                         :description="$seoMeta?->description"
                         :ogpMediaId="$seoMeta?->ogpMediaId"
                         :ogpMedia="$seoOgpMedia"
@@ -399,29 +388,37 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- 5. 保存方法選択 --}}
-            @if($isSimpleMode)
-                {{-- Simple mode: force database storage --}}
-                <input type="hidden" name="storage_type" value="database">
-            @elseif($isEditMode)
-                {{-- 編集時: 保存形式は作成後ロック（変更不可） --}}
-                <div>
-                    @include('components::form-label', [
-                        'for' => 'storage_type',
-                        'text' => __('common.content_storage.label'),
-                    ])
-                    <div class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-                        <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-lg text-gray-500"></i>
-                        <div>
-                            <div class="font-medium text-gray-900 dark:text-white">
-                                {{ $storageOptions[$storageType] ?? $storageType }}
-                            </div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $storageDescriptions[$storageType] ?? '' }}
-                            </div>
-                        </div>
+            {{-- 5. 保存方法 / 言語 / メタ情報 --}}
+            @if($isEditMode)
+                {{-- 編集時: メタ情報セクション（エディタータイプ・言語・保存形式バッジ） --}}
+                @php
+                    $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
+                @endphp
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        {{ __('dixlase-pages::components/page-content-editor.meta_section') }}
+                    </h3>
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
+                            {{ $currentCard['label'] ?? $editorType }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            <i class="fas fa-globe"></i>
+                            {{ $languageOptions[$langValue] ?? $langValue }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-gray-500 dark:text-gray-400"></i>
+                            {{ $storageOptions[$storageType] ?? $storageType }}
+                        </span>
                     </div>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
+                    </p>
+
+                    {{-- 編集時はメタ情報を hidden input で送信 --}}
                     <input type="hidden" name="storage_type" value="{{ $storageType }}">
+                    <input type="hidden" name="lang" value="{{ $langValue }}">
 
                     {{-- ファイル保存時の情報表示 --}}
                     @if($storageType === 'file')
@@ -441,6 +438,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         </div>
                     @endif
                 </div>
+            @elseif($isSimpleMode)
+                {{-- Simple mode: 保存形式と言語を hidden input で固定 --}}
+                <input type="hidden" name="storage_type" value="database">
             @else
                 {{-- 作成時: 保存形式を選択可能 --}}
                 <div>
@@ -480,36 +480,26 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
+            {{-- 6.5. 言語選択（作成時のみ：編集時はメタ情報に統合） --}}
+            @if(!$isEditMode)
+                <div>
+                    @include('components::form-label', [
+                        'for' => 'lang',
+                        'text' => __('dixlase-pages::components/page-content-editor.lang'),
+                    ])
 
-            {{-- 6.5. 言語選択 --}}
-            <div>
-                @include('components::form-label', [
-                    'for' => 'lang',
-                    'text' => __('dixlase-pages::components/page-content-editor.lang'),
-                ])
-
-                @if ($isEditMode)
-                    {{-- 編集時: 言語表示（変更不可） --}}
-                    <div class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-                        <i class="fas fa-globe text-gray-500"></i>
-                        <span class="font-medium text-gray-900 dark:text-white">
-                            {{ $languageOptions[$langValue] ?? $langValue }}
-                        </span>
-                    </div>
-                    <input type="hidden" name="lang" value="{{ $langValue }}">
-                @else
                     <x-form-select
                         name="lang"
                         :options="$languageOptions"
                         :value="$langValue"
                         xModel="lang"
                     />
-                @endif
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {{ __('dixlase-pages::components/page-content-editor.lang_help') }}
-                </p>
-                @include('components::form-error', ['name' => 'lang'])
-            </div>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {{ __('dixlase-pages::components/page-content-editor.lang_help') }}
+                    </p>
+                    @include('components::form-error', ['name' => 'lang'])
+                </div>
+            @endif
 
             {{-- 7. 公開設定 --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">

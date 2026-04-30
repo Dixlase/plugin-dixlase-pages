@@ -56,4 +56,6 @@ return [
     'simple_mode_notice' => 'Some settings are automatically configured in Simple mode. Switch to Advanced mode to customize all settings.',
     'advanced_editor_notice' => 'This page uses an advanced editor type. You can continue editing it, but new pages in Simple mode are limited to GUI and Markdown editors.',
     'slug_auto_generated' => 'The slug will be auto-generated from the title.',
+    'meta_section' => 'Meta Information',
+    'meta_locked_help' => 'Editor type, language, and storage method can only be selected at initial creation. To change them, create a new page.',
 ];
