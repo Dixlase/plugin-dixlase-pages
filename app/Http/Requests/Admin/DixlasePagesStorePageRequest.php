@@ -61,7 +61,7 @@ class DixlasePagesStorePageRequest extends FormRequest
     {
         return [
             // スラッグは任意（空の場合はタイトルから自動生成）
-            // ソフトデリートされたレコードは除外してユニークチェック
+            // スラッグは言語に関わらず全体でユニーク（URL重複を防ぐ）
             'slug' => [
                 'nullable',
                 'string',

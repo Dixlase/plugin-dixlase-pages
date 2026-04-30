@@ -73,7 +73,7 @@ class DixlasePagesPagesTableSeeder extends Seeder
         return [
             [
                 'title' => 'Markdownサンプルページ',
-                'slug' => 'markdown-sample',
+                'slug' => 'markdown-sample-ja',
                 'lang' => 'ja',
                 'editor_type' => ContentEditorType::MARKDOWN,
                 'storage_type' => ContentStorageType::DATABASE,
@@ -81,7 +81,7 @@ class DixlasePagesPagesTableSeeder extends Seeder
             ],
             [
                 'title' => 'HTMLサンプルページ',
-                'slug' => 'html-sample',
+                'slug' => 'html-sample-ja',
                 'lang' => 'ja',
                 'editor_type' => ContentEditorType::HTML,
                 'storage_type' => ContentStorageType::DATABASE,
@@ -100,7 +100,7 @@ class DixlasePagesPagesTableSeeder extends Seeder
         return [
             [
                 'title' => 'Markdown Sample Page',
-                'slug' => 'markdown-sample',
+                'slug' => 'markdown-sample-en',
                 'lang' => 'en',
                 'editor_type' => ContentEditorType::MARKDOWN,
                 'storage_type' => ContentStorageType::DATABASE,
@@ -108,7 +108,7 @@ class DixlasePagesPagesTableSeeder extends Seeder
             ],
             [
                 'title' => 'HTML Sample Page',
-                'slug' => 'html-sample',
+                'slug' => 'html-sample-en',
                 'lang' => 'en',
                 'editor_type' => ContentEditorType::HTML,
                 'storage_type' => ContentStorageType::DATABASE,
