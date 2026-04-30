@@ -58,15 +58,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     public function rules(): array
     {
-        // ルート引数からページIDを解決する（route model binding がまだの場合に備えて文字列ID にもフォールバック）
-        $routePage = $this->route('page');
-        if ($routePage instanceof \Plugins\DixlasePages\App\Models\DixlasePagesPage) {
-            $pageId = $routePage->id;
-        } elseif (is_numeric($routePage)) {
-            $pageId = (int) $routePage;
-        } else {
-            $pageId = null;
-        }
+        $pageId = $this->route('page')?->id;
 
         // スラッグは言語に関わらず全体でユニーク（URL重複を防ぐ）
         $slugRule = UniqueContentSlug::for('plg_dixlase_pages');
