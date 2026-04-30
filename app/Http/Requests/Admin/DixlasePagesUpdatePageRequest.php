@@ -58,7 +58,21 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     public function rules(): array
     {
-        $pageId = $this->route('page')->id ?? null;
+        // ルート引数からページIDを解決する（route model binding がまだの場合に備えて文字列ID にもフォールバック）
+        $routePage = $this->route('page');
+        if ($routePage instanceof \Plugins\DixlasePages\App\Models\DixlasePagesPage) {
+            $pageId = $routePage->id;
+        } elseif (is_numeric($routePage)) {
+            $pageId = (int) $routePage;
+        } else {
+            $pageId = null;
+        }
+
+        // スラッグは言語に関わらず全体でユニーク（URL重複を防ぐ）
+        $slugRule = UniqueContentSlug::for('plg_dixlase_pages');
+        if ($pageId !== null) {
+            $slugRule = $slugRule->ignore($pageId);
+        }
 
         return [
             // スラッグは必須（更新時は既存のスラッグがあるため）
@@ -68,7 +82,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
                 'string',
                 'max:255',
                 'regex:/^[a-z0-9\-]+$/',
-                UniqueContentSlug::for('plg_dixlase_pages')->ignore($pageId),
+                $slugRule,
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
