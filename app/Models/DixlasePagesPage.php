@@ -93,11 +93,18 @@ class DixlasePagesPage extends Model implements Revisionable
             }
         });
 
-        // ページ強制削除時にSEOメタ情報もカスケード削除（SoftDeletes時は消さない）
+        // ページ強制削除時にSEOメタ情報・コンテンツファイルもカスケード削除（SoftDeletes時は消さない）
         static::forceDeleted(function (self $page) {
+            // SEOメタ情報の削除
             if (app()->has(SeoMetaProviderInterface::class)) {
                 app(SeoMetaProviderInterface::class)
                     ->deleteMeta('dixlase-pages', (string) $page->id);
+            }
+
+            // ファイル保存の場合、関連ファイルも削除
+            if ($page->storage_type === ContentStorageType::FILE) {
+                $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
+                $contentService->deleteDirectory($page->slug);
             }
         });
     }

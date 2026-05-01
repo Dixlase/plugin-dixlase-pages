@@ -45,5 +45,6 @@ return [
     'no_pages_description' => 'Please create a new page.',
     'total_pages' => 'Total: :total items',
     'per_page' => 'Per Page',
-    'delete_success' => 'The page has been deleted successfully.',
+    'delete_success' => 'The page has been moved to the trash.',
+    'trash_link' => 'Trash',
 ];

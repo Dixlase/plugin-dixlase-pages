@@ -679,16 +679,105 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function destroy(DixlasePagesPage $page)
     {
-        // ファイル保存の場合、関連ファイルも削除
-        if ($page->storage_type === ContentStorageType::FILE) {
-            $this->contentService->deleteDirectory($page->slug);
-        }
-
+        // ソフトデリートでゴミ箱に移動（ファイル・SEOメタ情報は forceDelete 時に削除）
         $page->delete();
 
         return redirect()
             ->route('dixlase-pages::admin.pages.index')
             ->with('success', __('dixlase-pages::admin/pages/index.delete_success'));
+    }
+
+    /**
+     * ゴミ箱（ソフトデリート済みページ）一覧を表示
+     */
+    public function trash(Request $request)
+    {
+        $pages = DixlasePagesPage::onlyTrashed();
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $pages->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        $sort = $request->get('sort', 'deleted_at');
+        $order = $request->get('order', 'desc');
+        $allowedSorts = ['title', 'slug', 'deleted_at', 'created_at'];
+        if (! in_array($sort, $allowedSorts)) {
+            $sort = 'deleted_at';
+        }
+        if (! in_array($order, ['asc', 'desc'])) {
+            $order = 'desc';
+        }
+
+        $perPage = $request->get('per_page', 25);
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
+
+        $pages = $pages->orderBy($sort, $order)
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return view('dixlase-pages::admin.pages.trash', array_merge($this->viewParams, [
+            'pages' => $pages,
+            'currentSort' => $sort,
+            'currentOrder' => $order,
+        ]));
+    }
+
+    /**
+     * ゴミ箱からページを復元する
+     */
+    public function restore(int $id)
+    {
+        $page = DixlasePagesPage::onlyTrashed()->findOrFail($id);
+
+        // スラッグ衝突チェック（削除中に同じスラッグで新規作成された可能性）
+        $exists = DixlasePagesPage::where('slug', $page->slug)
+            ->whereNull('deleted_at')
+            ->exists();
+
+        if ($exists) {
+            return redirect()
+                ->route('dixlase-pages::admin.pages.trash')
+                ->with('error', __('dixlase-pages::admin/pages/trash.restore_slug_conflict', ['slug' => $page->slug]));
+        }
+
+        $page->restore();
+
+        return redirect()
+            ->route('dixlase-pages::admin.pages.trash')
+            ->with('success', __('dixlase-pages::admin/pages/trash.restore_success'));
+    }
+
+    /**
+     * ゴミ箱内のページを完全削除する（取り消し不可）
+     */
+    public function forceDestroy(int $id)
+    {
+        $page = DixlasePagesPage::onlyTrashed()->findOrFail($id);
+        $page->forceDelete();
+
+        return redirect()
+            ->route('dixlase-pages::admin.pages.trash')
+            ->with('success', __('dixlase-pages::admin/pages/trash.force_delete_success'));
+    }
+
+    /**
+     * ゴミ箱を空にする（全ページを完全削除）
+     */
+    public function emptyTrash()
+    {
+        $count = 0;
+        DixlasePagesPage::onlyTrashed()->each(function ($page) use (&$count) {
+            $page->forceDelete();
+            $count++;
+        });
+
+        return redirect()
+            ->route('dixlase-pages::admin.pages.trash')
+            ->with('success', __('dixlase-pages::admin/pages/trash.empty_success', ['count' => $count]));
     }
 
     /**

@@ -45,5 +45,6 @@ return [
     'no_pages_description' => '新しいページを作成してください。',
     'total_pages' => '全:total件',
     'per_page' => '表示件数',
-    'delete_success' => 'ページが正常に削除されました。',
+    'delete_success' => 'ページをゴミ箱に移動しました。',
+    'trash_link' => 'ゴミ箱',
 ];

@@ -57,6 +57,10 @@ Route::prefix('pages')
     ->group(function () {
         Route::get('/', [DixlasePagesAdminPagesController::class, 'index'])->name('index');
         Route::get('/new', [DixlasePagesAdminPagesController::class, 'create'])->name('create');
+        Route::get('/trash', [DixlasePagesAdminPagesController::class, 'trash'])->name('trash');
+        Route::post('/trash/empty', [DixlasePagesAdminPagesController::class, 'emptyTrash'])->name('trash.empty');
+        Route::post('/trash/{id}/restore', [DixlasePagesAdminPagesController::class, 'restore'])->whereNumber('id')->name('trash.restore');
+        Route::delete('/trash/{id}', [DixlasePagesAdminPagesController::class, 'forceDestroy'])->whereNumber('id')->name('trash.force-destroy');
         Route::get('/settings', [DixlasePagesAdminPagesController::class, 'settings'])->name('settings');
         Route::post('/settings', [DixlasePagesAdminPagesController::class, 'updateSettings'])->name('settings.update');
         Route::get('/preview-frame', [DixlasePagesAdminPagesController::class, 'previewFrameNew'])->name('preview-frame-new');
