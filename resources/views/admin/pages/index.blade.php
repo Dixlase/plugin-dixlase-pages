@@ -33,7 +33,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @section('content')
 <div class="mx-auto">
     <!-- ページヘッダー -->
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-end gap-2 mb-4">
+        @include('components::form-button', [
+            'type' => 'link',
+            'variant' => 'secondary',
+            'label' => __('dixlase-pages::admin/pages/index.trash_link'),
+            'icon' => 'fas fa-trash',
+            'href' => route('dixlase-pages::admin.pages.trash'),
+        ])
         @include('components::form-button', [
             'type' => 'link',
             'variant' => 'primary',
