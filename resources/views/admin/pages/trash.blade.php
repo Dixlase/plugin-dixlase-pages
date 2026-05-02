@@ -38,14 +38,28 @@ GNU General Public License for more details.
         </a>
 
         @if($pages->total() > 0)
-            <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.empty') }}"
-                  x-data
-                  @submit.prevent="if (confirm('{{ __('dixlase-pages::admin/pages/trash.empty_confirm') }}')) $el.submit();">
+            <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.empty') }}" id="emptyTrashForm">
                 @csrf
-                <x-form-button type="submit" variant="danger" size="sm" icon="fas fa-trash">
-                    {{ __('dixlase-pages::admin/pages/trash.empty_button') }}
-                </x-form-button>
             </form>
+            <x-form-button
+                type="button"
+                variant="danger"
+                size="sm"
+                icon="fas fa-trash"
+                xClick="openModal('emptyTrashModal')"
+            >
+                {{ __('dixlase-pages::admin/pages/trash.empty_button') }}
+            </x-form-button>
+            <x-ui-modal
+                id="emptyTrashModal"
+                :title="__('dixlase-pages::admin/pages/trash.empty_confirm_title')"
+                :message="__('dixlase-pages::admin/pages/trash.empty_confirm')"
+                :confirm_label="__('dixlase-pages::admin/pages/trash.empty_button')"
+                :cancel_label="__('common.cancel')"
+                icon_type="danger"
+                confirm_color="red"
+                form="emptyTrashForm"
+            />
         @endif
     </div>
 
@@ -120,22 +134,54 @@ GNU General Public License for more details.
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="inline-flex gap-2">
-                                    <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.restore', ['id' => $page->id]) }}" class="inline-block">
+                                    {{-- 復元 --}}
+                                    <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.restore', ['id' => $page->id]) }}" id="restoreForm-{{ $page->id }}">
                                         @csrf
-                                        <x-form-button type="submit" variant="secondary" size="sm" icon="fas fa-undo">
-                                            {{ __('dixlase-pages::admin/pages/trash.restore_button') }}
-                                        </x-form-button>
                                     </form>
-                                    <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.force-destroy', ['id' => $page->id]) }}"
-                                          class="inline-block"
-                                          x-data
-                                          @submit.prevent="if (confirm('{{ __('dixlase-pages::admin/pages/trash.force_delete_confirm') }}')) $el.submit();">
+                                    <x-form-button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        icon="fas fa-undo"
+                                        :xClick="'openModal(\'restoreModal-' . $page->id . '\')'"
+                                    >
+                                        {{ __('dixlase-pages::admin/pages/trash.restore_button') }}
+                                    </x-form-button>
+                                    <x-ui-modal
+                                        :id="'restoreModal-' . $page->id"
+                                        :title="__('dixlase-pages::admin/pages/trash.restore_confirm_title')"
+                                        :message="__('dixlase-pages::admin/pages/trash.restore_confirm')"
+                                        :confirm_label="__('dixlase-pages::admin/pages/trash.restore_button')"
+                                        :cancel_label="__('common.cancel')"
+                                        icon_type="info"
+                                        confirm_color="blue"
+                                        :form="'restoreForm-' . $page->id"
+                                    />
+
+                                    {{-- 完全削除 --}}
+                                    <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.force-destroy', ['id' => $page->id]) }}" id="forceDeleteForm-{{ $page->id }}">
                                         @csrf
                                         @method('DELETE')
-                                        <x-form-button type="submit" variant="danger" size="sm" icon="fas fa-trash-alt">
-                                            {{ __('dixlase-pages::admin/pages/trash.force_delete_button') }}
-                                        </x-form-button>
                                     </form>
+                                    <x-form-button
+                                        type="button"
+                                        variant="danger"
+                                        size="sm"
+                                        icon="fas fa-trash-alt"
+                                        :xClick="'openModal(\'forceDeleteModal-' . $page->id . '\')'"
+                                    >
+                                        {{ __('dixlase-pages::admin/pages/trash.force_delete_button') }}
+                                    </x-form-button>
+                                    <x-ui-modal
+                                        :id="'forceDeleteModal-' . $page->id"
+                                        :title="__('dixlase-pages::admin/pages/trash.force_delete_confirm_title')"
+                                        :message="__('dixlase-pages::admin/pages/trash.force_delete_confirm')"
+                                        :confirm_label="__('dixlase-pages::admin/pages/trash.force_delete_button')"
+                                        :cancel_label="__('common.cancel')"
+                                        icon_type="danger"
+                                        confirm_color="red"
+                                        :form="'forceDeleteForm-' . $page->id"
+                                    />
                                 </div>
                             </td>
                         </tr>

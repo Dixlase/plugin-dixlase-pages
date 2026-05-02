@@ -32,14 +32,18 @@ return [
     'col_actions' => 'Actions',
 
     'restore_button' => 'Restore',
+    'restore_confirm_title' => 'Restore Page',
+    'restore_confirm' => 'This will restore the page to the page list. Continue?',
     'restore_success' => 'Page has been restored.',
     'restore_slug_conflict' => 'The slug ":slug" is already in use. Change the conflicting page slug before restoring.',
 
     'force_delete_button' => 'Delete Permanently',
-    'force_delete_confirm' => 'This will permanently delete the page. This action cannot be undone. Are you sure?',
+    'force_delete_confirm_title' => 'Delete Page Permanently',
+    'force_delete_confirm' => 'This will permanently delete the page.<br><strong class="text-red-600 dark:text-red-400">This action cannot be undone.</strong> Deleted pages cannot be restored. Continue?',
     'force_delete_success' => 'Page has been permanently deleted.',
 
     'empty_button' => 'Empty Trash',
-    'empty_confirm' => 'This will permanently delete all pages in the trash. This action cannot be undone. Are you sure?',
+    'empty_confirm_title' => 'Empty Trash',
+    'empty_confirm' => 'This will permanently delete all pages in the trash.<br><strong class="text-red-600 dark:text-red-400">This action cannot be undone.</strong> Deleted pages cannot be restored. Continue?',
     'empty_success' => ':count pages have been permanently deleted.',
 ];

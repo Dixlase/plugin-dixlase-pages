@@ -32,14 +32,18 @@ return [
     'col_actions' => '操作',
 
     'restore_button' => '復元',
+    'restore_confirm_title' => 'ページを復元',
+    'restore_confirm' => 'このページを復元してページ一覧に戻します。よろしいですか？',
     'restore_success' => 'ページを復元しました。',
     'restore_slug_conflict' => 'スラッグ ":slug" は既に使用されています。先に他のページのスラッグを変更してから復元してください。',
 
     'force_delete_button' => '完全削除',
-    'force_delete_confirm' => 'このページを完全に削除します。この操作は取り消せません。よろしいですか？',
+    'force_delete_confirm_title' => 'ページを完全に削除',
+    'force_delete_confirm' => 'このページを完全に削除します。<br><strong class="text-red-600 dark:text-red-400">この操作は取り消せません。</strong>削除されたページは二度と復元できなくなります。よろしいですか？',
     'force_delete_success' => 'ページを完全に削除しました。',
 
     'empty_button' => 'ゴミ箱を空にする',
-    'empty_confirm' => 'ゴミ箱内の全ページを完全に削除します。この操作は取り消せません。よろしいですか？',
+    'empty_confirm_title' => 'ゴミ箱を空にする',
+    'empty_confirm' => 'ゴミ箱内の全ページを完全に削除します。<br><strong class="text-red-600 dark:text-red-400">この操作は取り消せません。</strong>削除されたページは二度と復元できなくなります。よろしいですか？',
     'empty_success' => ':count件のページを完全に削除しました。',
 ];
