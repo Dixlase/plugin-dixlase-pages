@@ -227,10 +227,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                                 :id="'deleteModal-' . $page->id"
                                                 :title="__('dixlase-pages::admin/pages/index.delete_confirm_title')"
                                                 :message="__('dixlase-pages::admin/pages/index.delete_confirm')"
-                                                :confirm_label="__('common.delete')"
+                                                :confirm_label="__('dixlase-pages::admin/pages/index.delete_confirm_button')"
                                                 :cancel_label="__('common.cancel')"
-                                                icon_type="danger"
-                                                confirm_color="red"
+                                                icon_type="warning"
+                                                confirm_color="amber"
                                                 :form="'deleteForm-' . $page->id"
                                             />
                                         </div>
