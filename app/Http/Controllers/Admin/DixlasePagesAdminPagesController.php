@@ -38,7 +38,7 @@ use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
-use App\Models\BaseSetting;
+use App\Models\SiteSetting;
 use App\Models\Media;
 use App\Services\ContentPreviewService;
 use App\Services\RevisionService;
@@ -305,7 +305,7 @@ class DixlasePagesAdminPagesController extends Controller
     private function prepareFormData(DixlasePagesPage $page, ?string $fileContents = null, ?string $customCss = null, ?string $customJs = null): array
     {
         // Determine admin mode (Simple=0, Advanced=1)
-        $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
+        $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
         // コンテンツ取得（新規ページの場合は空、既存ページはファイルまたはDBから）
         $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
 
@@ -451,7 +451,7 @@ class DixlasePagesAdminPagesController extends Controller
         $page = new DixlasePagesPage();
 
         // Determine admin mode (Simple=0, Advanced=1)
-        $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
+        $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
 
         // 設定のデフォルト値を適用（int-backed enumにはslugから変換が必要）
         $page->status = DixlasePagesPageSetting::getValue('default_status', 'draft');
@@ -786,7 +786,7 @@ class DixlasePagesAdminPagesController extends Controller
     public function settings()
     {
         // Determine admin mode (Simple=0, Advanced=1)
-        $isSimpleMode = (int) BaseSetting::getValue('admin_mode', 0) === 0;
+        $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
 
         // 設定データを取得
         $settings = DixlasePagesPageSetting::pluck('value', 'name')->toArray();
