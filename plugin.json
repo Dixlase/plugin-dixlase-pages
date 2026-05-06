@@ -37,8 +37,25 @@
     ],
     "capabilities": [
         "seo-meta",
-        "linkable"
+        "linkable",
+        "multilingual-content"
     ],
+    "multilingual_content": {
+        "types": [
+            {
+                "key": "dixlase-pages:page",
+                "model": "Plugins\\DixlasePages\\App\\Models\\DixlasePagesPage",
+                "label_field": "title",
+                "fields": [
+                    {
+                        "name": "title",
+                        "type": "text",
+                        "rules": "required|string|max:255"
+                    }
+                ]
+            }
+        ]
+    },
     "requires": {
         "dixlase": "^0.1.0",
         "php": ">=8.0"
