@@ -59,13 +59,17 @@ class DixlasePagesPage extends Model implements Revisionable
      * locale; without that plugin the trait silently falls back to the
      * raw column value, so existing single-locale installs keep working.
      *
-     * Phase C ships title only. body / content translation lands when
-     * richtext support is added to the multilingual editor.
+     * Phase E adds the content body alongside the title. The content is
+     * stored as the same source format (markdown / HTML / Blade) the
+     * primary-locale row uses; the front-end renderer evaluates the
+     * value verbatim. File-stored content keeps using the locale-aware
+     * path under getContentByEditorType() rather than this resolver.
      *
      * @var list<string>
      */
     protected array $translatable = [
         'title',
+        'content',
     ];
 
     /**
@@ -207,13 +211,19 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * コンテンツを取得（エディタータイプに応じて）
-     * ファイル保存の場合はファイルからコンテンツを読み込む
-     * DB保存の場合は content カラムから読み込む
+     * Read the page body, picking the storage backend by storage_type.
+     *
+     * - FILE storage: load from disk under app()->getLocale(), so each
+     *   locale already has its own file. The multilingual plugin is not
+     *   consulted for file-stored content.
+     * - DB storage: route through the TranslatableTrait so the
+     *   multilingual plugin's resolver can return a per-locale
+     *   translation when one is published. The trait falls back to the
+     *   raw `content` column when no translation row exists or when the
+     *   multilingual plugin is not installed.
      */
     public function getContentByEditorType(): ?string
     {
-        // ファイル保存の場合
         if ($this->storage_type === ContentStorageType::FILE) {
             $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
 
@@ -224,8 +234,7 @@ class DixlasePagesPage extends Model implements Revisionable
             );
         }
 
-        // DB保存の場合は content カラムから読み込む
-        return $this->content;
+        return $this->getTranslation('content');
     }
 
     /**

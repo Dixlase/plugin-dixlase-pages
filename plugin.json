@@ -51,6 +51,11 @@
                         "name": "title",
                         "type": "text",
                         "rules": "required|string|max:255"
+                    },
+                    {
+                        "name": "content",
+                        "type": "richtext",
+                        "rules": "nullable|string"
                     }
                 ]
             }
