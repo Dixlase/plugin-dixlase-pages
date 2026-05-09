@@ -40,7 +40,7 @@ use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
 {
     /**
-     * プロバイダーの識別子を取得
+     * Get the provider identifier
      */
     public function getProviderKey(): string
     {
@@ -48,7 +48,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     }
 
     /**
-     * プロバイダーの表示名を取得
+     * Get the provider display name
      */
     public function getProviderLabel(): string
     {
@@ -56,7 +56,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     }
 
     /**
-     * プロバイダーのアイコンクラスを取得
+     * Get the provider icon class
      */
     public function getProviderIcon(): ?string
     {
@@ -64,7 +64,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     }
 
     /**
-     * このプロバイダーが現在利用可能かどうか
+     * Whether this provider is currently available
      */
     public function isAvailable(): bool
     {
@@ -72,7 +72,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     }
 
     /**
-     * 利用可能なコンテンツのリストを取得
+     * Get the list of available content
      */
     public function getAvailableItems(int $limit = 100): array
     {
@@ -85,7 +85,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     }
 
     /**
-     * 検索クエリに基づいてコンテンツを検索
+     * Search content based on search query
      */
     public function searchItems(string $query, int $limit = 20): array
     {
@@ -101,7 +101,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     }
 
     /**
-     * 特定のIDからコンテンツを取得
+     * Get content from a specific ID
      */
     public function getItemById(string $id): ?LinkableDTO
     {
@@ -111,7 +111,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     }
 
     /**
-     * PageモデルをLinkableDTOに変換
+     * Convert Page model to LinkableDTO
      */
     protected function pageToDTO(DixlasePagesPage $page): LinkableDTO
     {

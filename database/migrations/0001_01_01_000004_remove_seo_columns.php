@@ -35,10 +35,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * SEO関連カラムの削除マイグレーション
+ * Migration to remove SEO-related columns
  *
- * SEO機能は将来SEOプラグインとして独立開発するため、
- * DixlasePagesから meta_description と ogp_image_id を削除する。
+ * SEO functionality will be developed independently as an SEO plugin in the future,
+ * so meta_description and ogp_image_id are removed from DixlasePages.
  */
 return new class extends Migration
 {

@@ -35,14 +35,14 @@ namespace Plugins\DixlasePages\App\Enums;
 use App\Enums\ContentStatus;
 
 /**
- * ページステータス
- * コアのContentStatusのエイリアス（後方互換性のため）
+ * Page status
+ * Alias for Core's ContentStatus (for backward compatibility)
  *
- * @deprecated 新規コードではApp\Enums\ContentStatusを直接使用してください
+ * @deprecated Use App\Enums\ContentStatus directly in new code
  */
 class PageStatus
 {
-    // ContentStatusの定数をエイリアス
+    // Alias ContentStatus constants
     public const DRAFT = ContentStatus::DRAFT;
 
     public const PUBLISHED = ContentStatus::PUBLISHED;
@@ -50,7 +50,7 @@ class PageStatus
     public const SCHEDULED = ContentStatus::SCHEDULED;
 
     /**
-     * スラッグ文字列からContentStatusインスタンスを取得
+     * Get ContentStatus instance from slug string
      */
     public static function from(string $value): ContentStatus
     {
@@ -58,7 +58,7 @@ class PageStatus
     }
 
     /**
-     * スラッグ文字列からContentStatusインスタンスを取得（失敗時はnull）
+     * Get ContentStatus instance from slug string (returns null on failure)
      */
     public static function tryFrom(string $value): ?ContentStatus
     {
@@ -66,7 +66,7 @@ class PageStatus
     }
 
     /**
-     * 全てのケースを取得
+     * Get all cases
      */
     public static function cases(): array
     {
@@ -74,7 +74,7 @@ class PageStatus
     }
 
     /**
-     * 全てのステータスを配列で取得
+     * Get all statuses as array
      */
     public static function toArray(): array
     {

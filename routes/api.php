@@ -35,11 +35,11 @@ use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesContro
 
 /*
 |--------------------------------------------------------------------------
-| プラグインAPIルート
+| Plugin API Routes
 |--------------------------------------------------------------------------
 |
-| 管理画面で使用するAPIエンドポイント
-| ミドルウェア: admin.ip, auth:member
+| API endpoints used in the admin panel
+| Middleware: admin.ip, auth:member
 |
 */
 
@@ -47,11 +47,11 @@ Route::prefix('admin/pages')
     ->middleware(['admin.ip', 'auth:member'])
     ->name('admin.pages.api.')
     ->group(function () {
-        // エディタータイプ別のファイルコンテンツ取得
+        // Get file content by editor type
         Route::get('/{page}/content/{editorType}', [DixlasePagesAdminPagesController::class, 'getFileContent'])
             ->name('content');
         
-        // 保存方法・エディタータイプ別のコンテンツ取得
+        // Get content by save method and editor type
         Route::get('/{page}/content/{storageType}/{editorType}', [DixlasePagesAdminPagesController::class, 'getContent'])
             ->name('content.get');
     });

@@ -38,20 +38,20 @@ use Illuminate\Support\Facades\Storage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 
 /**
- * ページコンテンツファイル管理サービス
- * ファイルベースのコンテンツ保存を管理
- * ManagesContentFilesトレイトを使用して共通機能を提供（ライセンス伝搬を避けるため継承なし）
+ * Page content file management service
+ * Manages file-based content storage
+ * Uses ManagesContentFiles trait to provide common functionality (no inheritance to avoid license propagation)
  *
- * ファイル構造: storage/app/private/{plugin-slug}/{page-slug}.{extension}
- * プラグインスラッグはplugin.jsonから動的に取得
+ * File structure: storage/app/private/{plugin-slug}/{page-slug}.{extension}
+ * Plugin slug is dynamically retrieved from plugin.json
  */
 class DixlasePagesPageContentService
 {
     use ManagesContentFiles;
 
     /**
-     * コンストラクタ
-     * plugin.jsonからプラグインスラッグを取得してベースパスを設定
+     * Constructor
+     * Retrieves plugin slug from plugin.json and sets the base path
      */
     public function __construct()
     {
@@ -68,20 +68,20 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * ファイルパスを取得する（フラット構造）
-     * 構造: {basePath}/{slug}.{extension} または {basePath}/{slug}.{locale}.{extension}
-     * デフォルト言語はファイル名に言語コードを付けない
+     * Retrieve file path (flat structure)
+     * Structure: {basePath}/{slug}.{extension} or {basePath}/{slug}.{locale}.{extension}
+     * Default language does not append language code to filename
      *
-     * @param  string  $slug  スラッグ
-     * @param  string  $locale  言語コード
-     * @param  string  $editorType  エディタータイプ
-     * @return string ファイルパス
+     * @param  string  $slug  Slug
+     * @param  string  $locale  Language code
+     * @param  string  $editorType  Editor type
+     * @return string File path
      */
     public function getFilePath(string $slug, string $locale, string $editorType): string
     {
         $extension = $this->extensions[$editorType] ?? 'txt';
 
-        // デフォルト言語はファイル名に言語コードを付けない
+        // Default language does not append language code to filename
         if ($locale === $this->defaultLocale) {
             return "{$this->basePath}/{$slug}.{$extension}";
         }
@@ -90,13 +90,13 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * スラッグ変更時にファイルをリネームする（単一ロケール対応）
+     * Rename file when slug changes (single locale support)
      *
-     * @param  string  $oldSlug  旧スラッグ
-     * @param  string  $newSlug  新スラッグ
-     * @param  string  $editorType  エディタータイプ
-     * @param  string  $locale  言語コード
-     * @return bool リネーム成功時はtrue
+     * @param  string  $oldSlug  Old slug
+     * @param  string  $newSlug  New slug
+     * @param  string  $editorType  Editor type
+     * @param  string  $locale  Language code
+     * @return bool True on successful rename
      */
     public function renameFile(string $oldSlug, string $newSlug, string $editorType, string $locale): bool
     {
@@ -111,11 +111,11 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * スラッグに関連するすべてのファイルを削除する（フラット構造対応）
-     * ディレクトリではなく、スラッグにマッチするファイルを検索して削除
+     * Delete all files related to a slug (flat structure support)
+     * Search and delete files matching the slug, not directories
      *
-     * @param  string  $slug  スラッグ
-     * @return bool すべて削除成功時はtrue
+     * @param  string  $slug  Slug
+     * @return bool True if all deletions succeed
      */
     public function deleteDirectory(string $slug): bool
     {
@@ -125,7 +125,7 @@ class DixlasePagesPageContentService
 
         foreach ($files as $file) {
             $filename = basename($file);
-            // {slug}.{ext} または {slug}.{locale}.{ext} パターンに一致するファイルを削除
+            // Delete files matching {slug}.{ext} or {slug}.{locale}.{ext} pattern
             if (preg_match($pattern, $filename)) {
                 if (! Storage::disk($this->disk)->delete($file)) {
                     $success = false;
@@ -137,11 +137,11 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * JS ファイルパスを取得する
+     * Retrieve JS file path
      *
-     * @param  string  $slug  スラッグ
-     * @param  string  $locale  言語コード
-     * @return string ファイルパス
+     * @param  string  $slug  Slug
+     * @param  string  $locale  Language code
+     * @return string File path
      */
     public function getJsFilePath(string $slug, string $locale): string
     {
@@ -153,11 +153,11 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * CSS ファイルパスを取得する
+     * Retrieve CSS file path
      *
-     * @param  string  $slug  スラッグ
-     * @param  string  $locale  言語コード
-     * @return string ファイルパス
+     * @param  string  $slug  Slug
+     * @param  string  $locale  Language code
+     * @return string File path
      */
     public function getCssFilePath(string $slug, string $locale): string
     {
@@ -169,11 +169,11 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * JS コンテンツを取得する（DB or ファイル）
+     * Retrieve JS content (DB or file)
      *
-     * @param  DixlasePagesPage  $page  ページモデル
-     * @param  string|null  $locale  言語コード（nullの場合は現在の言語）
-     * @return string|null コンテンツ
+     * @param  DixlasePagesPage  $page  Page model
+     * @param  string|null  $locale  Language code (current language if null)
+     * @return string|null Content
      */
     public function getJsContent(DixlasePagesPage $page, ?string $locale = null): ?string
     {
@@ -191,11 +191,11 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * CSS コンテンツを取得する（DB or ファイル）
+     * Retrieve CSS content (DB or file)
      *
-     * @param  DixlasePagesPage  $page  ページモデル
-     * @param  string|null  $locale  言語コード（nullの場合は現在の言語）
-     * @return string|null コンテンツ
+     * @param  DixlasePagesPage  $page  Page model
+     * @param  string|null  $locale  Language code (current language if null)
+     * @return string|null Content
      */
     public function getCssContent(DixlasePagesPage $page, ?string $locale = null): ?string
     {
@@ -213,12 +213,12 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * JS コンテンツをファイルに保存する
+     * Save JS content to file
      *
-     * @param  string  $slug  スラッグ
-     * @param  string  $locale  言語コード
-     * @param  string  $content  コンテンツ
-     * @return bool 保存成功時はtrue
+     * @param  string  $slug  Slug
+     * @param  string  $locale  Language code
+     * @param  string  $content  Content
+     * @return bool True on successful save
      */
     public function saveJsToFile(string $slug, string $locale, string $content): bool
     {
@@ -228,12 +228,12 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * CSS コンテンツをファイルに保存する
+     * Save CSS content to file
      *
-     * @param  string  $slug  スラッグ
-     * @param  string  $locale  言語コード
-     * @param  string  $content  コンテンツ
-     * @return bool 保存成功時はtrue
+     * @param  string  $slug  Slug
+     * @param  string  $locale  Language code
+     * @param  string  $content  Content
+     * @return bool True on successful save
      */
     public function saveCssToFile(string $slug, string $locale, string $content): bool
     {
@@ -243,11 +243,11 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * JS ファイルを削除する
+     * Delete JS file
      *
-     * @param  string  $slug  スラッグ
-     * @param  string  $locale  言語コード
-     * @return bool 削除成功時はtrue
+     * @param  string  $slug  Slug
+     * @param  string  $locale  Language code
+     * @return bool True on successful deletion
      */
     public function deleteJsFile(string $slug, string $locale): bool
     {
@@ -261,11 +261,11 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * CSS ファイルを削除する
+     * Delete CSS file
      *
-     * @param  string  $slug  スラッグ
-     * @param  string  $locale  言語コード
-     * @return bool 削除成功時はtrue
+     * @param  string  $slug  Slug
+     * @param  string  $locale  Language code
+     * @return bool True on successful deletion
      */
     public function deleteCssFile(string $slug, string $locale): bool
     {
@@ -279,18 +279,18 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * スラッグ変更時にCSS/JSファイルをリネームする
+     * Rename CSS/JS files when slug changes
      *
-     * @param  string  $oldSlug  旧スラッグ
-     * @param  string  $newSlug  新スラッグ
-     * @param  string  $locale  言語コード
-     * @return bool リネーム成功時はtrue
+     * @param  string  $oldSlug  Old slug
+     * @param  string  $newSlug  New slug
+     * @param  string  $locale  Language code
+     * @return bool True on successful rename
      */
     public function renameAssetFiles(string $oldSlug, string $newSlug, string $locale): bool
     {
         $success = true;
 
-        // JS ファイルのリネーム
+        // Rename JS file
         $oldJsPath = $this->getJsFilePath($oldSlug, $locale);
         $newJsPath = $this->getJsFilePath($newSlug, $locale);
         if (Storage::disk($this->disk)->exists($oldJsPath)) {
@@ -299,7 +299,7 @@ class DixlasePagesPageContentService
             }
         }
 
-        // CSS ファイルのリネーム
+        // Rename CSS file
         $oldCssPath = $this->getCssFilePath($oldSlug, $locale);
         $newCssPath = $this->getCssFilePath($newSlug, $locale);
         if (Storage::disk($this->disk)->exists($oldCssPath)) {

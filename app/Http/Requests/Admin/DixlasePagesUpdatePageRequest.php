@@ -60,15 +60,15 @@ class DixlasePagesUpdatePageRequest extends FormRequest
     {
         $pageId = $this->route('page')?->id;
 
-        // スラッグは言語に関わらず全体でユニーク（URL重複を防ぐ）
+        // Slug must be unique across all languages (to prevent URL duplication)
         $slugRule = UniqueContentSlug::for('plg_dixlase_pages');
         if ($pageId !== null) {
             $slugRule = $slugRule->ignore($pageId);
         }
 
         return [
-            // スラッグは必須（更新時は既存のスラッグがあるため）
-            // ソフトデリートされたレコードは除外してユニークチェック
+            // Slug is required (existing slug is present during updates)
+            // Exclude soft-deleted records from unique check
             'slug' => [
                 'required',
                 'string',
@@ -84,7 +84,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             'custom_css' => ['nullable', 'string'],
             'custom_js' => ['nullable', 'string'],
             'lang' => ['required', 'string', 'max:10'],
-            // SEOメタ（optional依存、SEOプラグインが無効でも検証は通過）
+            // SEO meta (optional dependency, validation passes even if SEO plugin is disabled)
             'seo_meta' => ['nullable', 'array'],
             'seo_meta.description' => ['nullable', 'string', 'max:300'],
             'seo_meta.ogp_media_id' => ['nullable', 'integer', 'exists:media,id'],
@@ -92,7 +92,7 @@ class DixlasePagesUpdatePageRequest extends FormRequest
     }
 
     /**
-     * バリデーション後の追加チェック
+     * Additional checks after validation
      */
     public function withValidator($validator): void
     {
@@ -104,22 +104,22 @@ class DixlasePagesUpdatePageRequest extends FormRequest
     }
 
     /**
-     * バリデーション前の処理
+     * Processing before validation
      */
     protected function prepareForValidation(): void
     {
-        // 言語が未指定の場合、サイト設定の言語をデフォルトで設定
+        // If language is not specified, set the site settings language as default
         if (empty($this->lang)) {
             $this->merge(['lang' => app()->getLocale()]);
         }
 
-        // 保存形式は作成後ロック：編集時は既存のページの値で上書き
+        // Save format is locked after creation: overwrite with existing page value during edit
         $page = $this->route('page');
         if ($page instanceof \Plugins\DixlasePages\App\Models\DixlasePagesPage && $page->exists) {
             $this->merge(['storage_type' => $page->storage_type->slug()]);
         }
 
-        // 公開権限チェック: 権限がないメンバーはステータスを強制的にdraftに
+        // Public permission check: force status to draft for members without permission
         $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
         $member = Auth::guard('member')->user();
         if ($member && $member->role->value < $publishMinRole) {
@@ -129,19 +129,19 @@ class DixlasePagesUpdatePageRequest extends FormRequest
             ]);
         }
 
-        // 日付指定以外の場合はpublished_atをクリア
+        // Clear published_at if not date-specified
         if ($this->status !== ContentStatus::SCHEDULED->slug()) {
             $this->merge(['published_at' => null]);
         }
 
-        // 公開ステータスの場合は現在時刻を設定
+        // Set current time if status is public
         if ($this->status === ContentStatus::PUBLISHED->slug()) {
             $this->merge(['published_at' => now()]);
         }
     }
 
     /**
-     * カスタムバリデーションメッセージ
+     * Custom validation messages
      */
     public function messages(): array
     {

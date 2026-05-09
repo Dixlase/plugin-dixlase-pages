@@ -45,61 +45,61 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
 
     public function register()
     {
-        // LinkableProviderを登録
+        // Register LinkableProvider
         $this->app->singleton(DixlasePagesPageLinkableProvider::class);
 
-        // タグ付けして、メニュープラグインから取得できるようにする
+        // Tag it so it can be retrieved from the menu plugin
         $this->app->tag([DixlasePagesPageLinkableProvider::class], 'linkable.providers');
     }
 
     public function boot()
     {
-        // ルートスラッグプロバイダーの登録
+        // Register route slug provider
         $this->registerRouteSlugProvider();
 
-        // ビューの登録（テーマによる上書きを優先）
+        // Register views (prioritize theme overrides)
         $this->registerPluginViews();
 
-        // 翻訳ファイルの登録
+        // Register translation files
         $this->loadTranslationsFrom(__DIR__.'/../../lang', 'dixlase-pages');
 
-        // マイグレーションの登録
+        // Register migrations
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
 
-        // 注: ルート（routes/web.php, routes/admin.php, routes/api.php）はPluginServiceProviderが自動読み込み
+        // Note: Routes (routes/web.php, routes/admin.php, routes/api.php) are auto-loaded by PluginServiceProvider
     }
 
     /**
-     * プラグインビューを登録（custom / テーマによる上書きをサポート）
+     * Register plugin views (supports custom / theme overrides)
      *
-     * 検索優先順位:
-     * 1. /custom/plugins/DixlasePages/resources/views/ — サイト固有カスタマイズ
-     * 2. themes/{有効テーマ}/plugins/DixlasePages/resources/views/ — テーマによる上書き
-     * 3. plugins/DixlasePages/resources/views/ — プラグインのデフォルト
+     * Search priority:
+     * 1. /custom/plugins/DixlasePages/resources/views/ — Site-specific customization
+     * 2. themes/{active theme}/plugins/DixlasePages/resources/views/ — Theme overrides
+     * 3. plugins/DixlasePages/resources/views/ — Plugin defaults
      */
     protected function registerPluginViews(): void
     {
         $namespace = 'dixlase-pages';
         $pluginRelativePath = 'plugins/DixlasePages/resources/views';
 
-        // 1. /custom/ からの上書き（最優先）
+        // 1. Overrides from /custom/ (highest priority)
         $customPath = base_path("custom/{$pluginRelativePath}");
         if (is_dir($customPath)) {
             $this->app['view']->addNamespace($namespace, $customPath);
         }
 
-        // 2. 有効テーマからの上書き
+        // 2. Overrides from active theme
         $themePath = $this->getThemeOverridePath($pluginRelativePath);
         if ($themePath && is_dir($themePath)) {
             $this->app['view']->addNamespace($namespace, $themePath);
         }
 
-        // 3. プラグインのデフォルトビュー
+        // 3. Plugin default views
         $this->loadViewsFrom(__DIR__.'/../../resources/views', $namespace);
     }
 
     /**
-     * テーマのプラグインビュー上書きパスを取得
+     * Get theme plugin view override path
      */
     protected function getThemeOverridePath(string $pluginRelativePath): ?string
     {
@@ -113,14 +113,14 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
                 return base_path("{$themeDirectory}/{$enabledTheme}/{$pluginRelativePath}");
             }
         } catch (\Exception $e) {
-            // テーマ未設定時は無視
+            // Ignore if theme is not set
         }
 
         return null;
     }
 
     /**
-     * ルートスラッグプロバイダーを登録
+     * Register route slug provider
      */
     protected function registerRouteSlugProvider(): void
     {
@@ -131,7 +131,7 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
     }
 
     /**
-     * プラグインが管理するルートスラッグを返す
+     * Return route slugs managed by the plugin
      *
      * @return array<RegisteredSlug>
      */

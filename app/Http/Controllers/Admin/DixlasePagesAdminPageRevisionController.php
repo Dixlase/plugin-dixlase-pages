@@ -47,7 +47,7 @@ use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageRevision;
 
 /**
- * ページ リビジョン一覧・差分表示・復元コントローラー
+ * Page revision list, diff display, and restore controller
  */
 class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
 {
@@ -59,7 +59,7 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
     }
 
     /**
-     * リビジョン一覧
+     * Revision list
      */
     public function index(DixlasePagesPage $page): View
     {
@@ -79,7 +79,7 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
     }
 
     /**
-     * リビジョン詳細（現行との差分表示）
+     * Revision details (diff display with current version)
      */
     public function show(DixlasePagesPage $page, int $id): View
     {
@@ -124,7 +124,7 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
     }
 
     /**
-     * リビジョン復元
+     * Revision restore
      */
     public function restore(DixlasePagesPage $page, int $id): RedirectResponse
     {
@@ -142,7 +142,7 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
     }
 
     /**
-     * リビジョンの保護フラグを切り替える
+     * Toggle the protection flag of a revision
      */
     public function toggleProtection(DixlasePagesPage $page, int $id): RedirectResponse
     {
@@ -163,7 +163,7 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
     }
 
     /**
-     * リビジョンのメモを更新する
+     * Update the memo of a revision
      */
     public function updateNote(Request $request, DixlasePagesPage $page, int $id): RedirectResponse
     {
@@ -185,7 +185,7 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
     }
 
     /**
-     * パンくずリストを設定する（リビジョンルートには {page} パラメータが必須）
+     * Set up breadcrumb list (revision routes require the {page} parameter)
      */
     private function applyBreadcrumbs(DixlasePagesPage $page, ?int $revisionId = null): void
     {

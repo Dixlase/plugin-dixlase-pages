@@ -44,7 +44,7 @@ class DixlasePagesPageSetting extends Model
     ];
 
     /**
-     * 設定値の取得
+     * Get settings value
      *
      * @param  string  $name
      * @param  mixed  $default
@@ -58,7 +58,7 @@ class DixlasePagesPageSetting extends Model
     }
 
     /**
-     * 設定値の保存
+     * Save settings value
      *
      * @param  string  $name
      * @param  mixed  $value
@@ -73,7 +73,7 @@ class DixlasePagesPageSetting extends Model
     }
 
     /**
-     * 複数の設定値を一括保存
+     * Bulk save multiple settings values
      */
     public static function setMany(array $settings): void
     {

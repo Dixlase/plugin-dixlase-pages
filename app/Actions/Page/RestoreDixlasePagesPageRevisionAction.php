@@ -43,10 +43,10 @@ use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageRevision;
 
 /**
- * ページを指定リビジョンから復元する Action
+ * Action to restore a page from a specified revision
  *
- * 復元前の状態が直前リビジョンと差分がある場合のみ、TYPE_RESTORE_BACKUP として
- * 自動的にバックアップが作成される（RevisionService 側のロジック）。
+ * A backup is automatically created as TYPE_RESTORE_BACKUP only if the state before restoration
+ * differs from the latest revision (logic on the RevisionService side).
  */
 class RestoreDixlasePagesPageRevisionAction extends AbstractAction
 {

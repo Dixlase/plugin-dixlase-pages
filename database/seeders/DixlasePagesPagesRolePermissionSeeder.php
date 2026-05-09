@@ -61,7 +61,7 @@ class DixlasePagesPagesRolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            // 既存のレコードをチェック
+            // Check for existing records
             $exists = DB::table('members_role_permissions')
                 ->where('menu_key', $permission['menu_key'])
                 ->exists();
