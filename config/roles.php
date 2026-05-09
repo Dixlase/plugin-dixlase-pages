@@ -33,17 +33,17 @@
 use App\Enums\MemberRole;
 
 /**
- * プラグインのデフォルト権限設定
+ * Plugin default permission settings
  *
- * 各メニュー/機能に対するデフォルトの権限を定義します。
- * 管理画面で変更された場合のみ、role_permission_overrides テーブルに差分が保存されます。
+ * Defines default permissions for each menu/feature.
+ * Only when changed in the admin panel, differences are saved to the role_permission_overrides table.
  *
- * 構造は config/admin.php の nav 構造と同じネスト形式です。
+ * Structure follows the same nested format as the nav structure in config/admin.php.
  */
 
 return [
     'permissions' => [
-        // ページ管理
+        // Page management
         'pages' => [
             'children' => [
                 'index' => [

@@ -35,7 +35,7 @@ return [
         'description' => 'ウェブサイトに静的ページ管理機能を追加します。固定ページの作成・編集・削除、SEO設定、公開/非公開制御など、コンテンツ管理に必要な機能を提供します。',
     ],
 
-    // メニュープラグイン連携用
+    // For menu plugin integration
     'provider' => [
         'label' => 'ページ',
     ],

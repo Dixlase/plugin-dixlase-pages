@@ -38,9 +38,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * ページリビジョンモデル
+ * Page revision model
  *
- * 保存時・手動・復元前バックアップでスナップショットを保持する。
+ * Holds snapshots on save, manual backup, and pre-restoration backup.
  */
 class DixlasePagesPageRevision extends Model
 {

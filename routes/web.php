@@ -35,13 +35,13 @@ use Plugins\DixlasePages\App\Http\Controllers\Front\DixlasePagesCustomAssetContr
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 
-// 個別ページ
+// Individual pages
 Route::middleware(['front.ip'])->group(
     function () {
-        // データベースから設定を取得、なければデフォルト値を使用
+        // Get settings from database, or use default values if none exist
         $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
 
-        // カスタム CSS/JS アセットルート（ページ表示ルートの前に定義）
+        // Custom CSS/JS asset routes (defined before page display routes)
         Route::get($pagesDirectory.'/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
             ->name('dixlase-pages::page.custom-style')
             ->withoutMiddleware([\App\Http\Middleware\ContentSecurityPolicy::class]);
@@ -50,25 +50,25 @@ Route::middleware(['front.ip'])->group(
             ->name('dixlase-pages::page.custom-script')
             ->withoutMiddleware([\App\Http\Middleware\ContentSecurityPolicy::class]);
 
-        // ページ表示ルート
+        // Page display routes
         Route::get($pagesDirectory.'/{slug}', function ($slug) {
             $locale = app()->getLocale();
 
-            // 管理画面にログインしている場合は全てのページを表示（プレビュー機能）
+            // Show all pages if logged in to admin panel (preview feature)
             if (auth('member')->check()) {
                 $page = DixlasePagesPage::where('slug', $slug)
                     ->forLang($locale)
                     ->firstOrFail();
             } else {
-                // ログインしていない場合は公開済みページのみ
-                // (published または scheduled で公開日時が過去のもの)
+                // Only public pages if not logged in
+                // (published or scheduled with publication date in the past)
                 $page = DixlasePagesPage::where('slug', $slug)
                     ->forLang($locale)
                     ->published()
                     ->firstOrFail();
             }
 
-            // フロントビュー変数を準備
+            // Prepare front view variables
             $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
             $editorType = $page->editor_type->slug() ?? 'html';
             $content = $page->getContentByEditorType() ?? '';

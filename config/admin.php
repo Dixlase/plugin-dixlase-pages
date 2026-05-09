@@ -31,8 +31,8 @@
  */
 
 return [
-    // プラグイン設定画面のルート名
+    // Route name for plugin settings screen
     'settings_route' => 'dixlase-pages::admin.pages.settings',
 
-    // 注: ナビゲーション設定は config/admin/navigation.php に移動
+    // Note: Navigation settings moved to config/admin/navigation.php
 ];

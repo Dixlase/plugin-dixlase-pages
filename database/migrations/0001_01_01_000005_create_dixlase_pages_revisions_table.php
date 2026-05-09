@@ -45,12 +45,12 @@ return new class extends Migration
             $table->foreignId('page_id')
                 ->constrained('plg_dixlase_pages')
                 ->cascadeOnDelete();
-            // 全フィールドの完全スナップショット
+            // Complete snapshot of all fields
             $table->json('snapshot');
-            // auto: 自動保存 / manual: 手動作成 / restore_backup: 復元前バックアップ
+            // auto: auto-save / manual: manually created / restore_backup: pre-restore backup
             $table->string('type', 20)->default('auto');
             $table->string('note')->nullable();
-            // 保護フラグ。true の場合は保持件数超過時の自動削除対象外
+            // Protection flag. If true, excluded from auto-deletion when retention limit is exceeded
             $table->boolean('is_protected')->default(false);
             $table->foreignId('created_by')
                 ->nullable()

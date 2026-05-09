@@ -41,7 +41,7 @@ use App\Enums\Permission;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageRevision;
 
 /**
- * ページリビジョンのメモを更新する Action
+ * Action to update page revision notes
  */
 class UpdateDixlasePagesPageRevisionNoteAction extends AbstractAction
 {

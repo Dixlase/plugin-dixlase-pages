@@ -45,19 +45,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
- * @property string $lang 言語コード
+ * @property string $lang Language code
  */
 class DixlasePagesPage extends Model implements Revisionable
 {
     use HasFactory, HasRevisions, SoftDeletes;
 
     /**
-     * テーブル名
+     * Table name
      */
     protected $table = 'plg_dixlase_pages';
 
     /**
-     * 一括代入可能な属性
+     * Mass assignable attributes
      *
      * @var array<int, string>
      */
@@ -75,7 +75,7 @@ class DixlasePagesPage extends Model implements Revisionable
     ];
 
     /**
-     * キャストする属性
+     * Attributes to cast
      *
      * @var array
      */
@@ -93,15 +93,15 @@ class DixlasePagesPage extends Model implements Revisionable
             }
         });
 
-        // ページ強制削除時にSEOメタ情報・コンテンツファイルもカスケード削除（SoftDeletes時は消さない）
+        // When force deleting a page, also cascade delete SEO meta information and content files (not deleted on SoftDeletes)
         static::forceDeleted(function (self $page) {
-            // SEOメタ情報の削除
+            // Delete SEO meta information
             if (app()->has(SeoMetaProviderInterface::class)) {
                 app(SeoMetaProviderInterface::class)
                     ->deleteMeta('dixlase-pages', (string) $page->id);
             }
 
-            // ファイル保存の場合、関連ファイルも削除
+            // When saved as file, also delete related files
             if ($page->storage_type === ContentStorageType::FILE) {
                 $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
                 $contentService->deleteDirectory($page->slug);
@@ -110,11 +110,11 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * ステータスのアクセサー（安全な変換）
+     * Status accessor (safe conversion)
      */
     public function getStatusAttribute($value): ContentStatus
     {
-        // 古いデータの変換
+        // Convert old data
         return match ($value) {
             '0', 0, 'draft', null => ContentStatus::DRAFT,
             '1', 1, 'published' => ContentStatus::PUBLISHED,
@@ -124,7 +124,7 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * ステータスのミューテーター
+     * Status mutator
      */
     public function setStatusAttribute($value): void
     {
@@ -133,14 +133,14 @@ class DixlasePagesPage extends Model implements Revisionable
         } elseif (is_int($value)) {
             $this->attributes['status'] = $value;
         } else {
-            // スラッグ文字列の場合はenumに変換してint値を保存
+            // If slug string, convert to enum and save int value
             $enum = ContentStatus::tryFromSlug((string) $value);
             $this->attributes['status'] = $enum ? $enum->value : ContentStatus::DRAFT->value;
         }
     }
 
     /**
-     * 公開されているかどうかを判定
+     * Determine if published
      */
     public function isPublished(): bool
     {
@@ -152,7 +152,7 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * 公開可能なページのスコープ
+     * Scope for public pages
      */
     public function scopePublished($query)
     {
@@ -166,7 +166,7 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * 下書きページのスコープ
+     * Scope for draft pages
      */
     public function scopeDraft($query)
     {
@@ -174,7 +174,7 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * 日付指定ページのスコープ
+     * Scope for scheduled pages
      */
     public function scopeScheduled($query)
     {
@@ -182,7 +182,7 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * 指定言語のページを取得するスコープ
+     * Scope to retrieve pages of specified language
      */
     public function scopeForLang(Builder $query, string $lang): Builder
     {
@@ -190,13 +190,13 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * コンテンツを取得（エディタータイプに応じて）
-     * ファイル保存の場合はファイルからコンテンツを読み込む
-     * DB保存の場合は content カラムから読み込む
+     * Retrieve content (according to editor type)
+     * When saved as file, load content from file
+     * When saved in DB, load from content column
      */
     public function getContentByEditorType(): ?string
     {
-        // ファイル保存の場合
+        // When saved as file
         if ($this->storage_type === ContentStorageType::FILE) {
             $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
 
@@ -207,12 +207,12 @@ class DixlasePagesPage extends Model implements Revisionable
             );
         }
 
-        // DB保存の場合は content カラムから読み込む
+        // When saved in DB, load from content column
         return $this->content;
     }
 
     /**
-     * ページURLのアクセサー
+     * Page URL accessor
      */
     public function getPageUrlAttribute(): string
     {
@@ -222,7 +222,7 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * ファクトリーの場所を指定
+     * Specify the factory location
      */
     protected static function newFactory()
     {

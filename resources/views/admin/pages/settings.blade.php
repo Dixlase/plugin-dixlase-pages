@@ -41,12 +41,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </div>
         @endif
 
-        {{-- 基本設定 --}}
+        {{-- Basic settings --}}
         <section class="mb-8">
             <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.basic.title') }}</h2>
 
             <div class="grid grid-cols-1 gap-6">
-                {{-- URLスラッグ --}}
+                {{-- URL slug --}}
                 <div>
                     <x-form-label
                         for="route_slug"
@@ -70,7 +70,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <x-form-error name="route_slug" />
                 </div>
 
-                {{-- デフォルトステータス --}}
+                {{-- Default status --}}
                 <div>
                     <x-form-label
                         :text="__('dixlase-pages::admin/pages/settings.basic.default_status')"
@@ -86,7 +86,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <x-form-error name="default_status" />
                 </div>
 
-                {{-- デフォルトエディタタイプ --}}
+                {{-- Default editor type --}}
                 <div>
                     <x-form-label
                         :text="__('dixlase-pages::admin/pages/settings.basic.default_editor_type')"
@@ -103,7 +103,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <x-form-error name="default_editor_type" />
                 </div>
 
-                {{-- デフォルト保存方式 (hidden in simple mode) --}}
+                {{-- Default save method (hidden in simple mode) --}}
                 @if($isSimpleMode)
                     <input type="hidden" name="default_storage_type" value="database">
                 @else
@@ -126,7 +126,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </div>
         </section>
 
-        {{-- 公開権限設定 --}}
+        {{-- Public permission settings --}}
         <section class="mb-8">
             <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.publish_permission.title') }}</h2>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">

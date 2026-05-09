@@ -36,19 +36,19 @@ use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesContro
 
 /*
 |--------------------------------------------------------------------------
-| プラグイン管理画面ルート（自動読み込み）
+| Plugin Admin Panel Routes (Auto-loaded)
 |--------------------------------------------------------------------------
 |
-| このファイルはプラグインが有効化されている場合、PluginServiceProviderによって
-| 自動的に読み込まれます。以下のミドルウェアが自動適用されます：
+| This file is automatically loaded by PluginServiceProvider when the plugin
+| is enabled. The following middleware are automatically applied:
 |
-| - admin.ip: IPアドレスフィルタリング
-| - auth:member: 管理メンバー認証
-| - verified: メール認証済みチェック
-| - log.admin.activity: 管理画面操作ログ
+| - admin.ip: IP address filtering
+| - auth:member: Admin member authentication
+| - verified: Email verification check
+| - log.admin.activity: Admin panel operation log
 |
-| ルートプレフィックス: /admin（動的に取得）
-| ルート名: プラグイン側で完全に制御（例: dixlase-pages::admin.pages.index）
+| Route prefix: /admin (dynamically retrieved)
+| Route name: Fully controlled by plugin (e.g., dixlase-pages::admin.pages.index)
 |
 */
 
@@ -73,7 +73,7 @@ Route::prefix('pages')
         Route::patch('/{page}', [DixlasePagesAdminPagesController::class, 'update'])->name('update');
         Route::delete('/{page}', [DixlasePagesAdminPagesController::class, 'destroy'])->name('destroy');
 
-        // リビジョン（閲覧・差分表示・復元）
+        // Revisions (view, diff, restore)
         Route::get('/{page}/revisions', [DixlasePagesAdminPageRevisionController::class, 'index'])->name('revisions.index');
         Route::get('/{page}/revisions/{id}', [DixlasePagesAdminPageRevisionController::class, 'show'])->whereNumber('id')->name('revisions.show');
         Route::post('/{page}/revisions/{id}/restore', [DixlasePagesAdminPageRevisionController::class, 'restore'])

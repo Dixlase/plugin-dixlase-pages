@@ -31,7 +31,7 @@
  */
 
 return [
-    // ページ管理
+    // Page Management
     'pages' => [
         '_insert_after' => 'front',
         'text' => 'dixlase-pages::admin/navigation.pages.text',

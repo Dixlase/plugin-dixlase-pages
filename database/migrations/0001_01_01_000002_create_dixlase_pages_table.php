@@ -45,28 +45,28 @@ return new class extends Migration
      */
     public function up()
     {
-        // pagesテーブル
+        // pages table
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->string('slug'); // ページのURL（スラッグ）
-            $table->string('lang', 10)->comment('言語コード'); // 言語コード
-            $table->string('title')->nullable(); // タイトル
-            $table->text('content')->nullable(); // コンテンツ（汎用）
-            $table->text('content_markdown')->nullable(); // Markdownエディタ用
-            $table->text('content_html')->nullable(); // HTMLエディタ用
-            $table->text('content_blade')->nullable(); // Bladeエディタ用
-            $table->text('custom_css')->nullable(); // カスタムCSS
-            $table->text('custom_js')->nullable(); // カスタムJavaScript
-            $table->text('meta_description')->nullable(); // メタディスクリプション
-            $table->unsignedBigInteger('ogp_image_id')->nullable(); // OGP画像
-            $table->tinyInteger('storage_type')->default(0); // 保存方法（0=database, 1=file）
-            $table->tinyInteger('editor_type')->default(3); // エディタタイプ（1=gui, 2=markdown, 3=html, 4=blade）
-            $table->tinyInteger('status')->default(0); // ステータス（0=draft, 1=published, 2=scheduled）
-            $table->timestamp('published_at')->nullable(); // 公開日時
+            $table->string('slug'); // Page URL (slug)
+            $table->string('lang', 10)->comment('言語コード'); // Language code
+            $table->string('title')->nullable(); // Title
+            $table->text('content')->nullable(); // Content (general purpose)
+            $table->text('content_markdown')->nullable(); // For Markdown editor
+            $table->text('content_html')->nullable(); // For HTML editor
+            $table->text('content_blade')->nullable(); // For Blade editor
+            $table->text('custom_css')->nullable(); // Custom CSS
+            $table->text('custom_js')->nullable(); // Custom JavaScript
+            $table->text('meta_description')->nullable(); // Meta description
+            $table->unsignedBigInteger('ogp_image_id')->nullable(); // OGP image
+            $table->tinyInteger('storage_type')->default(0); // Storage method (0=database, 1=file)
+            $table->tinyInteger('editor_type')->default(3); // Editor type (1=gui, 2=markdown, 3=html, 4=blade)
+            $table->tinyInteger('status')->default(0); // Status (0=draft, 1=public, 2=scheduled)
+            $table->timestamp('published_at')->nullable(); // Publication date and time
             $table->timestamps();
             $table->softDeletes();
             
-            // ソフトデリート対応のユニーク制約（slug + lang + deleted_at）
+            // Unique constraint for soft delete support (slug + lang + deleted_at)
             $table->unique(['slug', 'lang', 'deleted_at'], 'plg_dixlase_pages_slug_lang_del_unique');
             $table->index('lang');
             $table->index('ogp_image_id');

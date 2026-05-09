@@ -36,11 +36,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * コンテンツカラム統合マイグレーション
+ * Content column consolidation migration
  *
- * content_markdown, content_html, content_blade の3カラムを
- * 単一の content カラムに統合する。
- * editor_type に応じた旧カラムの値を content に移行後、旧カラムを削除する。
+ * Consolidates the three columns content_markdown, content_html, and content_blade
+ * into a single content column.
+ * Migrates values from the old columns to content according to editor_type, then removes the old columns.
  */
 return new class extends Migration
 {
@@ -48,7 +48,7 @@ return new class extends Migration
 
     public function up(): void
     {
-        // 既存データの統合: editor_type に応じた content_* カラムの値を content に移行
+        // Consolidate existing data: migrate content_* column values to content according to editor_type
         DB::table($this->table)->whereNull('deleted_at')->orderBy('id')->chunk(100, function ($pages) {
             foreach ($pages as $page) {
                 $content = match ($page->editor_type) {
@@ -58,7 +58,7 @@ return new class extends Migration
                     default => $page->content,
                 };
 
-                // content_* が null なら元の content をそのまま使う
+                // If content_* is null, use the original content as-is
                 if ($content === null) {
                     $content = $page->content;
                 }
@@ -67,7 +67,7 @@ return new class extends Migration
             }
         });
 
-        // 旧カラムを削除
+        // Remove old columns
         Schema::table($this->table, function (Blueprint $table) {
             $table->dropColumn(['content_markdown', 'content_html', 'content_blade']);
         });

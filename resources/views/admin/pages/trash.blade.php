@@ -29,7 +29,7 @@ GNU General Public License for more details.
 
 @section('content')
 <div class="mx-auto">
-    {{-- ページヘッダー --}}
+    {{-- Page header --}}
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <a href="{{ route('dixlase-pages::admin.pages.index') }}"
            class="inline-flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
@@ -63,7 +63,7 @@ GNU General Public License for more details.
         @endif
     </div>
 
-    {{-- 検索 --}}
+    {{-- Search --}}
     <section class="mb-4">
         <form method="GET" role="search">
             <fieldset>
@@ -82,12 +82,12 @@ GNU General Public License for more details.
         </form>
     </section>
 
-    {{-- 件数表示 --}}
+    {{-- Item count display --}}
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
         {{ __('dixlase-pages::admin/pages/trash.total_count', ['count' => $pages->total()]) }}
     </p>
 
-    {{-- ゴミ箱内ページ一覧 --}}
+    {{-- Page list in trash --}}
     @if($pages->isEmpty())
         <div class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
             <i class="fas fa-trash text-4xl text-gray-400 mb-4"></i>
@@ -134,7 +134,7 @@ GNU General Public License for more details.
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="inline-flex gap-2">
-                                    {{-- 復元 --}}
+                                    {{-- Restore --}}
                                     <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.restore', ['id' => $page->id]) }}" id="restoreForm-{{ $page->id }}">
                                         @csrf
                                     </form>
@@ -158,7 +158,7 @@ GNU General Public License for more details.
                                         :form="'restoreForm-' . $page->id"
                                     />
 
-                                    {{-- 完全削除 --}}
+                                    {{-- Permanent delete --}}
                                     <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.force-destroy', ['id' => $page->id]) }}" id="forceDeleteForm-{{ $page->id }}">
                                         @csrf
                                         @method('DELETE')
@@ -190,7 +190,7 @@ GNU General Public License for more details.
             </table>
         </div>
 
-        {{-- ページネーション --}}
+        {{-- Pagination --}}
         <div class="mt-4">
             {{ $pages->links() }}
         </div>

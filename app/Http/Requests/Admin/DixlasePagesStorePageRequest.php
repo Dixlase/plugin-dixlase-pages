@@ -60,8 +60,8 @@ class DixlasePagesStorePageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // スラッグは任意（空の場合はタイトルから自動生成）
-            // スラッグは言語に関わらず全体でユニーク（URL重複を防ぐ）
+            // Slug is optional (auto-generated from title if empty)
+            // Slug must be unique across all languages (to prevent URL duplication)
             'slug' => [
                 'nullable',
                 'string',
@@ -78,7 +78,7 @@ class DixlasePagesStorePageRequest extends FormRequest
             'custom_css' => ['nullable', 'string'],
             'custom_js' => ['nullable', 'string'],
             'lang' => ['required', 'string', 'max:10'],
-            // SEOメタ（optional依存、SEOプラグインが無効でも検証は通過）
+            // SEO meta (optional dependency, validation passes even if SEO plugin is disabled)
             'seo_meta' => ['nullable', 'array'],
             'seo_meta.description' => ['nullable', 'string', 'max:300'],
             'seo_meta.ogp_media_id' => ['nullable', 'integer', 'exists:media,id'],
@@ -86,7 +86,7 @@ class DixlasePagesStorePageRequest extends FormRequest
     }
 
     /**
-     * バリデーション後の追加チェック
+     * Additional checks after validation
      */
     public function withValidator($validator): void
     {
@@ -98,21 +98,21 @@ class DixlasePagesStorePageRequest extends FormRequest
     }
 
     /**
-     * バリデーション前の処理
+     * Pre-validation processing
      */
     protected function prepareForValidation(): void
     {
-        // 言語が未指定の場合、サイト設定の言語をデフォルトで設定
+        // If language is not specified, set site settings language as default
         if (empty($this->lang)) {
             $this->merge(['lang' => app()->getLocale()]);
         }
 
-        // スラッグが空の場合、タイトルから自動生成
+        // If slug is empty, auto-generate from title
         if (empty($this->slug) && ! empty($this->title)) {
             $this->merge(['slug' => $this->convertToSlug($this->title)]);
         }
 
-        // 公開権限チェック: 権限がないメンバーはステータスを強制的にdraftに
+        // Public permission check: force status to draft for members without permission
         $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
         $member = Auth::guard('member')->user();
         if ($member && $member->role->value < $publishMinRole) {
@@ -122,23 +122,23 @@ class DixlasePagesStorePageRequest extends FormRequest
             ]);
         }
 
-        // 日付指定以外の場合はpublished_atをクリア
+        // Clear published_at if not date-specified
         if ($this->status !== ContentStatus::SCHEDULED->slug()) {
             $this->merge(['published_at' => null]);
         }
 
-        // 公開ステータスの場合は現在時刻を設定
+        // Set current time if status is public
         if ($this->status === ContentStatus::PUBLISHED->slug()) {
             $this->merge(['published_at' => now()]);
         }
     }
 
     /**
-     * 文字列をスラッグに変換
+     * Convert string to slug
      */
     protected function convertToSlug(string $text): string
     {
-        // ローマ字変換マップ
+        // Romaji conversion map
         $romajiMap = [
             'あ' => 'a', 'い' => 'i', 'う' => 'u', 'え' => 'e', 'お' => 'o',
             'か' => 'ka', 'き' => 'ki', 'く' => 'ku', 'け' => 'ke', 'こ' => 'ko',
@@ -176,31 +176,31 @@ class DixlasePagesStorePageRequest extends FormRequest
 
         $result = mb_strtolower($text);
 
-        // ひらがな・カタカナをローマ字に変換
+        // Convert hiragana and katakana to romaji
         foreach ($romajiMap as $kana => $romaji) {
             $result = str_replace($kana, $romaji, $result);
         }
 
-        // 非ASCII文字を削除
+        // Remove non-ASCII characters
         $result = preg_replace('/[^\x00-\x7F]/u', '', $result);
 
-        // 空白、アンダースコアをハイフンに変換
+        // Convert spaces and underscores to hyphens
         $result = preg_replace('/[\s_]+/', '-', $result);
 
-        // 英数字とハイフン以外を削除
+        // Remove anything other than alphanumeric characters and hyphens
         $result = preg_replace('/[^a-z0-9-]/', '', $result);
 
-        // 連続するハイフンを1つに
+        // Collapse consecutive hyphens to one
         $result = preg_replace('/-+/', '-', $result);
 
-        // 先頭と末尾のハイフンを削除
+        // Remove leading and trailing hyphens
         $result = trim($result, '-');
 
         return $result;
     }
 
     /**
-     * カスタムバリデーションメッセージ
+     * Custom validation messages
      */
     public function messages(): array
     {

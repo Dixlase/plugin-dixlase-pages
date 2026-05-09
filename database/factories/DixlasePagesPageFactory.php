@@ -53,7 +53,7 @@ class DixlasePagesPageFactory extends Factory
      */
     public function definition(): array
     {
-        // 基本設定の言語を取得
+        // Get the language from basic settings
         $appLocale = config('app.locale', 'ja');
         $isJapaneseLocale = in_array($appLocale, ['ja', 'ja_JP']);
 
@@ -118,7 +118,7 @@ class DixlasePagesPageFactory extends Factory
     }
 
     /**
-     * 日本語と英語を混同したコンテンツを生成
+     * Generate content with mixed Japanese and English
      */
     private function generateMixedContent(bool $primaryJapanese = true): string
     {
@@ -142,7 +142,7 @@ class DixlasePagesPageFactory extends Factory
         $totalParagraphs = $this->faker->numberBetween(2, 4);
 
         for ($i = 0; $i < $totalParagraphs; $i++) {
-            // プライマリ言語を70%、セカンダリ言語を30%の確率で選択
+            // Select primary language with 70% probability, secondary language with 30% probability
             $useJapanese = $primaryJapanese
                 ? $this->faker->boolean(70)
                 : $this->faker->boolean(30);

@@ -78,7 +78,7 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * フォームデータからプレビュー表示する（保存せずに新しいタブで表示）
+     * Display preview from form data (display in new tab without saving)
      */
     public function preview(Request $request)
     {
@@ -91,12 +91,12 @@ class DixlasePagesAdminPagesController extends Controller
         $page->editor_type = ContentEditorType::tryFromSlug(
             $request->input('editor_type', 'html')
         ) ?? ContentEditorType::HTML;
-        // プレビューでは常にdatabaseとして扱い、POSTされたcontentを直接表示する
+        // In preview, always treat as database and directly display the POSTed content
         $page->storage_type = ContentStorageType::DATABASE;
         $page->status = $request->input('status', 'draft');
         $page->published_at = $request->input('published_at') ?: null;
 
-        // ビュー変数を準備（@phpブロック禁止のため）
+        // Prepare view variables (because @php blocks are prohibited)
         $editorType = $page->editor_type->slug() ?? 'html';
         $content = $page->getContentByEditorType() ?? '';
         $hasCustomCss = ! empty($page->custom_css);
@@ -114,11 +114,11 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * iframe用プレビューフレーム（テーマレイアウトでページを表示）
+     * Preview frame for iframe (display page with theme layout)
      *
-     * 管理画面のページ編集画面内iframeに読み込まれる。
-     * テーマの layouts.preview を使用して実際のテーマレイアウトで表示し、
-     * postMessage でコンテンツをリアルタイム更新する。
+     * Loaded in iframe within the admin panel page edit screen.
+     * Uses the theme's layouts.preview to display with actual theme layout,
+     * and updates content in real-time via postMessage.
      */
     public function previewFrame(DixlasePagesPage $page): \Illuminate\View\View
     {
@@ -140,10 +140,10 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * 新規ページ作成用の空プレビューフレーム
+     * Empty preview frame for new page creation
      *
-     * ページIDが存在しない新規作成画面で使用する。
-     * 空のページ構造をテーマのプレビューレイアウトで表示する。
+     * Used on the new page creation screen where page ID does not exist.
+     * Displays an empty page structure with the theme's preview layout.
      */
     public function previewFrameNew(): \Illuminate\View\View
     {
@@ -162,7 +162,7 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * プレビューフレーム用にテーマ設定を読み込む
+     * Load theme settings for preview frame
      */
     protected function loadThemeSettingsForPreview(): object
     {
@@ -193,10 +193,10 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * サーバーサイドプレビューレンダリング（Blade/GUI エディタ用）
+     * Server-side preview rendering (for Blade/GUI editors)
      *
-     * iframe内のリアルタイムプレビューで、クライアント側でレンダリングできない
-     * エディタタイプ（Blade、GUI）のコンテンツをHTMLに変換して返す。
+     * Converts content from editor types (Blade, GUI) that cannot be rendered client-side
+     * to HTML for real-time preview within iframe.
      */
     public function previewRender(Request $request): JsonResponse
     {
@@ -216,7 +216,7 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $pages = DixlasePagesPage::query();
 
-        // 検索機能（タイトル、コンテンツ、スラッグ、説明文）
+        // Search functionality (title, content, slug, description)
         if ($request->filled('search')) {
             $search = $request->get('search');
             $pages->where(function ($q) use ($search) {
@@ -226,27 +226,27 @@ class DixlasePagesAdminPagesController extends Controller
             });
         }
 
-        // ステータスフィルター
+        // Status filter
         if ($request->filled('status')) {
             $pages->where('status', $request->get('status'));
         }
 
-        // ソート設定を取得
+        // Get sort settings
         $sort = $request->get('sort', 'created_at');
         $order = $request->get('order', 'desc');
 
-        // 有効なソートフィールドのみ許可
+        // Allow only valid sort fields
         $allowedSorts = ['title', 'slug', 'status', 'created_at', 'updated_at', 'published_at'];
         if (! in_array($sort, $allowedSorts)) {
             $sort = 'created_at';
         }
 
-        // 有効なソート順序のみ許可
+        // Allow only valid sort order
         if (! in_array($order, ['asc', 'desc'])) {
             $order = 'desc';
         }
 
-        // ページネーション（件数指定対応）
+        // Pagination (with per-page count support)
         $perPage = $request->get('per_page', 25);
         $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
 
@@ -254,10 +254,10 @@ class DixlasePagesAdminPagesController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        // ページディレクトリ設定をデータベースから取得
+        // Get page directory settings from database
         $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
 
-        // 各ページにURLを追加
+        // Add URL to each page
         $pages->getCollection()->transform(function ($page) use ($pagesDirectory) {
             $page->page_url = config('app.url').'/'.$pagesDirectory.'/'.$page->slug;
 
@@ -272,9 +272,9 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * SEOメタ情報をSEOプラグイン経由で保存する（optional依存）
+     * Save SEO meta information via SEO plugin (optional dependency)
      *
-     * @param  array<string, mixed>  $validated  バリデーション済みフォームデータ
+     * @param  array<string, mixed>  $validated  Validated form data
      */
     private function saveSeoMeta(DixlasePagesPage $page, array $validated): void
     {
@@ -296,28 +296,28 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * フォーム表示に必要なデータを準備する
+     * Prepare data required for form display
      *
-     * @param  DixlasePagesPage  $page  ページモデル
-     * @param  string|null  $fileContents  ファイルから読み込んだコンテンツ
-     * @return array<string, mixed> ビューに渡すフォームデータ
+     * @param  DixlasePagesPage  $page  Page model
+     * @param  string|null  $fileContents  Content loaded from file
+     * @return array<string, mixed> Form data to pass to view
      */
     private function prepareFormData(DixlasePagesPage $page, ?string $fileContents = null, ?string $customCss = null, ?string $customJs = null): array
     {
         // Determine admin mode (Simple=0, Advanced=1)
         $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
-        // コンテンツ取得（新規ページの場合は空、既存ページはファイルまたはDBから）
+        // Get content (empty for new page, from file or DB for existing page)
         $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
 
-        // カスタムCSS/JS
+        // Custom CSS/JS
         $customCss = $customCss ?? ($page->custom_css ?? '');
         $customJs = $customJs ?? ($page->custom_js ?? '');
 
-        // ページディレクトリ設定
+        // Page directory settings
         $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
         $slugBaseUrl = config('app.url').'/'.$pagesDirectory.'/';
 
-        // ストレージ保存方法オプション（form-select用）
+        // Storage save method options (for form-select)
         $storageOptions = [];
         $storageDescriptions = [];
         foreach (ContentStorageType::optionsWithDescription() as $value => $option) {
@@ -325,12 +325,12 @@ class DixlasePagesAdminPagesController extends Controller
             $storageDescriptions[$value] = $option['description'];
         }
 
-        // 公開権限チェック: 現在のメンバーのロールが publish_min_role 以上か
+        // Public permission check: whether the current member's role is equal to or higher than publish_min_role
         $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
         $canPublish = $this->member && $this->member->role->value >= $publishMinRole;
 
-        // ステータスオプション（form-select用）
-        // 公開権限がないメンバーは下書きのみ
+        // Status options (for form-select)
+        // Members without public permission can only use draft
         $statusOptions = [];
         foreach (ContentStatus::optionsWithDescription() as $value => $option) {
             if (! $canPublish && $value !== ContentStatus::DRAFT->slug()) {
@@ -347,10 +347,10 @@ class DixlasePagesAdminPagesController extends Controller
         $currentEditorSlug = $page->exists ? $page->editor_type->slug() : null;
         $isAdvancedEditor = $currentEditorSlug && ! in_array($currentEditorSlug, $simpleEditorSlugs);
 
-        // Simple mode で除外するエディタースラッグ
+        // Editor slugs to exclude in Simple mode
         $excludeSlugs = $isSimpleMode && ! $isAdvancedEditor ? ['html', 'blade'] : ['blade'];
 
-        // エディタータイプのラジオカードオプション（共通コンポーネント用）
+        // Editor type radio card options (for common components)
         $editorManager = app(\App\Services\Editor\EditorManager::class);
         $enabledByPlugin = $editorManager->getAvailableEditorTypes();
         $editorCardOptions = ContentEditorType::radioCardOptions(
@@ -359,19 +359,19 @@ class DixlasePagesAdminPagesController extends Controller
             $enabledByPlugin
         );
 
-        // old()込みのステータス値（Alpine.js初期化用）
+        // Status value including old() (for Alpine.js initialization)
         $statusValue = old('status', $page->status->slug());
         $publishedAtValue = old('published_at', $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '');
 
-        // ファイル保存時の表示用ベースパス
+        // Display base path for file save
         $fileStorageBasePath = 'storage/app/private/'.$this->contentService->getBasePath();
 
-        // プレビューURL（別タブプレビュー）
+        // Preview URL (separate tab preview)
         $previewUrl = Route::has('dixlase-pages::admin.pages.preview')
             ? route('dixlase-pages::admin.pages.preview')
             : '';
 
-        // iframeプレビューフレームURL（編集時は既存ページ、新規作成時は空フレーム）
+        // iframe preview frame URL (existing page when editing, empty frame when creating new)
         if ($page->exists && Route::has('dixlase-pages::admin.pages.preview-frame')) {
             $previewFrameUrl = route('dixlase-pages::admin.pages.preview-frame', $page);
         } elseif (Route::has('dixlase-pages::admin.pages.preview-frame-new')) {
@@ -380,15 +380,15 @@ class DixlasePagesAdminPagesController extends Controller
             $previewFrameUrl = '';
         }
 
-        // サーバーサイドレンダリングURL（Blade/GUIエディタ用）
+        // Server-side rendering URL (for Blade/GUI editor)
         $previewRenderUrl = Route::has('dixlase-pages::admin.pages.preview-render')
             ? route('dixlase-pages::admin.pages.preview-render')
             : '';
 
-        // 言語オプション（翻訳キーからロケールに応じたラベルを取得）
+        // Language options (get labels according to locale from translation keys)
         $languageOptions = __('common.languages');
 
-        // 現在の言語値（既存ページはDBから、新規はアプリ言語）
+        // Current language value (from DB for existing pages, app language for new)
         $langValue = old('lang', $page->lang ?? app()->getLocale());
 
         // GUI editor info from plugin
@@ -396,7 +396,7 @@ class DixlasePagesAdminPagesController extends Controller
         $guiEditorAssetHtml = $guiEditorInfo ? \App\Presenters\Admin\ContentEditorPresenter::editorAssetHtml($guiEditorInfo) : '';
         $hasGuiEditor = $guiEditorInfo !== null;
 
-        // SEOメタ情報（SEOプラグインが有効かつ capability が宣言されている場合のみ）
+        // SEO meta information (only when SEO plugin is enabled and capability is declared)
         $seoMetaEnabled = false;
         $seoMeta = null;
         $seoOgpMedia = null;
@@ -453,7 +453,7 @@ class DixlasePagesAdminPagesController extends Controller
         // Determine admin mode (Simple=0, Advanced=1)
         $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
 
-        // 設定のデフォルト値を適用（int-backed enumにはslugから変換が必要）
+        // Apply default values from settings (int-backed enums need conversion from slug)
         $page->status = DixlasePagesPageSetting::getValue('default_status', 'draft');
 
         if ($isSimpleMode) {
@@ -497,7 +497,7 @@ class DixlasePagesAdminPagesController extends Controller
         $customJs = $validated['custom_js'] ?? '';
         $lang = $validated['lang'] ?? app()->getLocale();
 
-        // ファイル保存の場合はファイルにも保存
+        // For file save, also save to file
         if ($storageTypeSlug === 'file') {
             $this->contentService->saveToFile(
                 $validated['slug'],
@@ -506,7 +506,7 @@ class DixlasePagesAdminPagesController extends Controller
                 $content
             );
 
-            // CSS/JSファイルも保存
+            // Save CSS/JS files as well
             if (! empty($customCss)) {
                 $this->contentService->saveCssToFile($validated['slug'], $lang, $customCss);
             }
@@ -515,11 +515,11 @@ class DixlasePagesAdminPagesController extends Controller
             }
         }
 
-        // スラッグからenumインスタンスに変換（int-backed enumはslugから変換が必要）
+        // Convert from slug to enum instance (int-backed enums need conversion from slug)
         $storageType = ContentStorageType::tryFromSlug($storageTypeSlug) ?? ContentStorageType::DATABASE;
         $editorType = ContentEditorType::tryFromSlug($editorTypeSlug) ?? ContentEditorType::HTML;
 
-        // ページを作成（常にDBにもコンテンツを保存 = バックアップ）
+        // Create page (always save content to DB as well = backup)
         $page = DixlasePagesPage::create([
             'slug' => $validated['slug'],
             'lang' => $lang,
@@ -533,14 +533,14 @@ class DixlasePagesAdminPagesController extends Controller
             'custom_js' => $customJs,
         ]);
 
-        // リビジョン記録（ユーザーの明示保存なので manual）
+        // Record revision (manual because it's an explicit save by user)
         $this->revisionService->record(
             $page->fresh() ?? $page,
             type: RevisionService::TYPE_MANUAL,
             userId: $this->member?->id,
         );
 
-        // SEOメタ保存（SEOプラグイン有効時のみ）
+        // Save SEO meta (only when SEO plugin is enabled)
         $this->saveSeoMeta($page, $validated);
 
         return redirect()
@@ -561,7 +561,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function edit(DixlasePagesPage $page)
     {
-        // ファイル保存の場合、ファイルからコンテンツを読み込む
+        // For file storage, load content from file
         $fileContents = null;
         $customCss = null;
         $customJs = null;
@@ -593,7 +593,7 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $validated = $request->validated();
 
-        // editor_type はモデルの既存値を維持（編集時は変更不可）
+        // editor_type maintains the existing model value (cannot be changed during editing)
         $editorTypeSlug = $page->editor_type->slug();
         $storageTypeSlug = $validated['storage_type'];
         $newStorageType = ContentStorageType::tryFromSlug($storageTypeSlug) ?? ContentStorageType::DATABASE;
@@ -602,10 +602,10 @@ class DixlasePagesAdminPagesController extends Controller
         $oldStorageType = $page->storage_type;
         $locale = app()->getLocale();
 
-        // スラッグが変更された場合、ファイルをリネーム
+        // If slug is changed, rename the file
         if ($oldStorageType === ContentStorageType::FILE && $oldSlug !== $validated['slug']) {
             $this->contentService->renameFile($oldSlug, $validated['slug'], $editorTypeSlug, $locale);
-            // CSS/JSファイルもリネーム
+            // Rename CSS/JS files as well
             $this->contentService->renameAssetFiles($oldSlug, $validated['slug'], $locale);
         }
 
@@ -613,17 +613,17 @@ class DixlasePagesAdminPagesController extends Controller
         $customCss = $validated['custom_css'] ?? '';
         $customJs = $validated['custom_js'] ?? '';
 
-        // 保存方法が変更された場合の処理
+        // Handle storage method changes
         if ($oldStorageType !== $newStorageType) {
             if ($oldStorageType === ContentStorageType::FILE && $newStorageType === ContentStorageType::DATABASE) {
-                // ファイル→DB: ファイルを削除（DBには常にバックアップがあるため読み込み不要）
+                // File→DB: Delete file (no need to load since DB always has backup)
                 $this->contentService->deleteFile($validated['slug'], $locale, $editorTypeSlug);
                 $this->contentService->deleteCssFile($validated['slug'], $locale);
                 $this->contentService->deleteJsFile($validated['slug'], $locale);
             }
         }
 
-        // ファイル保存の場合はファイルにも保存
+        // For file save, also save to file
         if ($newStorageType === ContentStorageType::FILE) {
             $this->contentService->saveToFile(
                 $validated['slug'],
@@ -632,7 +632,7 @@ class DixlasePagesAdminPagesController extends Controller
                 $content
             );
 
-            // CSS/JSファイルも保存
+            // Save CSS/JS files as well
             if (! empty($customCss)) {
                 $this->contentService->saveCssToFile($validated['slug'], $locale, $customCss);
             } else {
@@ -645,7 +645,7 @@ class DixlasePagesAdminPagesController extends Controller
             }
         }
 
-        // ページを更新（常にDBにもコンテンツを保存 = バックアップ）
+        // Update page (always save content to DB as backup)
         $page->update([
             'slug' => $validated['slug'],
             'lang' => $validated['lang'] ?? app()->getLocale(),
@@ -658,15 +658,15 @@ class DixlasePagesAdminPagesController extends Controller
             'custom_js' => $customJs,
         ]);
 
-        // リビジョン記録（ユーザーの明示保存なので manual）
-        // 直前リビジョンと差分がない場合はスキップされる
+        // Record revision (manual because it's an explicit save by user)
+        // Skipped if there are no changes from the previous revision
         $this->revisionService->record(
             $page->fresh() ?? $page,
             type: RevisionService::TYPE_MANUAL,
             userId: $this->member?->id,
         );
 
-        // SEOメタ保存（SEOプラグイン有効時のみ）
+        // Save SEO meta (only when SEO plugin is enabled)
         $this->saveSeoMeta($page, $validated);
 
         return redirect()
@@ -679,7 +679,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function destroy(DixlasePagesPage $page)
     {
-        // ソフトデリートでゴミ箱に移動（ファイル・SEOメタ情報は forceDelete 時に削除）
+        // Soft delete to move to trash (files and SEO meta are deleted on forceDelete)
         $page->delete();
 
         return redirect()
@@ -688,7 +688,7 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * ゴミ箱（ソフトデリート済みページ）一覧を表示
+     * Display trash (soft-deleted pages) list
      */
     public function trash(Request $request)
     {
@@ -727,13 +727,13 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * ゴミ箱からページを復元する
+     * Restore a page from trash
      */
     public function restore(int $id)
     {
         $page = DixlasePagesPage::onlyTrashed()->findOrFail($id);
 
-        // スラッグ衝突チェック（削除中に同じスラッグで新規作成された可能性）
+        // Check for slug collision (possibility that a new page with the same slug was created while deleted)
         $exists = DixlasePagesPage::where('slug', $page->slug)
             ->whereNull('deleted_at')
             ->exists();
@@ -752,7 +752,7 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * ゴミ箱内のページを完全削除する（取り消し不可）
+     * Permanently delete a page in trash (cannot be undone)
      */
     public function forceDestroy(int $id)
     {
@@ -765,7 +765,7 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * ゴミ箱を空にする（全ページを完全削除）
+     * Empty trash (permanently delete all pages)
      */
     public function emptyTrash()
     {
@@ -788,10 +788,10 @@ class DixlasePagesAdminPagesController extends Controller
         // Determine admin mode (Simple=0, Advanced=1)
         $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
 
-        // 設定データを取得
+        // Get settings data
         $settings = DixlasePagesPageSetting::pluck('value', 'name')->toArray();
 
-        // デフォルトステータスのラジオカードオプション
+        // Radio card options for default status
         $statusIcons = [
             'draft' => 'fas fa-pencil-alt',
             'published' => 'fas fa-eye',
@@ -809,7 +809,7 @@ class DixlasePagesAdminPagesController extends Controller
             ];
         }
 
-        // エディタータイプのラジオカードオプション（Bladeは現在無効）
+        // Radio card options for editor type (Blade is currently disabled)
         $editorIcons = [
             'gui' => 'fas fa-magic',
             'markdown' => 'fab fa-markdown',
@@ -825,7 +825,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         $editorTypeCardOptions = [];
         foreach (ContentEditorType::cases() as $type) {
-            // Bladeエディタは現バージョンでは無効
+            // Blade editor is disabled in the current version
             if ($type === ContentEditorType::BLADE) {
                 continue;
             }
@@ -843,7 +843,7 @@ class DixlasePagesAdminPagesController extends Controller
             ];
         }
 
-        // ストレージタイプのラジオカードオプション
+        // Radio card options for storage type
         $storageIcons = [
             'database' => 'fas fa-database',
             'file' => 'fas fa-file-code',
@@ -864,11 +864,11 @@ class DixlasePagesAdminPagesController extends Controller
             ];
         }
 
-        // ページディレクトリのURL表示用ベースURL
+        // Base URL for displaying page directory URLs
         $siteUrl = config('app.url');
 
-        // 公開権限のロールスライダー用データ
-        // 編集権限以上のロールのみ選択可能（ゲスト/受付/寄稿者は除外）
+        // Data for public permission role slider
+        // Only roles with editor permission or higher can be selected (guest/receptionist/contributor excluded)
         $publishRoleOptions = [];
         foreach (MemberRole::cases() as $role) {
             if ($role === MemberRole::GUEST || $role === MemberRole::SUPER_ADMIN) {
@@ -889,7 +889,7 @@ class DixlasePagesAdminPagesController extends Controller
         $publishValueToIndex = array_flip($publishRoleValues);
         $publishMaxIndex = count($publishRoleValues) - 1;
 
-        // 現在の publish_min_role 設定値
+        // Current publish_min_role settings value
         $currentPublishMinRole = (int) ($settings['publish_min_role'] ?? MemberRole::EDITOR->value);
         $publishRoleIndex = $publishValueToIndex[$currentPublishMinRole] ?? 0;
 
@@ -914,7 +914,7 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $validated = $request->validated();
 
-        // 設定をデータベースに保存
+        // Save settings to database
         DixlasePagesPageSetting::setMany($validated);
 
         return redirect()
@@ -927,7 +927,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function getFileContent(DixlasePagesPage $page, string $editorType)
     {
-        // ファイル保存でない場合は空を返す
+        // Return empty if not file storage
         if ($page->storage_type !== ContentStorageType::FILE) {
             return response()->json(['content' => '']);
         }
@@ -950,14 +950,14 @@ class DixlasePagesAdminPagesController extends Controller
         $content = '';
 
         if ($storageType === 'file') {
-            // ファイルからコンテンツを読み込む
+            // Load content from file
             $content = $this->contentService->loadFromFile(
                 $page->slug,
                 app()->getLocale(),
                 $editorType
             ) ?? '';
         } else {
-            // DBから content カラムを読み込む
+            // Load content column from DB
             $content = $page->content ?? '';
         }
 

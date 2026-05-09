@@ -78,7 +78,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 ])
 
 {{--
-レイアウト:
+Layout:
 +----------------------------------+---+----------------+
 | Main Content                     |[>]| Right Sidebar  |
 |  Title                           |   | Slug           |
@@ -109,12 +109,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         hasGuiEditor: {{ $hasGuiEditor ? 'true' : 'false' }}
      })">
 
-        {{-- ===== メインコンテンツエリア ===== --}}
+        {{-- ===== Main Content Area ===== --}}
 
-        {{-- 1. エディタータイプ選択 --}}
+        {{-- 1. Editor Type Selection --}}
         <div class="mb-6">
             @if ($isEditMode)
-                {{-- 編集時: プレビュートグルのみ表示（エディタータイプ・言語・保存形式は右カラムのメタ情報に表示） --}}
+                {{-- Edit mode: Show preview toggle only (editor type, language, storage format are shown in right column meta info) --}}
                 <input type="hidden" name="editor_type" value="{{ $editorType }}">
                 @if($previewFrameUrl)
                     <div class="flex flex-wrap items-center gap-3 text-xs">
@@ -130,7 +130,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     </div>
                 @endif
             @else
-                {{-- 作成時: エディタータイプ ラジオカード選択 --}}
+                {{-- Create mode: Editor type radio card selection --}}
                 @include('components::form-label', [
                     'for' => 'editor_type',
                     'text' => __('common.content_editor.label'),
@@ -149,7 +149,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-error', ['name' => 'editor_type'])
             @endif
 
-            {{-- プレビュートグルボタン（作成時） --}}
+            {{-- Preview toggle button (create mode) --}}
             @if($previewFrameUrl && !$isEditMode)
                 <div class="mt-3">
                     <button type="button" @click="togglePreview()"
@@ -165,7 +165,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             @endif
         </div>
 
-        {{-- 3. コンテンツエディタ（スプリットペイン） --}}
+        {{-- 3. Content Editor (split pane) --}}
         <div x-ref="splitContainer"
              class="flex gap-4 overflow-hidden"
              :class="[
@@ -173,7 +173,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                  (isDragging || isResizingPreview) ? 'select-none' : ''
              ]">
 
-            {{-- エディタペイン --}}
+            {{-- Editor pane --}}
             <div x-ref="editorPane"
                  class="w-full min-w-0"
                  :class="isHorizontal && previewVisible ? 'overflow-y-auto' : ''"
@@ -185,7 +185,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         'text' => __('common.content'),
                     ])
 
-                    {{-- GUI エディタ --}}
+                    {{-- GUI editor --}}
                     <div x-show="editorType === 'gui'" x-cloak>
                         @if($guiEditorInfo)
                             @include($guiEditorInfo->viewName, [
@@ -203,10 +203,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         @endif
                     </div>
 
-                    {{-- テキストエディタ（HTML / Markdown 共通） --}}
+                    {{-- Text editor (common for HTML / Markdown) --}}
                     <div x-show="editorType !== 'gui'" x-cloak>
                         @if(!$isSimpleMode)
-                            {{-- タブナビゲーション（HTMLエディタ時のみ） --}}
+                            {{-- Tab navigation (HTML editor only) --}}
                             <nav x-show="editorType === 'html'" class="flex border-b border-gray-200 dark:border-gray-600 mb-4" role="tablist">
                                 <button type="button"
                                         @click="activeTab = 'content'"
@@ -254,7 +254,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         </div>
 
                         @if(!$isSimpleMode)
-                            {{-- CSS タブ（HTMLエディタ時のみ） --}}
+                            {{-- CSS tab (HTML editor only) --}}
                             <div x-show="activeTab === 'css' && editorType === 'html'" x-cloak role="tabpanel">
                                 <x-form-textarea
                                     id="custom_css"
@@ -268,7 +268,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                                 />
                             </div>
 
-                            {{-- JS タブ（HTMLエディタ時のみ） --}}
+                            {{-- JS tab (HTML editor only) --}}
                             <div x-show="activeTab === 'js' && editorType === 'html'" x-cloak role="tabpanel">
                                 <x-form-textarea
                                     id="custom_js"
@@ -288,18 +288,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             </div>
 
-            {{-- プレビューペイン（編集時のみ） --}}
+            {{-- Preview pane (edit mode only) --}}
             @if($previewFrameUrl)
                 @include('components.content-editor.preview-pane')
             @endif
         </div>
 
-        {{-- スクロールボタン（編集時のみ） --}}
+        {{-- Scroll button (edit mode only) --}}
         @if($previewFrameUrl)
             @include('components.content-editor.scroll-buttons')
         @endif
 
-        {{-- ===== 右サイドバー ===== --}}
+        {{-- ===== Right Sidebar ===== --}}
         <x-admin.right-sidebar
             :openLabel="__('dixlase-pages::components/page-content-editor.sidebar_open')"
             :closeLabel="__('dixlase-pages::components/page-content-editor.sidebar_close')"
@@ -316,10 +316,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 <x-ui-message type="warning" :message="__('dixlase-pages::components/page-content-editor.advanced_editor_notice')" textSize="text-xs" />
             @endif
 
-            {{-- 別タブプレビュー --}}
+            {{-- Preview in new tab --}}
             <x-content-editor.new-tab-preview :url="$previewUrl" />
 
-            {{-- メタ情報（編集時：プレビューの直下、タイトルの上に配置） --}}
+            {{-- Meta info (edit mode: placed directly below preview, above title) --}}
             @if($isEditMode)
                 @php
                     $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
@@ -346,11 +346,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
                     </p>
 
-                    {{-- 編集時はメタ情報を hidden input で送信 --}}
+                    {{-- In edit mode, send meta info via hidden input --}}
                     <input type="hidden" name="storage_type" value="{{ $storageType }}">
                     <input type="hidden" name="lang" value="{{ $langValue }}">
 
-                    {{-- ファイル保存時の情報表示 --}}
+                    {{-- Display info for file storage --}}
                     @if($storageType === 'file')
                         <div class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                             <div class="flex items-start">
@@ -370,7 +370,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- タイトル --}}
+            {{-- Title --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {{ __('dixlase-pages::components/page-content-editor.title') }}<x-form-required-badge />
@@ -387,7 +387,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 @include('components::form-error', ['name' => 'title'])
             </div>
 
-            {{-- 4. スラッグ --}}
+            {{-- 4. Slug --}}
             @if($isSimpleMode && !$isEditMode)
                 {{-- Simple mode (new page): slug auto-generated from title --}}
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
@@ -411,7 +411,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         {{ __('dixlase-pages::components/page-content-editor.slug_help') }}
                     </p>
-                    {{-- URLプレビュー --}}
+                    {{-- URL Preview --}}
                     <div class="mt-2 text-sm" x-show="slug" x-cloak>
                         <span class="text-gray-500 dark:text-gray-400">{{ __('dixlase-pages::components/page-content-editor.slug_url_preview') }}:</span>
                         @if ($isEditMode)
@@ -426,8 +426,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- 4.5 SEOメタ設定（SEOプラグイン有効 かつ seo-meta capability 宣言時のみ表示） --}}
-            {{-- <x-dynamic-component> は実行時にコンポーネントを解決するため、SEOプラグインが無効でも安全 --}}
+            {{-- 4.5 SEO Meta settings (shown only when SEO plugin is enabled and seo-meta capability is declared) --}}
+            {{-- <x-dynamic-component> resolves components at runtime, so it's safe even when the SEO plugin is disabled --}}
             @if($seoMetaEnabled)
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                     <x-dynamic-component
@@ -439,12 +439,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- 5. 保存方法（作成時のみ：編集時はプレビュー直下のメタ情報セクションに統合済み） --}}
+            {{-- 5. Save Method (creation only: when editing, integrated into the meta info section below preview) --}}
             @if($isSimpleMode)
-                {{-- Simple mode: 保存形式を hidden input で固定 --}}
+                {{-- Simple mode: save format is fixed via hidden input --}}
                 <input type="hidden" name="storage_type" value="database">
             @elseif(! $isEditMode)
-                {{-- 作成時: 保存形式を選択可能 --}}
+                {{-- On creation: save format is selectable --}}
                 <div>
                     @include('components::form-label', [
                         'for' => 'storage_type',
@@ -463,7 +463,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         @endforeach
                     </ul>
 
-                    {{-- ファイル保存時の情報表示 --}}
+                    {{-- Display info for file storage --}}
                     <div x-show="isFileStorage" x-cloak class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <div class="flex items-start">
                             <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
@@ -482,7 +482,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- 6.5. 言語選択（作成時のみ：編集時はメタ情報に統合） --}}
+            {{-- 6.5. Language Selection (creation only: when editing, integrated into meta info) --}}
             @if(!$isEditMode)
                 <div>
                     @include('components::form-label', [
@@ -503,7 +503,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- リビジョン履歴（編集時のみ） --}}
+            {{-- Revision History (edit only) --}}
             @if($isEditMode && $pageId)
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -523,13 +523,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 </div>
             @endif
 
-            {{-- 7. 公開設定 --}}
+            {{-- 7. Public settings --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                     {{ __('dixlase-pages::components/page-content-editor.publish_section') }}
                 </h3>
 
-                {{-- ステータス --}}
+                {{-- Status --}}
                 <div class="mb-4">
                     @include('components::form-label', [
                         'for' => 'status',
@@ -545,7 +545,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     @include('components::form-error', ['name' => 'status'])
                 </div>
 
-                {{-- 公開日時（予約公開の場合のみ表示） --}}
+                {{-- Publication date/time (shown only for scheduled public) --}}
                 <div x-show="status === 'scheduled'" x-cloak x-transition>
                     @include('components::form-label', [
                         'for' => 'published_at',
