@@ -52,6 +52,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     :customJs="$customJs"
     :languageOptions="$languageOptions"
     :langValue="$langValue"
+    :multilingualEnabled="$multilingualEnabled"
     :isSimpleMode="$isSimpleMode"
     :isAdvancedEditor="$isAdvancedEditor"
     :canPublish="$canPublish"
