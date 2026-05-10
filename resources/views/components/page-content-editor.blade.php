@@ -64,6 +64,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     // 言語オプション
     'languageOptions' => [],
     'langValue' => '',
+    // Whether the multilingual plugin is active; toggles language UI visibility.
+    'multilingualEnabled' => false,
     // 簡単モード
     'isSimpleMode' => false,
     'isAdvancedEditor' => false,
@@ -333,10 +335,12 @@ Layout:
                             <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
                             {{ $currentCard['label'] ?? $editorType }}
                         </span>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                            <i class="fas fa-globe"></i>
-                            {{ $languageOptions[$langValue] ?? $langValue }}
-                        </span>
+                        @if($multilingualEnabled)
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                                <i class="fas fa-globe"></i>
+                                {{ $languageOptions[$langValue] ?? $langValue }}
+                            </span>
+                        @endif
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
                             <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-gray-500 dark:text-gray-400"></i>
                             {{ $storageOptions[$storageType] ?? $storageType }}
@@ -483,7 +487,10 @@ Layout:
             @endif
 
             {{-- 6.5. Language Selection (creation only: when editing, integrated into meta info) --}}
-            @if(!$isEditMode)
+            {{-- Hidden when the multilingual plugin is inactive: the site only --}}
+            {{-- has one language so the picker would be misleading. The store --}}
+            {{-- request fills `lang` from the site default in that case. --}}
+            @if(!$isEditMode && $multilingualEnabled)
                 <div>
                     @include('components::form-label', [
                         'for' => 'lang',

@@ -385,11 +385,20 @@ class DixlasePagesAdminPagesController extends Controller
             ? route('dixlase-pages::admin.pages.preview-render')
             : '';
 
+        // Whether the multilingual plugin's locale URL routing is on. Drives
+        // the language picker visibility on the create/edit form. We check
+        // the same config flag the multilingual plugin itself gates its
+        // runtime locale wiring on; the resolver binding alone is not a
+        // reliable signal because the multilingual plugin always registers
+        // it (even when the operator has the master toggle off).
+        $multilingualEnabled = (bool) config('dixlase_multilingual.locale_url_routing_enabled', false);
+
         // Language options (get labels according to locale from translation keys)
         $languageOptions = __('common.languages');
 
-        // Current language value (from DB for existing pages, app language for new)
-        $langValue = old('lang', $page->lang ?? app()->getLocale());
+        // Current language value (from DB for existing pages, site default for new)
+        $siteDefaultLocale = SiteSetting::getValue('locale', app()->getLocale());
+        $langValue = old('lang', $page->lang ?? $siteDefaultLocale);
 
         // GUI editor info from plugin
         $guiEditorInfo = \App\Presenters\Admin\ContentEditorPresenter::guiEditorInfo();
@@ -431,6 +440,7 @@ class DixlasePagesAdminPagesController extends Controller
             'previewRenderUrl',
             'languageOptions',
             'langValue',
+            'multilingualEnabled',
             'isSimpleMode',
             'isAdvancedEditor',
             'canPublish',
