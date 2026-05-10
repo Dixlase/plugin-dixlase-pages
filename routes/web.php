@@ -51,7 +51,11 @@ Route::middleware(['front.ip'])->group(
             ->withoutMiddleware([\App\Http\Middleware\ContentSecurityPolicy::class]);
 
         // Page display routes
-        Route::get($pagesDirectory.'/{slug}', function ($slug) {
+        // Use Request->route('slug') instead of a positional closure parameter:
+        // when this route is mirrored under the {locale} prefix, Laravel binds
+        // the closure's first scalar argument to the {locale} value, not {slug}.
+        Route::get($pagesDirectory.'/{slug}', function (\Illuminate\Http\Request $request) {
+            $slug = (string) ($request->route('slug') ?? '');
             $locale = app()->getLocale();
 
             // Show all pages if logged in to admin panel (preview feature)
