@@ -37,6 +37,7 @@ use App\DTO\RouteSlug\RegisteredSlug;
 use App\Traits\PluginLoaderTrait;
 use Illuminate\Support\ServiceProvider;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
+use Plugins\DixlasePages\App\Services\DixlasePagesLocalizedUrlProvider;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageLinkableProvider;
 
 class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugProvider
@@ -50,6 +51,13 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
 
         // Tag it so it can be retrieved from the menu plugin
         $this->app->tag([DixlasePagesPageLinkableProvider::class], 'linkable.providers');
+
+        // Phase D: tag the LocalizedUrlProvider implementation so the
+        // multilingual plugin's LocalizedUrlAggregator can collect it
+        // when emitting alternate-language URLs (hreflang, sitemap, etc.).
+        // Optional dependency: nothing breaks if multilingual is absent.
+        $this->app->singleton(DixlasePagesLocalizedUrlProvider::class);
+        $this->app->tag([DixlasePagesLocalizedUrlProvider::class], 'localized-url.providers');
     }
 
     public function boot()
