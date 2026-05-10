@@ -30,7 +30,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @extends('themes::layouts.app')
 
-@section('title', $page->title)
+@section('title', $page->getTranslation('title'))
 
 @if(!empty($hasCustomCss))
     @push('styles')
@@ -71,7 +71,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 <!-- Page header -->
                 <header class="px-8 sm:px-10 lg:px-12 pt-10 pb-14 border-b border-gray-200 dark:border-gray-700">
                     <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
-                        {{ $page->title }}
+                        {{ $page->getTranslation('title') }}
                     </h1>
                 </header>
 
