@@ -69,11 +69,13 @@ class DixlasePagesPageContentService
 
     /**
      * Retrieve file path (flat structure)
-     * Structure: {basePath}/{slug}.{extension} or {basePath}/{slug}.{locale}.{extension}
-     * Default language does not append language code to filename
+     * Structure: {basePath}/{slug}.{extension}
+     *
+     * Each page row already carries its own `lang`, so the filename does not
+     * embed the locale.
      *
      * @param  string  $slug  Slug
-     * @param  string  $locale  Language code
+     * @param  string  $locale  Language code (kept for trait compatibility, unused)
      * @param  string  $editorType  Editor type
      * @return string File path
      */
@@ -81,12 +83,7 @@ class DixlasePagesPageContentService
     {
         $extension = $this->extensions[$editorType] ?? 'txt';
 
-        // Default language does not append language code to filename
-        if ($locale === $this->defaultLocale) {
-            return "{$this->basePath}/{$slug}.{$extension}";
-        }
-
-        return "{$this->basePath}/{$slug}.{$locale}.{$extension}";
+        return "{$this->basePath}/{$slug}.{$extension}";
     }
 
     /**
@@ -140,32 +137,24 @@ class DixlasePagesPageContentService
      * Retrieve JS file path
      *
      * @param  string  $slug  Slug
-     * @param  string  $locale  Language code
+     * @param  string  $locale  Language code (kept for signature compatibility, unused)
      * @return string File path
      */
     public function getJsFilePath(string $slug, string $locale): string
     {
-        if ($locale === $this->defaultLocale) {
-            return "{$this->basePath}/{$slug}.js";
-        }
-
-        return "{$this->basePath}/{$slug}.{$locale}.js";
+        return "{$this->basePath}/{$slug}.js";
     }
 
     /**
      * Retrieve CSS file path
      *
      * @param  string  $slug  Slug
-     * @param  string  $locale  Language code
+     * @param  string  $locale  Language code (kept for signature compatibility, unused)
      * @return string File path
      */
     public function getCssFilePath(string $slug, string $locale): string
     {
-        if ($locale === $this->defaultLocale) {
-            return "{$this->basePath}/{$slug}.css";
-        }
-
-        return "{$this->basePath}/{$slug}.{$locale}.css";
+        return "{$this->basePath}/{$slug}.css";
     }
 
     /**
