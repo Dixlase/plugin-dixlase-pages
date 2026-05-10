@@ -33,6 +33,7 @@
 namespace Plugins\DixlasePages\App\Http\Controllers\Front;
 
 use App\Enums\ContentEditorType;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
@@ -52,9 +53,9 @@ class DixlasePagesCustomAssetController extends Controller
     /**
      * Serve custom JavaScript as an external file
      */
-    public function script(string $slug): Response
+    public function script(Request $request): Response
     {
-        $content = $this->resolveContent($slug, 'js');
+        $content = $this->resolveContent($this->resolveSlug($request), 'js');
 
         if ($content === null) {
             abort(404);
@@ -66,15 +67,25 @@ class DixlasePagesCustomAssetController extends Controller
     /**
      * Serve custom CSS as an external file
      */
-    public function style(string $slug): Response
+    public function style(Request $request): Response
     {
-        $content = $this->resolveContent($slug, 'css');
+        $content = $this->resolveContent($this->resolveSlug($request), 'css');
 
         if ($content === null) {
             abort(404);
         }
 
         return $this->buildResponse($content, 'text/css');
+    }
+
+    /**
+     * Read the slug from the route by name. Necessary because Laravel binds
+     * scalar controller parameters by position, and the locale-prefixed
+     * mirror route adds a {locale} parameter ahead of {slug}.
+     */
+    private function resolveSlug(Request $request): string
+    {
+        return (string) ($request->route('slug') ?? '');
     }
 
     /**
