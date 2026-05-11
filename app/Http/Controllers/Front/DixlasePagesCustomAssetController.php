@@ -37,6 +37,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
 
@@ -89,16 +90,26 @@ class DixlasePagesCustomAssetController extends Controller
     }
 
     /**
-     * Resolve JS or CSS content from the page
+     * Resolve JS or CSS content from the page.
+     *
+     * Mirrors the page-display route's visibility rules: admins (logged-in
+     * members) can fetch assets for draft pages so the admin preview iframe
+     * paints styled. Anonymous visitors only see published / past-scheduled
+     * pages. Without the admin branch the page HTML loads (the page route
+     * has its own admin bypass) but the asset routes return 404, leaving
+     * the preview unstyled.
      */
     private function resolveContent(string $slug, string $type): ?string
     {
         $locale = App::getLocale();
 
-        $page = DixlasePagesPage::where('slug', $slug)
-            ->forLang($locale)
-            ->published()
-            ->first();
+        $query = DixlasePagesPage::where('slug', $slug)->forLang($locale);
+
+        if (! Auth::guard('member')->check()) {
+            $query->published();
+        }
+
+        $page = $query->first();
 
         if (! $page) {
             return null;
