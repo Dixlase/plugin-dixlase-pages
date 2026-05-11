@@ -51,12 +51,16 @@ return new class extends Migration
             $table->string('slug'); // Page URL (slug)
             $table->string('lang', 10)->comment('言語コード'); // Language code
             $table->string('title')->nullable(); // Title
-            $table->text('content')->nullable(); // Content (general purpose)
-            $table->text('content_markdown')->nullable(); // For Markdown editor
-            $table->text('content_html')->nullable(); // For HTML editor
-            $table->text('content_blade')->nullable(); // For Blade editor
-            $table->text('custom_css')->nullable(); // Custom CSS
-            $table->text('custom_js')->nullable(); // Custom JavaScript
+            // longText (4 GiB) instead of text (64 KiB): rendered HTML, Blade
+            // sources, and asset bundles routinely exceed 64 KiB, and a TEXT
+            // column would surface the truncation as a 1366 "Incorrect string
+            // value" rather than a clean size error.
+            $table->longText('content')->nullable(); // Content (general purpose)
+            $table->longText('content_markdown')->nullable(); // For Markdown editor
+            $table->longText('content_html')->nullable(); // For HTML editor
+            $table->longText('content_blade')->nullable(); // For Blade editor
+            $table->longText('custom_css')->nullable(); // Custom CSS
+            $table->longText('custom_js')->nullable(); // Custom JavaScript
             $table->text('meta_description')->nullable(); // Meta description
             $table->unsignedBigInteger('ogp_image_id')->nullable(); // OGP image
             $table->tinyInteger('storage_type')->default(0); // Storage method (0=database, 1=file)
