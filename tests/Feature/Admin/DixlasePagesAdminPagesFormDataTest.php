@@ -35,6 +35,7 @@ namespace Plugins\DixlasePages\Tests\Feature\Admin;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Models\SiteSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Plugins\DixlasePages\App\Http\Controllers\Admin\DixlasePagesAdminPagesController;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
@@ -205,7 +206,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     public function test_editor_card_options_contain_all_required_types(): void
     {
         // Set to advanced mode so all editors are available
-        \App\Models\BaseSetting::setValue('admin_mode', 1);
+        SiteSetting::setValue('admin_mode', 1);
 
         $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
@@ -230,7 +231,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     public function test_editor_card_options_in_simple_mode_contain_only_gui_and_markdown(): void
     {
         // Set to simple mode
-        \App\Models\BaseSetting::setValue('admin_mode', 0);
+        SiteSetting::setValue('admin_mode', 0);
 
         $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
@@ -247,7 +248,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     public function test_editor_card_options_have_icons_and_descriptions(): void
     {
         // Set to advanced mode so all editors are available
-        \App\Models\BaseSetting::setValue('admin_mode', 1);
+        SiteSetting::setValue('admin_mode', 1);
 
         $page = new DixlasePagesPage();
         $result = $this->prepareFormData->invoke($this->controller, $page);
@@ -264,7 +265,7 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     public function test_simple_mode_allows_editing_existing_html_page(): void
     {
         // Set to simple mode
-        \App\Models\BaseSetting::setValue('admin_mode', 0);
+        SiteSetting::setValue('admin_mode', 0);
 
         $page = DixlasePagesPage::factory()->create([
             'editor_type' => ContentEditorType::HTML,
