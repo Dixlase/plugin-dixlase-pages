@@ -63,4 +63,4 @@ Dixlase Pages の将来の運営体制は、Dixlase プロジェクト全体の�
 
 ---
 
-**お問い合わせ:** office@exc-d.com
+**お問い合わせ:** info@dixlase.org

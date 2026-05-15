@@ -63,4 +63,4 @@ Future governance of Dixlase Pages is tied to the future governance of the Dixla
 
 ---
 
-**Contact:** office@exc-d.com
+**Contact:** info@dixlase.org
