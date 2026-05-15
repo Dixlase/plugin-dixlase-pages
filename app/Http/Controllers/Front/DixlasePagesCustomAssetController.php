@@ -103,13 +103,25 @@ class DixlasePagesCustomAssetController extends Controller
     {
         $locale = App::getLocale();
 
-        $query = DixlasePagesPage::where('slug', $slug)->forLang($locale);
+        // Mirror the page-display route's lookup so a page that exists only
+        // under the site's primary locale (with multilingual translations
+        // overlaying its content for other locales) still serves its
+        // CSS/JS at /{locale}/<slug>/custom-{style,script}. Without the
+        // primary-locale fallback the page HTML renders but its assets 404.
+        $baseQuery = DixlasePagesPage::where('slug', $slug);
 
         if (! Auth::guard('member')->check()) {
-            $query->published();
+            $baseQuery->published();
         }
 
-        $page = $query->first();
+        $page = (clone $baseQuery)->forLang($locale)->first();
+
+        if ($page === null) {
+            $primaryLocale = \App\Helpers\LocaleHelper::getSiteDefaultLocale();
+            if ($primaryLocale !== $locale && $primaryLocale !== '') {
+                $page = (clone $baseQuery)->forLang($primaryLocale)->first();
+            }
+        }
 
         if (! $page) {
             return null;
