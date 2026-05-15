@@ -88,6 +88,9 @@
         "contracts": [
             "RouteSlugProvider"
         ],
+        "tailwind_content": [
+            "storage/app/private/dixlase-pages"
+        ],
         "migrations": true,
         "commands": false,
         "middleware": false
