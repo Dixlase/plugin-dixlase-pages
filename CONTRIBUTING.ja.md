@@ -34,7 +34,7 @@ Dixlase プロジェクトが v0.1.x の期間中、CLA はメールで提出し
 
 1. [個人 CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.ja.md) (該当する場合は [法人 CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.ja.md) も) を全文お読みください
 2. コントリビューター情報欄に記入し、末尾に署名してください
-3. 件名 `CLA 提出 — <氏名または組織名>` で **office@exc-d.com** に提出ファイルを添付してメール送信してください。コントリビューションを予定しているプラグインも明記してください
+3. 件名 `CLA 提出 — <氏名または組織名>` で **info@dixlase.org** に提出ファイルを添付してメール送信してください。コントリビューションを予定しているプラグインも明記してください
 
 1 通の CLA で Core および公式プラグイン全体のコントリビューションをカバーします。リポジトリごとに別個の CLA に署名する必要はありません。
 
@@ -61,4 +61,4 @@ Dixlase Pages および Dixlase プロジェクト全体へのコントリビュ
 
 ---
 
-**お問い合わせ:** office@exc-d.com
+**お問い合わせ:** info@dixlase.org

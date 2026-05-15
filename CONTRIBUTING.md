@@ -34,7 +34,7 @@ While the Dixlase Project is in v0.1.x, CLA submission is handled by email:
 
 1. Read the canonical [Individual CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.md) (and [Corporate CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.md) if applicable) in full
 2. Fill in the contributor information fields and sign at the bottom
-3. Email the completed file to **office@exc-d.com** with the subject `CLA submission — <your name or organization>` and mention which plugin(s) you intend to contribute to
+3. Email the completed file to **info@dixlase.org** with the subject `CLA submission — <your name or organization>` and mention which plugin(s) you intend to contribute to
 
 A single CLA covers contributions to the entire Dixlase Project — Core and all official plugins. You do not need to sign separate CLAs per repository.
 
@@ -61,4 +61,4 @@ All contributions to Dixlase Pages and the wider Dixlase Project are subject to 
 
 ---
 
-**Contact:** office@exc-d.com
+**Contact:** info@dixlase.org
