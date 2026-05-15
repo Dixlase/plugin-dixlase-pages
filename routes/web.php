@@ -58,18 +58,45 @@ Route::middleware(['front.ip'])->group(
             $slug = (string) ($request->route('slug') ?? '');
             $locale = app()->getLocale();
 
-            // Show all pages if logged in to admin panel (preview feature)
-            if (auth('member')->check()) {
-                $page = DixlasePagesPage::where('slug', $slug)
-                    ->forLang($locale)
-                    ->firstOrFail();
-            } else {
-                // Only public pages if not logged in
-                // (published or scheduled with publication date in the past)
-                $page = DixlasePagesPage::where('slug', $slug)
-                    ->forLang($locale)
-                    ->published()
-                    ->firstOrFail();
+            // Look up the page row. Two storage patterns are supported:
+            //
+            //   1. Legacy "one row per language" — distinct rows with the
+            //      same slug but different `lang` values (the migration's
+            //      unique constraint covers (slug, lang, deleted_at)).
+            //      forLang($locale) finds the right row directly.
+            //
+            //   2. DixlaseMultilingual translation overlay — a single row
+            //      with `lang` set to the site's primary locale plus
+            //      per-locale overlay rows in
+            //      plg_dixlase_multilingual_translations. forLang($locale)
+            //      returns nothing for non-primary locales, so we fall
+            //      back to the site's primary locale and let the
+            //      TranslatableTrait inside getContentByEditorType()
+            //      surface the right translation at render time.
+            //
+            // Both patterns can coexist: a slug that has its own
+            // lang=$locale row uses it (pattern 1 wins for that locale);
+            // otherwise the primary-locale row + multilingual overlay
+            // takes over (pattern 2).
+            $baseQuery = DixlasePagesPage::where('slug', $slug);
+
+            // Preview unpublished pages only when a logged-in admin is
+            // viewing them. Public visitors see published / scheduled rows.
+            if (! auth('member')->check()) {
+                $baseQuery->published();
+            }
+
+            $page = (clone $baseQuery)->forLang($locale)->first();
+
+            if ($page === null) {
+                $primaryLocale = \App\Helpers\LocaleHelper::getSiteDefaultLocale();
+                if ($primaryLocale !== $locale && $primaryLocale !== '') {
+                    $page = (clone $baseQuery)->forLang($primaryLocale)->first();
+                }
+            }
+
+            if ($page === null) {
+                abort(404);
             }
 
             // Prepare front view variables
