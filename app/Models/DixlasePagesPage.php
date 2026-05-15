@@ -34,6 +34,7 @@ namespace Plugins\DixlasePages\App\Models;
 
 use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
 use App\Contracts\Revisionable;
+use App\Contracts\TranslationResolver;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
@@ -42,6 +43,7 @@ use App\Traits\TranslatableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -213,9 +215,14 @@ class DixlasePagesPage extends Model implements Revisionable
     /**
      * Read the page body, picking the storage backend by storage_type.
      *
-     * - FILE storage: load from disk under app()->getLocale(), so each
-     *   locale already has its own file. The multilingual plugin is not
-     *   consulted for file-stored content.
+     * - FILE storage: prefer a multilingual translation overlay for the
+     *   current locale when one is published; only fall back to the
+     *   per-locale file on disk when no overlay exists. The overlay
+     *   takes priority because the central translation editor is the
+     *   discoverable place to manage non-source locales, and a stale
+     *   per-locale file (e.g. an `en/html.html` that was created with
+     *   source-locale text and never updated) would otherwise mask the
+     *   newer overlay content the operator just saved.
      * - DB storage: route through the TranslatableTrait so the
      *   multilingual plugin's resolver can return a per-locale
      *   translation when one is published. The trait falls back to the
@@ -225,16 +232,47 @@ class DixlasePagesPage extends Model implements Revisionable
     public function getContentByEditorType(): ?string
     {
         if ($this->storage_type === ContentStorageType::FILE) {
+            $locale = app()->getLocale();
+
+            $overlay = $this->resolveMultilingualOverlay('content', $locale);
+            if ($overlay !== null && $overlay !== '') {
+                return $overlay;
+            }
+
             $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
 
             return $contentService->loadFromFile(
                 $this->slug,
-                app()->getLocale(),
+                $locale,
                 $this->editor_type?->slug() ?? 'html'
             );
         }
 
         return $this->getTranslation('content');
+    }
+
+    /**
+     * Ask the multilingual TranslationResolver directly for a translation
+     * value, bypassing TranslatableTrait::getTranslation()'s fallback
+     * chain to the default locale and the raw column.
+     *
+     * Returns null when no resolver is bound (the multilingual plugin is
+     * not installed or its master toggle is off) or when no published
+     * translation exists for this (entity, locale, field). The FILE
+     * branch of getContentByEditorType() uses that null to drop through
+     * to its disk-file fallback rather than mistakenly returning the
+     * raw `content` column (which would be the source-locale text).
+     */
+    private function resolveMultilingualOverlay(string $field, string $locale): ?string
+    {
+        if (! App::bound(TranslationResolver::class)) {
+            return null;
+        }
+
+        $resolver = App::make(TranslationResolver::class);
+        $value = $resolver->resolve($this, $field, $locale);
+
+        return is_string($value) ? $value : null;
     }
 
     /**
