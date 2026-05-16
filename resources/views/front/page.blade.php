@@ -65,8 +65,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             @endif
         @endauth
 
+        @php
+            $hasAdminBar = auth('member')->check();
+        @endphp
         <!-- Main content -->
-        <div class="container mx-auto pt-32 pb-24 px-6 sm:px-8 lg:px-12">
+        <div class="container mx-auto {{ $hasAdminBar ? 'pt-52' : 'pt-40' }} px-6 sm:px-8 lg:px-12">
             <article class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                 <!-- Page header -->
                 <header class="px-8 sm:px-10 lg:px-12 pt-10 pb-14 border-b border-gray-200 dark:border-gray-700">
