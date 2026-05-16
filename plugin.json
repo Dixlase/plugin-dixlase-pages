@@ -98,7 +98,15 @@
     "permissions": {
         "database": {
             "own_tables": true,
-            "core_tables": []
+            "core_tables_read": [
+                "site_settings",
+                "media",
+                "themes",
+                "theme_settings"
+            ],
+            "core_tables_write": [
+                "members_role_permissions"
+            ]
         },
         "storage": {
             "own_directory": true,
@@ -136,8 +144,8 @@
         },
         "_optional": [],
         "_notes": {
-            "ja": "",
-            "en": ""
+            "en": "site_settings is read for admin-mode detection and the site default locale; media is read for the SEO OGP image lookup; themes and theme_settings are read directly to render the admin preview frame because no core ThemeRegistryInterface contract exists yet (slated for v0.2). DixlasePagesPageRevision uses App\\Models\\Member as a belongs-to relation target for the revision author (framework convention; MemberRepositoryInterface pending in v0.2). The plugin seeder writes members_role_permissions during install for default Pages role setup; this will move to a core install hook in v0.2.",
+            "ja": "site_settings は管理モード判定とサイト既定ロケール取得用、media は SEO OGP 画像の検索用に参照する。themes / theme_settings は管理プレビューフレーム描画用に直接参照しているが、コアの ThemeRegistryInterface contract が未整備のため当面の措置 (v0.2 で contract に移行予定)。DixlasePagesPageRevision はリビジョン作成者を保持するため App\\Models\\Member を belongs-to 関連の対象として参照する (フレームワーク慣習、MemberRepositoryInterface は v0.2 で追加予定)。プラグインの Seeder はインストール時に Pages のデフォルトロール設定として members_role_permissions に書き込み、v0.2 でコアの install フックに移行予定。"
         }
     },
     "files": {

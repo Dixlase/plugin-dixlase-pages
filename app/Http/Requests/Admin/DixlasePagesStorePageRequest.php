@@ -36,7 +36,7 @@ use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
-use App\Models\SiteSetting;
+use App\Facades\SiteSettings;
 use App\Rules\UniqueContentSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -107,7 +107,7 @@ class DixlasePagesStorePageRequest extends FormRequest
         // language picker is not rendered), default to the site-wide locale
         // setting rather than the admin's current UI locale.
         if (empty($this->lang)) {
-            $this->merge(['lang' => SiteSetting::getValue('locale', app()->getLocale())]);
+            $this->merge(['lang' => SiteSettings::get('locale', app()->getLocale())]);
         }
 
         // If slug is empty, auto-generate from title

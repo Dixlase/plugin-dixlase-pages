@@ -35,6 +35,15 @@ namespace Plugins\DixlasePages\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Seeds default role permissions for the Pages plugin's admin menus.
+ *
+ * @internal Documented exception (plugin.json _notes): writes to core
+ * `members_role_permissions` table directly because no core plugin install
+ * hook for role-permission registration exists yet. Slated for migration
+ * to that hook in v0.2 — at that point this seeder becomes a declarative
+ * registration call and core seeds the table.
+ */
 class DixlasePagesPagesRolePermissionSeeder extends Seeder
 {
     /**
