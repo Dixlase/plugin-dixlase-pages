@@ -77,12 +77,17 @@ class SeoMetaIntegrationTest extends TestCase
         $member = \App\Models\Member::factory()->create([
             'role' => \App\Enums\MemberRole::ADMIN,
         ]);
-        $this->controller = new class($contentService, $member) extends DixlasePagesAdminPagesController
+        $mediaRepository = $this->app->make(\App\Contracts\Repositories\MediaRepositoryInterface::class);
+        $this->controller = new class($contentService, $member, $mediaRepository) extends DixlasePagesAdminPagesController
         {
-            public function __construct(DixlasePagesPageContentService $contentService, $member)
-            {
+            public function __construct(
+                DixlasePagesPageContentService $contentService,
+                $member,
+                \App\Contracts\Repositories\MediaRepositoryInterface $mediaRepository
+            ) {
                 $this->contentService = $contentService;
                 $this->member = $member;
+                $this->mediaRepository = $mediaRepository;
             }
         };
 

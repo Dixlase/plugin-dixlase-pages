@@ -33,13 +33,13 @@
 namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
 use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
+use App\Contracts\Repositories\MediaRepositoryInterface;
 use App\DTO\PluginIntegration\SeoMetaDTO;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
-use App\Models\SiteSetting;
-use App\Models\Media;
+use App\Facades\SiteSettings;
 use App\Services\ContentPreviewService;
 use App\Services\RevisionService;
 use App\Traits\AdminInterfaceTrait;
@@ -67,12 +67,16 @@ class DixlasePagesAdminPagesController extends Controller
 
     protected RevisionService $revisionService;
 
+    protected MediaRepositoryInterface $mediaRepository;
+
     public function __construct(
         DixlasePagesPageContentService $contentService,
-        RevisionService $revisionService
+        RevisionService $revisionService,
+        MediaRepositoryInterface $mediaRepository
     ) {
         $this->contentService = $contentService;
         $this->revisionService = $revisionService;
+        $this->mediaRepository = $mediaRepository;
         $this->initialize();
         $this->initializeAfterLogin();
     }
@@ -162,7 +166,13 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * Load theme settings for preview frame
+     * Load theme settings for preview frame.
+     *
+     * @internal Documented exception (plugin.json _notes): reads core `themes`
+     * and `theme_settings` tables directly because no ThemeRegistryInterface
+     * contract exists yet. Slated for migration to a core contract in v0.2.
+     * Keep all theme/theme_settings DB access centralized here so the v0.2
+     * retrofit touches a single method.
      */
     protected function loadThemeSettingsForPreview(): object
     {
@@ -305,7 +315,7 @@ class DixlasePagesAdminPagesController extends Controller
     private function prepareFormData(DixlasePagesPage $page, ?string $fileContents = null, ?string $customCss = null, ?string $customJs = null): array
     {
         // Determine admin mode (Simple=0, Advanced=1)
-        $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
+        $isSimpleMode = (int) SiteSettings::get('admin_mode', 0) === 0;
         // Get content (empty for new page, from file or DB for existing page)
         $content = $fileContents ?? ($page->exists ? ($page->getContentByEditorType() ?? '') : '');
 
@@ -397,7 +407,7 @@ class DixlasePagesAdminPagesController extends Controller
         $languageOptions = __('common.languages');
 
         // Current language value (from DB for existing pages, site default for new)
-        $siteDefaultLocale = SiteSetting::getValue('locale', app()->getLocale());
+        $siteDefaultLocale = SiteSettings::get('locale', app()->getLocale());
         $langValue = old('lang', $page->lang ?? $siteDefaultLocale);
 
         // GUI editor info from plugin
@@ -417,7 +427,7 @@ class DixlasePagesAdminPagesController extends Controller
                 if ($page->exists) {
                     $seoMeta = $provider->getMeta('dixlase-pages', (string) $page->id);
                     if ($seoMeta?->ogpMediaId) {
-                        $seoOgpMedia = Media::find($seoMeta->ogpMediaId);
+                        $seoOgpMedia = $this->mediaRepository->find($seoMeta->ogpMediaId);
                     }
                 }
             }
@@ -461,7 +471,7 @@ class DixlasePagesAdminPagesController extends Controller
         $page = new DixlasePagesPage();
 
         // Determine admin mode (Simple=0, Advanced=1)
-        $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
+        $isSimpleMode = (int) SiteSettings::get('admin_mode', 0) === 0;
 
         // Apply default values from settings (int-backed enums need conversion from slug)
         $page->status = DixlasePagesPageSetting::getValue('default_status', 'draft');
@@ -796,7 +806,7 @@ class DixlasePagesAdminPagesController extends Controller
     public function settings()
     {
         // Determine admin mode (Simple=0, Advanced=1)
-        $isSimpleMode = (int) SiteSetting::getValue('admin_mode', 0) === 0;
+        $isSimpleMode = (int) SiteSettings::get('admin_mode', 0) === 0;
 
         // Get settings data
         $settings = DixlasePagesPageSetting::pluck('value', 'name')->toArray();
