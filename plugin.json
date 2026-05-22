@@ -105,9 +105,7 @@
                 "themes",
                 "theme_settings"
             ],
-            "core_tables_write": [
-                "members_role_permissions"
-            ]
+            "core_tables_write": []
         },
         "storage": {
             "own_directory": true,
@@ -145,8 +143,8 @@
         },
         "_optional": [],
         "_notes": {
-            "en": "site_settings is read for admin-mode detection and the site default locale; media is read for the SEO OGP image lookup; themes and theme_settings are read directly to render the admin preview frame because no core ThemeRegistryInterface contract exists yet (slated for v0.2). DixlasePagesPageRevision uses App\\Models\\Member as a belongs-to relation target for the revision author (framework convention; MemberRepositoryInterface pending in v0.2). The plugin seeder writes members_role_permissions during install for default Pages role setup; this will move to a core install hook in v0.2.",
-            "ja": "site_settings は管理モード判定とサイト既定ロケール取得用、media は SEO OGP 画像の検索用に参照する。themes / theme_settings は管理プレビューフレーム描画用に直接参照しているが、コアの ThemeRegistryInterface contract が未整備のため当面の措置 (v0.2 で contract に移行予定)。DixlasePagesPageRevision はリビジョン作成者を保持するため App\\Models\\Member を belongs-to 関連の対象として参照する (フレームワーク慣習、MemberRepositoryInterface は v0.2 で追加予定)。プラグインの Seeder はインストール時に Pages のデフォルトロール設定として members_role_permissions に書き込み、v0.2 でコアの install フックに移行予定。"
+            "en": "site_settings is read for admin-mode detection and the site default locale; media is read for the SEO OGP image lookup; themes and theme_settings are read directly to render the admin preview frame because no core ThemeRegistryInterface contract exists yet (slated for v0.2). DixlasePagesPageRevision uses App\\Models\\Member as a belongs-to relation target for the revision author (framework convention; MemberRepositoryInterface pending in v0.2). Default role permissions for the Pages admin menus are declared in config/roles.php and resolved at runtime by the core PermissionRegistry; no core table is written during install.",
+            "ja": "site_settings は管理モード判定とサイト既定ロケール取得用、media は SEO OGP 画像の検索用に参照する。themes / theme_settings は管理プレビューフレーム描画用に直接参照しているが、コアの ThemeRegistryInterface contract が未整備のため当面の措置 (v0.2 で contract に移行予定)。DixlasePagesPageRevision はリビジョン作成者を保持するため App\\Models\\Member を belongs-to 関連の対象として参照する (フレームワーク慣習、MemberRepositoryInterface は v0.2 で追加予定)。Pages 管理メニューのデフォルトロール権限は config/roles.php で宣言し、コアの PermissionRegistry が実行時に解決する。インストール時にコアのテーブルへ書き込みは行わない。"
         }
     },
     "files": {
@@ -189,7 +187,6 @@
         "database/migrations/0001_01_01_000005_create_dixlase_pages_revisions_table.php": "sha256:3d4488218b114e1e61bb3d1c2e675ba2472876a720b2d62915e718038886ad18",
         "database/seeders/DatabaseSeeder.php": "sha256:8cfe835c35e928d030d395c70a5ebd1c606295f2272bb9415ed2c10df79eea27",
         "database/seeders/DixlasePagesPageSettingsSeeder.php": "sha256:2145fade83a9ebe88a9eef72f37c8034ed0c1a67bf3f4c92224d2cc995f826e0",
-        "database/seeders/DixlasePagesPagesRolePermissionSeeder.php": "sha256:ee1c3be4238b2575b744722a291608667282ccdfc8a268b812bdb7bd19080d2c",
         "database/seeders/DixlasePagesPagesTableSeeder.php": "sha256:be5f81be74e5c60c3c52a512f7f82c1f9fcab2b3236dd620f4303677b1afaa8b",
         "lang/en/admin.php": "sha256:3289dcd44801708fcaabed54a168f6d68bb0099e898daf32b135a91eee62f22d",
         "lang/en/admin/navigation.php": "sha256:93d76f6ac4c838d707fc6f8a46c30c973fa47064721eb6085704a2299d36a701",
@@ -243,7 +240,6 @@
         "resources/comment-translations/ja/database/migrations/0001_01_01_000003_consolidate_dixlase_pages_content_columns.php": "sha256:dd5dd5b0840d8b2c62a6b18361b5af7f3ce8b7b7612877769e581fb6e1f1ae6c",
         "resources/comment-translations/ja/database/migrations/0001_01_01_000004_remove_seo_columns.php": "sha256:b03bf5289c8a473f4a6fb6c5f6fd3f4901bb5f2cec0d226a5052cb2338e7265b",
         "resources/comment-translations/ja/database/migrations/0001_01_01_000005_create_dixlase_pages_revisions_table.php": "sha256:c76da786422867b0cca8b77cea4611cc04eeda1c01823c6e9215e8b582ca63ee",
-        "resources/comment-translations/ja/database/seeders/DixlasePagesPagesRolePermissionSeeder.php": "sha256:899df6e2d8d22411dedd3b0f41613cbaac513134cbf60fa100047eef3ed35afd",
         "resources/comment-translations/ja/lang/ja/admin.php": "sha256:c14bf33d7a696cae8c66c4c3697137a4fcd76779fe63482245717d55f999bec8",
         "resources/comment-translations/ja/resources/views/admin/pages/preview-frame.blade.php": "sha256:b3f41d3dbd567befaf31265d1d22fba3dd9020934b1d1f3930ce1761946d8bd0",
         "resources/comment-translations/ja/resources/views/admin/pages/settings.blade.php": "sha256:5e8087e7855bb12818394ed4377623eede33c74f50d27e8b0c32a4a12a5151a5",

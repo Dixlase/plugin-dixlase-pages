@@ -44,7 +44,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DixlasePagesPageSettingsSeeder::class,
             DixlasePagesPagesTableSeeder::class,
-            DixlasePagesPagesRolePermissionSeeder::class,
         ]);
     }
 }
