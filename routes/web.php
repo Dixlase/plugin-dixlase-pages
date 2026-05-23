@@ -39,7 +39,7 @@ use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 Route::middleware(['front.ip'])->group(
     function () {
         // Get settings from database, or use default values if none exist
-        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
         // Custom CSS/JS asset routes (defined before page display routes)
         Route::get($pagesDirectory.'/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])

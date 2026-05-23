@@ -89,8 +89,8 @@ class DixlasePagesFrontPageTest extends TestCase
             CheckMaintenanceMode::class,
         ]);
 
-        // ルートスラッグを取得（RefreshDatabase後なのでデフォルト値 'pages' が返る）
-        $this->pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+        // ルートスラッグを取得（RefreshDatabase後なのでデフォルト値 'page' が返る）
+        $this->pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
         // RefreshDatabase後にフロントルートを再登録
         // （ブート時にはDB設定テーブルが未作成のためルートが未登録）

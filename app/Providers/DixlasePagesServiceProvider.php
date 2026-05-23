@@ -146,9 +146,9 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
     public function getRouteSlugs(): array
     {
         try {
-            $slug = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+            $slug = DixlasePagesPageSetting::getValue('route_slug', 'page');
         } catch (\Exception $e) {
-            $slug = 'pages';
+            $slug = 'page';
         }
 
         return [
