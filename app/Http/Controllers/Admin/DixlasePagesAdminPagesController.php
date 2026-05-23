@@ -265,7 +265,7 @@ class DixlasePagesAdminPagesController extends Controller
             ->withQueryString();
 
         // Get page directory settings from database
-        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
         // Add URL to each page
         $pages->getCollection()->transform(function ($page) use ($pagesDirectory) {
@@ -324,7 +324,7 @@ class DixlasePagesAdminPagesController extends Controller
         $customJs = $customJs ?? ($page->custom_js ?? '');
 
         // Page directory settings
-        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'page');
         $slugBaseUrl = config('app.url').'/'.$pagesDirectory.'/';
 
         // Storage save method options (for form-select)

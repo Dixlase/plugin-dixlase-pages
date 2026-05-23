@@ -130,7 +130,7 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
      */
     protected function generatePageUrl(DixlasePagesPage $page): string
     {
-        $directory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+        $directory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
         return '/'.$directory.'/'.$page->slug;
     }

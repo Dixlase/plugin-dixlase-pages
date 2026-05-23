@@ -90,7 +90,7 @@ class DixlasePagesRouteSlugProviderTest extends TestCase
     }
 
     /**
-     * getRouteSlugs がデフォルト値 'pages' を返すことを検証
+     * getRouteSlugs がデフォルト値 'page' を返すことを検証
      */
     public function test_get_route_slugs_returns_default_slug(): void
     {
@@ -98,7 +98,7 @@ class DixlasePagesRouteSlugProviderTest extends TestCase
         $slugs = $provider->getRouteSlugs();
 
         $slug = $slugs[0];
-        $this->assertSame('pages', $slug->slug);
+        $this->assertSame('page', $slug->slug);
     }
 
     /**

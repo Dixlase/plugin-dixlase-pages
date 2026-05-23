@@ -61,7 +61,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                             type="text"
                             name="route_slug"
                             id="route_slug"
-                            value="{{ old('route_slug', $settings['route_slug'] ?? 'pages') }}"
+                            value="{{ old('route_slug', $settings['route_slug'] ?? 'page') }}"
                             class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-blue-500 focus:border-blue-500"
                             required
                         />

@@ -280,7 +280,7 @@ class DixlasePagesPage extends Model implements Revisionable
      */
     public function getPageUrlAttribute(): string
     {
-        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'pages');
+        $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
         return url($pagesDirectory.'/'.$this->slug);
     }
