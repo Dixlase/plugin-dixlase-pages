@@ -2,7 +2,7 @@
     "name": "Dixlase Pages",
     "package_name": "dixlase/dixlase-pages",
     "slug": "dixlase-pages",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": {
         "ja": "固定ページ管理機能を提供するプラグインです。",
         "en": "This plugin provides static page management functionality."
