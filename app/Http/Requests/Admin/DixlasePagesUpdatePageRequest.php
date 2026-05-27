@@ -60,8 +60,10 @@ class DixlasePagesUpdatePageRequest extends FormRequest
     {
         $pageId = $this->route('page')?->id;
 
-        // Slug must be unique across all languages (to prevent URL duplication)
-        $slugRule = UniqueContentSlug::for('plg_dixlase_pages');
+        // Slug uniqueness is scoped by (parent_id, slug) so siblings
+        // cannot collide; cycle/depth/self checks live in withValidator.
+        $slugRule = UniqueContentSlug::for('plg_dixlase_pages')
+            ->where('parent_id', $this->input('parent_id'));
         if ($pageId !== null) {
             $slugRule = $slugRule->ignore($pageId);
         }
@@ -75,6 +77,11 @@ class DixlasePagesUpdatePageRequest extends FormRequest
                 'max:255',
                 'regex:/^[a-z0-9\-]+$/',
                 $slugRule,
+            ],
+            'parent_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('plg_dixlase_pages', 'id')->whereNull('deleted_at'),
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
@@ -99,6 +106,54 @@ class DixlasePagesUpdatePageRequest extends FormRequest
         $validator->after(function ($validator) {
             if (empty($this->title)) {
                 $validator->errors()->add('title', __('dixlase-pages::admin/pages/validation.title_required'));
+            }
+
+            $parentId = $this->input('parent_id');
+            $page = $this->route('page');
+            if (! ($page instanceof \Plugins\DixlasePages\App\Models\DixlasePagesPage)) {
+                return;
+            }
+
+            if ($parentId === null || $parentId === '') {
+                return;
+            }
+
+            $parentId = (int) $parentId;
+
+            // Self-parent: the page cannot be its own parent.
+            if ($parentId === (int) $page->id) {
+                $validator->errors()->add(
+                    'parent_id',
+                    __('dixlase-pages::admin/pages/validation.parent_self')
+                );
+
+                return;
+            }
+
+            // Cycle: parent must not live inside this page's own subtree,
+            // otherwise the ancestors() walk would loop forever.
+            if (in_array($parentId, $page->subtreeIds(), true)) {
+                $validator->errors()->add(
+                    'parent_id',
+                    __('dixlase-pages::admin/pages/validation.parent_cycle')
+                );
+
+                return;
+            }
+
+            // Depth limit: moving the subtree under the new parent must
+            // keep every descendant within MAX_DEPTH. The deepest
+            // descendant's new depth equals parent.depth() + 1 + this
+            // page's subtreeMaxDepth().
+            $parent = \Plugins\DixlasePages\App\Models\DixlasePagesPage::find($parentId);
+            if ($parent !== null) {
+                $newDeepest = $parent->depth() + 1 + $page->subtreeMaxDepth();
+                if ($newDeepest > \Plugins\DixlasePages\App\Models\DixlasePagesPage::MAX_DEPTH) {
+                    $validator->errors()->add(
+                        'parent_id',
+                        __('dixlase-pages::admin/pages/validation.parent_depth_exceeded')
+                    );
+                }
             }
         });
     }

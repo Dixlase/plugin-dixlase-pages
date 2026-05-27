@@ -132,6 +132,6 @@ class DixlasePagesPageLinkableProvider implements LinkableProviderInterface
     {
         $directory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
-        return '/'.$directory.'/'.$page->slug;
+        return '/'.$directory.'/'.implode('/', $page->pathSegments());
     }
 }

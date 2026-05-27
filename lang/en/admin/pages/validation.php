@@ -45,4 +45,7 @@ return [
     'default_status_required' => 'Default status is required.',
     'default_status_in' => 'Default status must be published, draft, or scheduled.',
     'at_least_one_title_required' => 'Title is required.',
+    'parent_self' => 'A page cannot be its own parent.',
+    'parent_cycle' => 'The parent page cannot be one of this page\'s descendants.',
+    'parent_depth_exceeded' => 'Page hierarchy is limited to 3 levels.',
 ];

@@ -41,59 +41,51 @@ Route::middleware(['front.ip'])->group(
         // Get settings from database, or use default values if none exist
         $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
-        // Custom CSS/JS asset routes (defined before page display routes)
-        Route::get($pagesDirectory.'/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
+        // Custom CSS/JS asset routes (defined before page display routes).
+        // {path} accepts slashes so hierarchical pages like /page/parent/child
+        // get their own asset URLs; the regex constraint is what allows '/'
+        // through. The trailing literal segment lets Laravel split the path
+        // off the asset filename when compiling the route.
+        Route::get($pagesDirectory.'/{path}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
+            ->where('path', '.+')
             ->name('dixlase-pages::page.custom-style')
             ->withoutMiddleware([\App\Http\Middleware\ContentSecurityPolicy::class]);
 
-        Route::get($pagesDirectory.'/{slug}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
+        Route::get($pagesDirectory.'/{path}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
+            ->where('path', '.+')
             ->name('dixlase-pages::page.custom-script')
             ->withoutMiddleware([\App\Http\Middleware\ContentSecurityPolicy::class]);
 
-        // Page display routes
-        // Use Request->route('slug') instead of a positional closure parameter:
-        // when this route is mirrored under the {locale} prefix, Laravel binds
-        // the closure's first scalar argument to the {locale} value, not {slug}.
-        Route::get($pagesDirectory.'/{slug}', function (\Illuminate\Http\Request $request) {
-            $slug = (string) ($request->route('slug') ?? '');
+        // Page display route. {path} accepts the full hierarchical URL
+        // (e.g. "parent/child"), which the model resolver walks segment
+        // by segment against (parent_id, slug) to find the target page.
+        // Use Request->route('path') instead of a positional closure
+        // parameter: when this route is mirrored under the {locale}
+        // prefix, Laravel binds the closure's first scalar argument to
+        // the {locale} value, not {path}.
+        Route::get($pagesDirectory.'/{path}', function (\Illuminate\Http\Request $request) {
+            $path = (string) ($request->route('path') ?? '');
             $locale = app()->getLocale();
 
-            // Look up the page row. Two storage patterns are supported:
+            // Admins see drafts and future-scheduled pages so the admin
+            // preview works; public visitors only get published rows.
+            // Two storage patterns are supported:
             //
-            //   1. Legacy "one row per language" — distinct rows with the
-            //      same slug but different `lang` values (the migration's
-            //      unique constraint covers (slug, lang, deleted_at)).
-            //      forLang($locale) finds the right row directly.
+            //   1. Legacy "one row per language" — distinct rows per
+            //      (slug, lang). resolvePath() tries the current locale
+            //      first via forLang($locale).
             //
-            //   2. DixlaseMultilingual translation overlay — a single row
-            //      with `lang` set to the site's primary locale plus
-            //      per-locale overlay rows in
-            //      plg_dixlase_multilingual_translations. forLang($locale)
-            //      returns nothing for non-primary locales, so we fall
-            //      back to the site's primary locale and let the
+            //   2. DixlaseMultilingual translation overlay — a single
+            //      row at the site's primary locale plus per-locale
+            //      overlays. resolvePath() falls back to the primary
+            //      locale when forLang($locale) misses, and the
             //      TranslatableTrait inside getContentByEditorType()
-            //      surface the right translation at render time.
-            //
-            // Both patterns can coexist: a slug that has its own
-            // lang=$locale row uses it (pattern 1 wins for that locale);
-            // otherwise the primary-locale row + multilingual overlay
-            // takes over (pattern 2).
-            $baseQuery = DixlasePagesPage::where('slug', $slug);
-
-            // Preview unpublished pages only when a logged-in admin is
-            // viewing them. Public visitors see published / scheduled rows.
-            if (! auth('member')->check()) {
-                $baseQuery->published();
-            }
-
-            $page = (clone $baseQuery)->forLang($locale)->first();
-
-            if ($page === null) {
-                $primaryLocale = \App\Helpers\LocaleHelper::getSiteDefaultLocale();
-                if ($primaryLocale !== $locale && $primaryLocale !== '') {
-                    $page = (clone $baseQuery)->forLang($primaryLocale)->first();
-                }
-            }
+            //      surfaces the right translation at render time.
+            $page = DixlasePagesPage::resolvePath(
+                $path,
+                $locale,
+                publishedOnly: ! auth('member')->check()
+            );
 
             if ($page === null) {
                 abort(404);
@@ -126,6 +118,6 @@ Route::middleware(['front.ip'])->group(
                 'hasCustomJs',
                 'customAssetVersion',
             ));
-        })->name('dixlase-pages::page.show');
+        })->where('path', '.+')->name('dixlase-pages::page.show');
     }
 );

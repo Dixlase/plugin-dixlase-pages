@@ -28,6 +28,30 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
+{{-- Parent page selector. Lets an editor place this page under another
+     page so its public URL becomes /page/{parent}/{slug}. The candidate
+     list comes from prepareFormData() and already excludes the current
+     page and its descendants (cycle prevention) along with anything that
+     would push the subtree past the depth limit. --}}
+<div class="mb-6">
+    <label for="parent_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        {{ __('dixlase-pages::admin/pages/form.parent_id') }}
+    </label>
+    <select
+        id="parent_id"
+        name="parent_id"
+        class="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+    >
+        <option value="">{{ __('dixlase-pages::admin/pages/form.parent_id_top_level') }}</option>
+        @foreach($parentOptions as $optionId => $optionLabel)
+            <option value="{{ $optionId }}" @selected((int) $parentValue === (int) $optionId)>{{ $optionLabel }}</option>
+        @endforeach
+    </select>
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        {{ __('dixlase-pages::admin/pages/form.parent_id_help') }}
+    </p>
+</div>
+
 <x-dixlase-pages::page-content-editor
     :title="$page->title ?? ''"
     :storageType="$page->storage_type?->slug() ?? 'database'"
