@@ -43,6 +43,8 @@ use App\Traits\TranslatableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -85,6 +87,7 @@ class DixlasePagesPage extends Model implements Revisionable
      * @var array<int, string>
      */
     protected $fillable = [
+        'parent_id',
         'slug',
         'lang',
         'title',
@@ -96,6 +99,14 @@ class DixlasePagesPage extends Model implements Revisionable
         'status',
         'published_at',
     ];
+
+    /**
+     * Maximum depth of the page hierarchy. depth() of a top-level page is
+     * 0; with MAX_DEPTH = 2 we accept three URL segments (/page/a/b/c).
+     * Validators consult this constant to refuse assignments that would
+     * push the resulting page beyond the limit.
+     */
+    public const MAX_DEPTH = 2;
 
     /**
      * Attributes to cast
@@ -114,6 +125,16 @@ class DixlasePagesPage extends Model implements Revisionable
             if (empty($page->slug)) {
                 $page->slug = Str::slug($page->title);
             }
+        });
+
+        // Promote children to top-level when a parent is removed (soft or
+        // force). Without this, children's URLs would resolve to "parent
+        // missing -> 404" because the resolver walks from the root by
+        // (parent_id, slug). Restoring the parent later leaves the
+        // already-promoted children at the top level; reattaching them is
+        // a manual operation.
+        static::deleting(function (self $page) {
+            self::where('parent_id', $page->id)->update(['parent_id' => null]);
         });
 
         // When force deleting a page, also cascade delete SEO meta information and content files (not deleted on SoftDeletes)
@@ -213,6 +234,162 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
+     * Scope to top-level pages (no parent).
+     */
+    public function scopeTopLevel(Builder $query): Builder
+    {
+        return $query->whereNull('parent_id');
+    }
+
+    /**
+     * Parent page (null for top-level pages).
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * Direct children.
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * Walk from the root to this page, returning ancestors plus self
+     * in root-to-self order. Used for URL composition and breadcrumbs.
+     * Returns just [self] for top-level pages.
+     *
+     * @return array<int, self>
+     */
+    public function ancestorsAndSelf(): array
+    {
+        $chain = [$this];
+        $current = $this;
+        while ($current->parent_id !== null) {
+            $parent = $current->parent()->first();
+            if ($parent === null) {
+                break;
+            }
+            array_unshift($chain, $parent);
+            $current = $parent;
+        }
+
+        return $chain;
+    }
+
+    /**
+     * Number of ancestors above this page. 0 for top-level pages.
+     */
+    public function depth(): int
+    {
+        return max(0, count($this->ancestorsAndSelf()) - 1);
+    }
+
+    /**
+     * Slugs from root to this page. /page/parent/child returns
+     * ['parent', 'child'] for the child page.
+     *
+     * @return array<int, string>
+     */
+    public function pathSegments(): array
+    {
+        return array_map(static fn (self $p) => (string) $p->slug, $this->ancestorsAndSelf());
+    }
+
+    /**
+     * Maximum descendant depth within this page's subtree, measured
+     * relative to self. A leaf returns 0; a parent of a single child
+     * returns 1. Used by validation to refuse parent assignments that
+     * would push any descendant beyond MAX_DEPTH.
+     */
+    public function subtreeMaxDepth(): int
+    {
+        $max = 0;
+        foreach ($this->children()->get() as $child) {
+            $max = max($max, 1 + $child->subtreeMaxDepth());
+        }
+
+        return $max;
+    }
+
+    /**
+     * Ids of self plus every descendant. Used by validation to refuse
+     * a parent_id that points inside this page's own subtree (which
+     * would create a cycle).
+     *
+     * @return array<int, int>
+     */
+    public function subtreeIds(): array
+    {
+        $ids = [(int) $this->id];
+        foreach ($this->children()->get() as $child) {
+            $ids = array_merge($ids, $child->subtreeIds());
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Walk the URL path segment-by-segment and return the final page.
+     *
+     * Each segment is matched as (slug, parent_id) where parent_id is
+     * NULL for the first segment and the previously-matched page's id
+     * for each subsequent segment. Returns null as soon as any segment
+     * fails to resolve. Mirrors the original single-slug route's locale
+     * fallback: try the current locale first, then the site primary
+     * locale (so a primary-locale row with multilingual overlay still
+     * resolves for non-primary visitors).
+     *
+     * @param  string  $path           Raw URL path, e.g. "parent/child"
+     * @param  string  $locale         Current request locale
+     * @param  bool    $publishedOnly  Hide draft / future-scheduled rows
+     *                                 (false for admin preview)
+     */
+    public static function resolvePath(string $path, string $locale, bool $publishedOnly): ?self
+    {
+        $segments = array_values(array_filter(
+            explode('/', trim($path, '/')),
+            static fn (string $s) => $s !== ''
+        ));
+        if ($segments === []) {
+            return null;
+        }
+
+        $primaryLocale = \App\Helpers\LocaleHelper::getSiteDefaultLocale();
+        $parentId = null;
+        $page = null;
+
+        foreach ($segments as $segment) {
+            $base = static::where('slug', $segment);
+            if ($parentId === null) {
+                $base->whereNull('parent_id');
+            } else {
+                $base->where('parent_id', $parentId);
+            }
+            if ($publishedOnly) {
+                $base->published();
+            }
+
+            $found = (clone $base)->forLang($locale)->first();
+            if ($found === null && $primaryLocale !== '' && $primaryLocale !== $locale) {
+                $found = (clone $base)->forLang($primaryLocale)->first();
+            }
+
+            if ($found === null) {
+                return null;
+            }
+
+            $parentId = $found->id;
+            $page = $found;
+        }
+
+        return $page;
+    }
+
+    /**
      * Read the page body, picking the storage backend by storage_type.
      *
      * - FILE storage: prefer a multilingual translation overlay for the
@@ -276,13 +453,14 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * Page URL accessor
+     * Page URL accessor. Composes the full hierarchical path from the
+     * root to this page (e.g. /page/parent/child for a child page).
      */
     public function getPageUrlAttribute(): string
     {
         $pagesDirectory = DixlasePagesPageSetting::getValue('route_slug', 'page');
 
-        return url($pagesDirectory.'/'.$this->slug);
+        return url($pagesDirectory.'/'.implode('/', $this->pathSegments()));
     }
 
     /**

@@ -61,14 +61,24 @@ class DixlasePagesStorePageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Slug is optional (auto-generated from title if empty)
-            // Slug must be unique across all languages (to prevent URL duplication)
+            // Slug is optional (auto-generated from title if empty).
+            // Uniqueness is scoped by (parent_id, slug) so siblings cannot
+            // collide but the same slug may appear under different parents
+            // (and at the top level too — see withValidator for the
+            // top-level safety net the DB unique key cannot enforce on
+            // MySQL because NULL parent_id values are not equal).
             'slug' => [
                 'nullable',
                 'string',
                 'max:255',
                 'regex:/^[a-z0-9\-]*$/',
-                UniqueContentSlug::for('plg_dixlase_pages'),
+                UniqueContentSlug::for('plg_dixlase_pages')
+                    ->where('parent_id', $this->input('parent_id')),
+            ],
+            'parent_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('plg_dixlase_pages', 'id')->whereNull('deleted_at'),
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
@@ -94,6 +104,20 @@ class DixlasePagesStorePageRequest extends FormRequest
         $validator->after(function ($validator) {
             if (empty($this->title)) {
                 $validator->errors()->add('title', __('dixlase-pages::admin/pages/validation.title_required'));
+            }
+
+            // Hierarchy depth limit: a new page becomes parent.depth() + 1
+            // deep. Refuse parent assignments that would put the new page
+            // beyond DixlasePagesPage::MAX_DEPTH.
+            $parentId = $this->input('parent_id');
+            if ($parentId !== null && $parentId !== '') {
+                $parent = \Plugins\DixlasePages\App\Models\DixlasePagesPage::find($parentId);
+                if ($parent !== null && $parent->depth() + 1 > \Plugins\DixlasePages\App\Models\DixlasePagesPage::MAX_DEPTH) {
+                    $validator->errors()->add(
+                        'parent_id',
+                        __('dixlase-pages::admin/pages/validation.parent_depth_exceeded')
+                    );
+                }
             }
         });
     }

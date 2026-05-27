@@ -35,4 +35,7 @@ return [
     'meta_description_help' => 'Description text displayed in search engine results. Recommended length: 120-160 characters.',
     'ogp_image' => 'OGP Image',
     'ogp_image_help' => 'Enter the path to the image displayed when shared on social media. (e.g., /images/ogp/page-image.jpg)',
+    'parent_id' => 'Parent page',
+    'parent_id_top_level' => '(Top-level page)',
+    'parent_id_help' => 'Optional. Choose a parent to place this page under it, e.g. /page/parent/this-slug. Hierarchy is limited to 3 levels.',
 ];

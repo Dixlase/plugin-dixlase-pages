@@ -415,6 +415,29 @@ class DixlasePagesAdminPagesController extends Controller
         $guiEditorAssetHtml = $guiEditorInfo ? \App\Presenters\Admin\ContentEditorPresenter::editorAssetHtml($guiEditorInfo) : '';
         $hasGuiEditor = $guiEditorInfo !== null;
 
+        // Parent page selector options. Build the breadcrumb label from
+        // each candidate's ancestor chain. For an existing page, exclude
+        // the page itself and its descendants (avoiding cycles) and any
+        // candidate whose new depth would push this page's subtree past
+        // DixlasePagesPage::MAX_DEPTH. For a new page the subtree is
+        // empty, so the limit becomes parent.depth() <= MAX_DEPTH - 1.
+        $excludeIds = $page->exists ? $page->subtreeIds() : [];
+        $subtreeMax = $page->exists ? $page->subtreeMaxDepth() : 0;
+        $parentOptions = [];
+        foreach (DixlasePagesPage::query()->orderBy('id')->get() as $candidate) {
+            if (in_array((int) $candidate->id, $excludeIds, true)) {
+                continue;
+            }
+            if ($candidate->depth() + 1 + $subtreeMax > DixlasePagesPage::MAX_DEPTH) {
+                continue;
+            }
+            $parentOptions[(int) $candidate->id] = implode(' / ', array_map(
+                static fn ($p) => ($p->getTranslation('title') ?: $p->slug),
+                $candidate->ancestorsAndSelf()
+            ));
+        }
+        $parentValue = old('parent_id', $page->parent_id);
+
         // SEO meta information (only when SEO plugin is enabled and capability is declared)
         $seoMetaEnabled = false;
         $seoMeta = null;
@@ -460,6 +483,8 @@ class DixlasePagesAdminPagesController extends Controller
             'seoMetaEnabled',
             'seoMeta',
             'seoOgpMedia',
+            'parentOptions',
+            'parentValue',
         );
     }
 

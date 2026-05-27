@@ -56,7 +56,7 @@ class DixlasePagesCustomAssetController extends Controller
      */
     public function script(Request $request): Response
     {
-        $content = $this->resolveContent($this->resolveSlug($request), 'js');
+        $content = $this->resolveContent($this->resolvePath($request), 'js');
 
         if ($content === null) {
             abort(404);
@@ -70,7 +70,7 @@ class DixlasePagesCustomAssetController extends Controller
      */
     public function style(Request $request): Response
     {
-        $content = $this->resolveContent($this->resolveSlug($request), 'css');
+        $content = $this->resolveContent($this->resolvePath($request), 'css');
 
         if ($content === null) {
             abort(404);
@@ -80,50 +80,36 @@ class DixlasePagesCustomAssetController extends Controller
     }
 
     /**
-     * Read the slug from the route by name. Necessary because Laravel binds
-     * scalar controller parameters by position, and the locale-prefixed
-     * mirror route adds a {locale} parameter ahead of {slug}.
+     * Read the URL path from the route by name. Necessary because Laravel
+     * binds scalar controller parameters by position, and the
+     * locale-prefixed mirror route adds a {locale} parameter ahead of
+     * {path}.
      */
-    private function resolveSlug(Request $request): string
+    private function resolvePath(Request $request): string
     {
-        return (string) ($request->route('slug') ?? '');
+        return (string) ($request->route('path') ?? '');
     }
 
     /**
-     * Resolve JS or CSS content from the page.
-     *
-     * Mirrors the page-display route's visibility rules: admins (logged-in
-     * members) can fetch assets for draft pages so the admin preview iframe
-     * paints styled. Anonymous visitors only see published / past-scheduled
-     * pages. Without the admin branch the page HTML loads (the page route
-     * has its own admin bypass) but the asset routes return 404, leaving
-     * the preview unstyled.
+     * Resolve JS or CSS content from the page identified by the
+     * hierarchical URL path. Mirrors the page-display route's visibility
+     * rules: admins (logged-in members) can fetch assets for draft pages
+     * so the admin preview iframe paints styled. Anonymous visitors only
+     * see published / past-scheduled pages. Without the admin branch the
+     * page HTML loads (the page route has its own admin bypass) but the
+     * asset routes return 404, leaving the preview unstyled.
      */
-    private function resolveContent(string $slug, string $type): ?string
+    private function resolveContent(string $path, string $type): ?string
     {
         $locale = App::getLocale();
 
-        // Mirror the page-display route's lookup so a page that exists only
-        // under the site's primary locale (with multilingual translations
-        // overlaying its content for other locales) still serves its
-        // CSS/JS at /{locale}/<slug>/custom-{style,script}. Without the
-        // primary-locale fallback the page HTML renders but its assets 404.
-        $baseQuery = DixlasePagesPage::where('slug', $slug);
-
-        if (! Auth::guard('member')->check()) {
-            $baseQuery->published();
-        }
-
-        $page = (clone $baseQuery)->forLang($locale)->first();
+        $page = DixlasePagesPage::resolvePath(
+            $path,
+            $locale,
+            publishedOnly: ! Auth::guard('member')->check()
+        );
 
         if ($page === null) {
-            $primaryLocale = \App\Helpers\LocaleHelper::getSiteDefaultLocale();
-            if ($primaryLocale !== $locale && $primaryLocale !== '') {
-                $page = (clone $baseQuery)->forLang($primaryLocale)->first();
-            }
-        }
-
-        if (! $page) {
             return null;
         }
 

@@ -45,4 +45,7 @@ return [
     'default_status_required' => 'デフォルトステータスは必須です。',
     'default_status_in' => 'デフォルトステータスは公開、下書き、または日付指定を選択してください。',
     'at_least_one_title_required' => 'タイトルは必須です。',
+    'parent_self' => 'ページを自分自身の親に設定することはできません。',
+    'parent_cycle' => '親ページにこのページの子孫を指定することはできません。',
+    'parent_depth_exceeded' => 'ページ階層は 3 階層までです。',
 ];

@@ -106,24 +106,26 @@ class DixlasePagesFrontPageTest extends TestCase
 
         Route::middleware(['front.ip'])
             ->group(function () use ($dir) {
-                Route::get($dir.'/{slug}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
+                Route::get($dir.'/{path}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
+                    ->where('path', '.+')
                     ->name('dixlase-pages::page.custom-style');
 
-                Route::get($dir.'/{slug}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
+                Route::get($dir.'/{path}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
+                    ->where('path', '.+')
                     ->name('dixlase-pages::page.custom-script');
 
-                Route::get($dir.'/{slug}', function ($slug) {
+                Route::get($dir.'/{path}', function (\Illuminate\Http\Request $request) {
+                    $path = (string) ($request->route('path') ?? '');
                     $locale = app()->getLocale();
 
-                    if (auth('member')->check()) {
-                        $page = DixlasePagesPage::where('slug', $slug)
-                            ->forLang($locale)
-                            ->firstOrFail();
-                    } else {
-                        $page = DixlasePagesPage::where('slug', $slug)
-                            ->forLang($locale)
-                            ->published()
-                            ->firstOrFail();
+                    $page = DixlasePagesPage::resolvePath(
+                        $path,
+                        $locale,
+                        publishedOnly: ! auth('member')->check()
+                    );
+
+                    if ($page === null) {
+                        abort(404);
                     }
 
                     $contentService = app(DixlasePagesPageContentService::class);
@@ -141,7 +143,7 @@ class DixlasePagesFrontPageTest extends TestCase
                         'hasCustomJs',
                         'customAssetVersion',
                     ));
-                })->name('dixlase-pages::page.show');
+                })->where('path', '.+')->name('dixlase-pages::page.show');
             });
     }
 
