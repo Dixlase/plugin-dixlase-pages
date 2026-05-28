@@ -31,6 +31,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <x-dixlase-pages::page-content-editor
     :parentOptions="$parentOptions"
     :parentValue="$parentValue"
+    :parentPaths="$parentPaths"
     :title="$page->title ?? ''"
     :storageType="$page->storage_type?->slug() ?? 'database'"
     :editorType="$page->editor_type?->slug() ?? 'html'"
