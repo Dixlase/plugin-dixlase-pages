@@ -32,15 +32,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('title', $page->getTranslation('title'))
 
+@php
+    // The route param is the page's full hierarchical path, not just its
+    // own slug, so a child page's asset URLs resolve under /page/parent/child/.
+    $pageAssetPath = implode('/', $page->pathSegments());
+@endphp
+
 @if(!empty($hasCustomCss))
     @push('styles')
-        <link rel="stylesheet" href="{{ route('dixlase-pages::page.custom-style', ['slug' => $page->slug]) }}?v={{ $customAssetVersion }}">
+        <link rel="stylesheet" href="{{ route('dixlase-pages::page.custom-style', ['path' => $pageAssetPath]) }}?v={{ $customAssetVersion }}">
     @endpush
 @endif
 
 @if(!empty($hasCustomJs))
     @push('scripts')
-        <script src="{{ route('dixlase-pages::page.custom-script', ['slug' => $page->slug]) }}?v={{ $customAssetVersion }}" defer></script>
+        <script src="{{ route('dixlase-pages::page.custom-script', ['path' => $pageAssetPath]) }}?v={{ $customAssetVersion }}" defer></script>
     @endpush
 @endif
 
