@@ -59,12 +59,24 @@ return new class extends Migration
         });
     }
 
-    public function down(): void
-    {
-        Schema::table($this->table, function (Blueprint $table) {
-            $table->text('content')->nullable()->change();
-            $table->text('custom_css')->nullable()->change();
-            $table->text('custom_js')->nullable()->change();
-        });
-    }
+    /**
+     * Intentional no-op.
+     *
+     * The original column type was TEXT (64 KiB), but `up()` widened to
+     * LONGTEXT precisely because real pages overflow that ceiling. Asking
+     * MySQL to shrink LONGTEXT back to TEXT against an active table fails
+     * with SQLSTATE 22001 ("Data too long for column ...") as soon as any
+     * stored row exceeds 64 KiB — which is the common case once a site
+     * has any sizeable page.
+     *
+     * Plugin uninstall walks every migration's down() in reverse, so a
+     * literal reversal here would block uninstall whenever real content
+     * is present. The table itself is dropped by migration 000002's
+     * `down()`, which makes column-type rollback redundant for the
+     * uninstall path. For a partial single-step rollback to take effect
+     * the operator would have to truncate / shorten the offending rows
+     * by hand first; we deliberately do not attempt that lossy operation
+     * automatically.
+     */
+    public function down(): void {}
 };
