@@ -566,6 +566,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         // Create page (always save content to DB as well = backup)
         $page = DixlasePagesPage::create([
+            'parent_id' => $validated['parent_id'] ?? null,
             'slug' => $validated['slug'],
             'lang' => $lang,
             'title' => $validated['title'] ?? null,
@@ -692,6 +693,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         // Update page (always save content to DB as backup)
         $page->update([
+            'parent_id' => $validated['parent_id'] ?? null,
             'slug' => $validated['slug'],
             'lang' => $validated['lang'] ?? app()->getLocale(),
             'title' => $validated['title'] ?? null,

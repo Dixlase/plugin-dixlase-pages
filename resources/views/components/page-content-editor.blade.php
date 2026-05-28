@@ -29,6 +29,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 --}}
 
 @props([
+    // 親ページ候補オプション (id => 表示ラベル)
+    'parentOptions' => [],
+    // 現在選択中の親ページ id (null = トップレベル)
+    'parentValue' => null,
     // タイトル
     'title' => '',
     // エディター & ストレージ
@@ -529,6 +533,31 @@ Layout:
                     <x-form-help-text :text="__('dixlase-pages::components/page-content-editor.revisions_help')" />
                 </div>
             @endif
+
+            {{-- Parent page (hierarchy). Placed between revisions and publish
+                 settings so the URL-shaping inputs sit together vertically.
+                 The candidate list is built server-side and already excludes
+                 the current page and its descendants (cycle prevention) plus
+                 anything that would push the subtree past MAX_DEPTH. --}}
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <label for="parent_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {{ __('dixlase-pages::admin/pages/form.parent_id') }}
+                </label>
+                <select
+                    id="parent_id"
+                    name="parent_id"
+                    class="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">{{ __('dixlase-pages::admin/pages/form.parent_id_top_level') }}</option>
+                    @foreach($parentOptions as $optionId => $optionLabel)
+                        <option value="{{ $optionId }}" @selected(old('parent_id', $parentValue) !== null && (int) old('parent_id', $parentValue) === (int) $optionId)>{{ $optionLabel }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ __('dixlase-pages::admin/pages/form.parent_id_help') }}
+                </p>
+                @include('components::form-error', ['name' => 'parent_id'])
+            </div>
 
             {{-- 7. Public settings --}}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
