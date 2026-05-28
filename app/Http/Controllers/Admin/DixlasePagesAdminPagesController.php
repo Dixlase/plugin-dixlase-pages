@@ -424,6 +424,10 @@ class DixlasePagesAdminPagesController extends Controller
         $excludeIds = $page->exists ? $page->subtreeIds() : [];
         $subtreeMax = $page->exists ? $page->subtreeMaxDepth() : 0;
         $parentOptions = [];
+        // Map of [parent_id => "ancestor-slug/.../parent-slug"], handed to the
+        // editor's Alpine state so the URL preview can prepend the parent path
+        // (e.g. /page/philosophy/tesuto for a child of "philosophy").
+        $parentPaths = [];
         foreach (DixlasePagesPage::query()->orderBy('id')->get() as $candidate) {
             if (in_array((int) $candidate->id, $excludeIds, true)) {
                 continue;
@@ -435,6 +439,7 @@ class DixlasePagesAdminPagesController extends Controller
                 static fn ($p) => ($p->getTranslation('title') ?: $p->slug),
                 $candidate->ancestorsAndSelf()
             ));
+            $parentPaths[(int) $candidate->id] = implode('/', $candidate->pathSegments());
         }
         $parentValue = old('parent_id', $page->parent_id);
 
@@ -485,6 +490,7 @@ class DixlasePagesAdminPagesController extends Controller
             'seoOgpMedia',
             'parentOptions',
             'parentValue',
+            'parentPaths',
         );
     }
 

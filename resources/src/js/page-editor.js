@@ -41,6 +41,12 @@ document.addEventListener('alpine:init', () => {
             slug: config.slug || '',
             publishedAt: config.publishedAt || '',
             slugBaseUrl: config.slugBaseUrl || '',
+            // Selected parent page id ('' or null = top-level). Bound to the
+            // parent_id <select> via x-model so the URL preview updates live.
+            parentId: config.parentId ?? '',
+            // Map of [parent_id => "ancestor-slug/.../parent-slug"] used by
+            // the pageUrl getter to prepend the parent path.
+            parentPaths: config.parentPaths || {},
             isEditMode: config.isEditMode || false,
             fileStorageBasePath: config.fileStorageBasePath || '',
             // CSS/JSタブ
@@ -138,10 +144,16 @@ document.addEventListener('alpine:init', () => {
             },
 
             /**
-             * ページURLプレビューを返す
+             * ページURLプレビューを返す。親ページが選択されているときは
+             * 親パス (/page/parent/) の後ろに自身のスラッグを付けた階層 URL を返す。
              */
             get pageUrl() {
-                return this.slugBaseUrl + this.slug;
+                const parentPath = this.parentId
+                    ? (this.parentPaths[this.parentId] || '')
+                    : '';
+                return parentPath
+                    ? `${this.slugBaseUrl}${parentPath}/${this.slug}`
+                    : `${this.slugBaseUrl}${this.slug}`;
             },
 
             /**
