@@ -711,6 +711,25 @@ class DixlasePagesAdminPagesController extends Controller
             'custom_js' => $customJs,
         ]);
 
+        // Keep any existing multilingual translation overlay in sync with the
+        // column write. Without this, an overlay row that already exists for
+        // the current locale (e.g. one the operator authored via the
+        // translation manager earlier) shadows the column on display, so
+        // edits made here would silently "revert" the moment the page is
+        // re-rendered. We only touch overlays that already exist — new ones
+        // are still owned by the translation manager, so a fresh page won't
+        // suddenly grow overlay rows just because someone saved it once.
+        if (\Illuminate\Support\Facades\App::bound(\App\Contracts\TranslationResolver::class)) {
+            $resolver = app(\App\Contracts\TranslationResolver::class);
+            $currentLocale = app()->getLocale();
+            $titleValue = $validated['title'] ?? '';
+            foreach ([['title', $titleValue], ['content', $content]] as [$field, $value]) {
+                if ($resolver->exists($page, $field, $currentLocale)) {
+                    $resolver->store($page, $field, $value, $currentLocale);
+                }
+            }
+        }
+
         // Record revision (manual because it's an explicit save by user)
         // Skipped if there are no changes from the previous revision
         $this->revisionService->record(
