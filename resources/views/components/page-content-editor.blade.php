@@ -499,7 +499,7 @@ Layout:
             {{-- Hidden when the multilingual plugin is inactive: the site only --}}
             {{-- has one language so the picker would be misleading. The store --}}
             {{-- request fills `lang` from the site default in that case. --}}
-            @if(!$isEditMode && $multilingualEnabled)
+            @if($multilingualEnabled)
                 <div>
                     @include('components::form-label', [
                         'for' => 'lang',
@@ -513,7 +513,11 @@ Layout:
                         xModel="lang"
                     />
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('dixlase-pages::components/page-content-editor.lang_help') }}
+                        @if($isEditMode)
+                            {{ __('dixlase-pages::components/page-content-editor.lang_edit_help') }}
+                        @else
+                            {{ __('dixlase-pages::components/page-content-editor.lang_help') }}
+                        @endif
                     </p>
                     @include('components::form-error', ['name' => 'lang'])
                 </div>
