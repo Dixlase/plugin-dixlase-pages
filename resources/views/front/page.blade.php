@@ -75,17 +75,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             $hasAdminBar = auth('member')->check();
         @endphp
         <!-- Main content -->
+        {{-- No card wrapper: the article sits flat on the page background so
+             the body's colour shows through. Pages that want a card or
+             other styling can re-apply it via custom CSS (see the
+             philosophy page's override for the inverse). --}}
         <div class="container mx-auto {{ $hasAdminBar ? 'pt-52' : 'pt-40' }} px-6 sm:px-8 lg:px-12">
-            <article class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <article>
                 <!-- Page header -->
-                <header class="px-8 sm:px-10 lg:px-12 pt-10 pb-14 border-b border-gray-200 dark:border-gray-700">
-                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
+                <header class="pb-5">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
                         {{ $page->getTranslation('title') }}
                     </h1>
                 </header>
 
                 <!-- Page content -->
-                <div class="px-8 sm:px-10 lg:px-12 py-10">
+                <div>
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         @if($editorType === 'markdown')
                             {{-- Markdown: parse and output with shortcode processing --}}
