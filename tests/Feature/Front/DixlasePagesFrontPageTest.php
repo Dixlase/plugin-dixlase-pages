@@ -203,6 +203,58 @@ class DixlasePagesFrontPageTest extends TestCase
     }
 
     /**
+     * 階層 URL (/page/parent/child) が公開ページを解決して 200 を返すことを確認
+     */
+    public function test_nested_path_resolves_child_page(): void
+    {
+        $parent = DixlasePagesPage::factory()->published()->create([
+            'slug' => 'parent',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'lang' => app()->getLocale(),
+        ]);
+        DixlasePagesPage::factory()->published()->create([
+            'slug' => 'child',
+            'title' => 'Nested Page',
+            'content' => '<p>Hello Nested</p>',
+            'parent_id' => $parent->id,
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'lang' => app()->getLocale(),
+        ]);
+
+        $response = $this->get('/'.$this->pagesDirectory.'/parent/child');
+
+        $response->assertStatus(200);
+        $response->assertSee('Nested Page');
+        $response->assertSee('Hello Nested');
+    }
+
+    /**
+     * 親なしの子スラッグ単独 URL は 404 を返すことを確認
+     */
+    public function test_child_slug_without_parent_path_returns_404(): void
+    {
+        $parent = DixlasePagesPage::factory()->published()->create([
+            'slug' => 'top',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'lang' => app()->getLocale(),
+        ]);
+        DixlasePagesPage::factory()->published()->create([
+            'slug' => 'leaf',
+            'parent_id' => $parent->id,
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'lang' => app()->getLocale(),
+        ]);
+
+        $response = $this->get('/'.$this->pagesDirectory.'/leaf');
+
+        $response->assertStatus(404);
+    }
+
+    /**
      * カスタムCSSアセットが正しいContent-Typeで返されることを確認
      */
     public function test_custom_css_asset_returns_correct_content_type(): void
