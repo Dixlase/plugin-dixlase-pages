@@ -163,6 +163,16 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // The parent_id <select> emits "" for the "Top-level page" option.
+        // Coerce that to null before validation so the `nullable|integer`
+        // rule chain skips cleanly and $validated['parent_id'] holds null
+        // (not ""), which the controller then passes straight to MySQL.
+        // Empty strings here would otherwise produce "set parent_id = "
+        // and trigger SQLSTATE 22007 on save.
+        if ($this->input('parent_id') === '') {
+            $this->merge(['parent_id' => null]);
+        }
+
         // If language is not specified, set the site settings language as default
         if (empty($this->lang)) {
             $this->merge(['lang' => app()->getLocale()]);
