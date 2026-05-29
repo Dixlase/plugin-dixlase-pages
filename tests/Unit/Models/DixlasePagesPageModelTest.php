@@ -78,6 +78,20 @@ class DixlasePagesPageModelTest extends TestCase
         $this->assertDatabaseHas('plg_dixlase_pages', ['slug' => 'test-page']);
     }
 
+    /**
+     * Source language can be changed after creation so an operator can
+     * relocate a row between locale-prefixed front URLs without recreating
+     * it.
+     */
+    public function test_lang_is_updatable_after_creation(): void
+    {
+        $page = $this->createPage(['lang' => 'en']);
+
+        $page->update(['lang' => 'ja']);
+
+        $this->assertSame('ja', $page->fresh()->lang);
+    }
+
     public function test_casts(): void
     {
         $page = $this->createPage();

@@ -350,6 +350,24 @@ class DixlasePagesAdminPagesFormDataTest extends TestCase
     }
 
     /**
+     * 編集モードでも langValue は既存ページの値で言語オプションが露出することを確認。
+     * (UI 上で言語ピッカーを再表示する変更と対応)
+     */
+    public function test_prepare_form_data_returns_existing_lang_on_edit(): void
+    {
+        $page = DixlasePagesPage::factory()->create([
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'lang' => 'en',
+        ]);
+
+        $result = $this->prepareFormData->invoke($this->controller, $page);
+
+        $this->assertSame('en', $result['langValue']);
+        $this->assertIsArray($result['languageOptions']);
+    }
+
+    /**
      * slugBaseUrlにアプリURLが含まれスラッシュで終わることを確認
      */
     public function test_slug_base_url_contains_app_url_and_ends_with_slash(): void
