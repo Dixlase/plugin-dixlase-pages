@@ -429,6 +429,55 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
+     * Override TranslatableTrait::getAttribute() for translatable fields so
+     * the lookup only honours an overlay row whose locale matches the
+     * current request locale exactly. The trait's stock implementation
+     * falls back through config('app.fallback_locale') before reaching
+     * the raw column, which on a site whose primary locale is, say,
+     * Japanese silently lets a stale English overlay shadow the
+     * Japanese source-column value. Anything off the translatable list
+     * goes through Eloquent's normal getAttribute() untouched.
+     */
+    public function getAttribute($key): mixed
+    {
+        if (
+            in_array($key, $this->translatable ?? [], true)
+            && App::bound(TranslationResolver::class)
+        ) {
+            $overlay = $this->resolveMultilingualOverlay($key, App::getLocale());
+            if ($overlay !== null && $overlay !== '') {
+                return $overlay;
+            }
+            // Skip TranslatableTrait's defaultLocale fallback step and read
+            // straight from the column via Eloquent's base accessor.
+            return Model::getAttribute($key);
+        }
+
+        return parent::getAttribute($key);
+    }
+
+    /**
+     * Same short-circuit as getAttribute() for explicit getTranslation()
+     * call sites (e.g. the front-page view's @section('title')): honour
+     * an overlay only when one exists for the requested locale and fall
+     * through to the raw column otherwise. This intentionally diverges
+     * from TranslatableTrait::getTranslation()'s defaultLocale step so
+     * a non-source-locale overlay cannot shadow the source-column value.
+     */
+    public function getTranslation(string $field, ?string $locale = null, bool $fallback = true): mixed
+    {
+        if (App::bound(TranslationResolver::class)) {
+            $locale = $locale ?? App::getLocale();
+            $overlay = $this->resolveMultilingualOverlay($field, $locale);
+            if ($overlay !== null && $overlay !== '') {
+                return $overlay;
+            }
+        }
+
+        return $this->getOriginalValue($field);
+    }
+
+    /**
      * Ask the multilingual TranslationResolver directly for a translation
      * value, bypassing TranslatableTrait::getTranslation()'s fallback
      * chain to the default locale and the raw column.

@@ -79,11 +79,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
              the body's colour shows through. Pages that want a card or
              other styling can re-apply it via custom CSS (see the
              philosophy page's override for the inverse). --}}
-        <div class="container mx-auto {{ $hasAdminBar ? 'pt-52' : 'pt-40' }} px-6 sm:px-8 lg:px-12">
+        <div class="container mx-auto {{ $hasAdminBar ? 'pt-14' : 'pt-12' }} px-6 sm:px-8 lg:px-12">
             <article>
                 <!-- Page header -->
-                <header class="pb-5">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                <header class="pt-10 pb-5">
+                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
                         {{ $page->getTranslation('title') }}
                     </h1>
                 </header>
