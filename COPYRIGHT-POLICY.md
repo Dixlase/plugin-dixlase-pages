@@ -22,7 +22,7 @@ Dixlase Pages is distributed under two parallel licenses, and recipients choose 
 
   (a) the GNU General Public License version 3 or later ("GPL"), as set out in [`LICENSE`](./LICENSE); and
 
-  (b) a separate commercial license offered by exc-D inc., as set out in [`LICENSE.commercial`](./LICENSE.commercial).
+  (b) a separate commercial license offered by exc-D inc., as set out in [`LICENSE-COMMERCIAL`](./LICENSE-COMMERCIAL).
 
 Both licenses cover the same software; they differ only in obligations.
 
@@ -53,7 +53,7 @@ For instructions, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 | Layer | Document |
 |---|---|
 | Open-source license | [`LICENSE`](./LICENSE) — GPL v3 |
-| Commercial license | [`LICENSE.commercial`](./LICENSE.commercial) |
+| Commercial license | [`LICENSE-COMMERCIAL`](./LICENSE-COMMERCIAL) |
 | Individual contributor agreement | https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.md |
 | Corporate contributor agreement | https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.md |
 

@@ -11,7 +11,7 @@
           License バージョン 3 の条項(全文は LICENSE に記載); または
 
       (b) exc-D inc. から提供される商用ライセンス
-          (詳細は LICENSE.commercial、または
+          (詳細は LICENSE-COMMERCIAL、または
           info@dixlase.org までお問い合わせください)。
 
     本プラグインリポジトリへのコントリビューションは、
@@ -27,8 +27,8 @@
 ファイル構成:
 
     LICENSE                GNU General Public License v3 原文
-    LICENSE.commercial     商用ライセンス条項(別途契約)
-    LICENSE.commercial-ja  LICENSE.commercial の日本語版
+    LICENSE-COMMERCIAL     商用ライセンス条項(別途契約)
+    LICENSE-COMMERCIAL.ja  LICENSE-COMMERCIAL の日本語版
     NOTICE                 プロジェクト著作権とデュアルライセンス概要
                            (英語版)
     NOTICE.ja              本ファイル(日本語版)

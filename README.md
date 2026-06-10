@@ -23,7 +23,7 @@ This plugin declares the following capability in `plugin.json`:
 Dixlase Pages is distributed under a **dual license**:
 
 - **Open Source License**: [GNU General Public License v3](./LICENSE)
-- **Commercial License**: For use cases where GPL v3 compliance is not feasible, a separate commercial license is available — see [LICENSE.commercial](./LICENSE.commercial) (currently a draft) or contact **info@dixlase.org**.
+- **Commercial License**: For use cases where GPL v3 compliance is not feasible, a separate commercial license is available — see [LICENSE-COMMERCIAL](./LICENSE-COMMERCIAL) (currently a draft) or contact **info@dixlase.org**.
 
 A short overview of how these files fit together is in [NOTICE](./NOTICE) ([日本語](./NOTICE.ja)).
 
