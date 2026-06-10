@@ -11,7 +11,7 @@
           GPL terms); or
 
       (b) a commercial license agreement obtained from exc-D inc.
-          (see LICENSE.commercial for details, or contact
+          (see LICENSE-COMMERCIAL for details, or contact
           info@dixlase.org).
 
     Contributions to this plugin repository are governed by the
@@ -26,11 +26,11 @@
 
 File map:
 
-    LICENSE                GNU General Public License v3 (verbatim)
-    LICENSE.commercial     Commercial license terms (separate agreement)
-    LICENSE.commercial-ja  Japanese counterpart of LICENSE.commercial
-    NOTICE                 This file — project copyright and dual-license
-                           summary (English)
-    NOTICE.ja              Japanese counterpart of this file
+    LICENSE                  GNU General Public License v3 (verbatim)
+    LICENSE-COMMERCIAL       Commercial license terms (separate agreement)
+    LICENSE-COMMERCIAL.ja    Japanese counterpart of LICENSE-COMMERCIAL
+    NOTICE                   This file — project copyright and dual-license
+                             summary (English)
+    NOTICE.ja                Japanese counterpart of this file
 
 =======================================================================

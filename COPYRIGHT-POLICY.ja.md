@@ -22,7 +22,7 @@ Dixlase Pages は、以下の 2 つのライセンスにより並行して配布
 
   (a) GNU General Public License バージョン 3 またはそれ以降(以下「GPL」といいます)([`LICENSE`](./LICENSE))
 
-  (b) GPL の遵守を希望しない当事者向けに exc-D inc. が別途提供する商用ライセンス([`LICENSE.commercial`](./LICENSE.commercial))
+  (b) GPL の遵守を希望しない当事者向けに exc-D inc. が別途提供する商用ライセンス([`LICENSE-COMMERCIAL`](./LICENSE-COMMERCIAL))
 
 両ライセンスは同一のソフトウェアを対象とし、義務の内容のみが異なります。
 
@@ -53,7 +53,7 @@ CLA モデルにおいては、コントリビューターはコントリビュ�
 | 階層 | 文書 |
 |---|---|
 | オープンソースライセンス | [`LICENSE`](./LICENSE) — GPL v3 |
-| 商用ライセンス | [`LICENSE.commercial`](./LICENSE.commercial) |
+| 商用ライセンス | [`LICENSE-COMMERCIAL`](./LICENSE-COMMERCIAL) |
 | 個人コントリビューター契約 | https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.md |
 | 法人コントリビューター契約 | https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.md |
 
