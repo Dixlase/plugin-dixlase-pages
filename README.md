@@ -1,5 +1,7 @@
 # Dixlase Pages
 
+For Japanese, see [README.ja.md](./README.ja.md).
+
 Static-page management for Dixlase: a hierarchical page tree under a configurable URL prefix (`/page/parent/child` by default), GUI / Markdown / HTML / Blade editors, database or per-locale file storage, per-page custom CSS / JavaScript, a revisions history with restore, draft / published / scheduled statuses, SEO meta integration, and translation overlays via Dixlase Multilingual.
 
 ## Features
