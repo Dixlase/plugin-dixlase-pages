@@ -52,7 +52,9 @@ Dixlase Pages is distributed under a **dual license**:
 
 A short overview of how these files fit together is in [NOTICE](./NOTICE) ([日本語](./NOTICE.ja)).
 
-Contributions to this plugin repository are governed by the [Dixlase Copyright Policy](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.md) and the Dixlase Contributor License Agreement (see CONTRIBUTING.md).
+## Contributing
+
+The Contributor License Agreement (CLA) is still under review, so the v0.1.x line does not yet accept code Pull Requests. Once the CLA is finalized, contributions will reopen under the [Dixlase Copyright Policy](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.md) and the Dixlase CLA (see CONTRIBUTING.md). Bug reports and proposals via Issues are welcome in the meantime.
 
 ---
 (C) exc-D inc. - 2026
