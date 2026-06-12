@@ -39,9 +39,7 @@ Dixlase 用の固定ページ管理プラグイン。
 
 ## インストール
 
-1. プラグインを Dixlase インストール先の `plugins/DixlasePages` に配置します。
-2. 管理画面の **ダッシュボード → プラグイン** から有効化するか、お使いの環境の CLI インストールコマンドを実行します。
-3. 有効化すると、本プラグインのマイグレーションが自動実行され、既定の URL プレフィックス (`page`)、公開可能ロール、ページステータスの選択肢が seed されます。
+管理画面の **ダッシュボード → プラグイン** から本プラグインを検索し、ダウンロード → 有効化します。有効化すると本プラグイン用のテーブルが自動で作成されます。
 
 ## 使い方
 
@@ -74,14 +72,17 @@ Dixlase Pages は **デュアルライセンス** で配布されています。
 - **オープンソースライセンス**: [GNU General Public License v3](./LICENSE)
 - **商用ライセンス**: GPL v3 の遵守が現実的でないユースケース向けに、別途商用ライセンスの提供を予定しています。
 
-**現時点では商用ライセンスはまだ提供しておりません**(雛形のみ [LICENSE-COMMERCIAL](./LICENSE-COMMERCIAL) に Draft として置いています)。
+**現時点では商用ライセンスはまだ提供しておりません。
+**(雛形のみ [LICENSE-COMMERCIAL](./LICENSE-COMMERCIAL) に Draft として置いています)。
 提供開始時期や条件に関するお問い合わせは **info@dixlase.org** までご連絡ください。
 
 各ファイルの関係概要は [NOTICE.ja](./NOTICE.ja)([English](./NOTICE))にあります。
 
 ## コントリビューションについて
 
-CLA (Contributor License Agreement) のレビュー中のため、v0.1.x ではコード Pull Request を受け付けていません。CLA 確定後に受付を再開し、その時点から [Dixlase Copyright Policy](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.md) と Dixlase CLA(詳細は CONTRIBUTING.md)の対象となります。それまでも Issue での不具合報告・機能提案は歓迎しています。
+CLA (Contributor License Agreement) のレビュー中のため、現在 Pull Request を受け付けていません。
+CLA 確定後に受付を開始し、その時点から [Dixlase Copyright Policy](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.md) と Dixlase CLA(詳細は CONTRIBUTING.md)の対象となります。
+それまでも Issue での不具合報告・機能提案は歓迎しています。
 
 ---
 

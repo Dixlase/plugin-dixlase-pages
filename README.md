@@ -21,9 +21,7 @@ Static-page management for Dixlase: a hierarchical page tree under a configurabl
 
 ## Installation
 
-1. Place the plugin at `plugins/DixlasePages` inside your Dixlase installation.
-2. Enable it from the admin panel under **Dashboard → Plugins**, or run the equivalent CLI install command for your environment.
-3. After enable, the plugin's migrations run automatically and seed the default URL prefix (`page`), publishing role, and page-status options.
+Open the admin panel under **Dashboard → Plugins**, find this plugin, then download and enable it. The plugin's tables are created automatically on enable.
 
 ## Usage
 
