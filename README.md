@@ -2,7 +2,7 @@
 
 For Japanese, see [README.ja.md](./README.ja.md).
 
-Static-page management for Dixlase: a hierarchical page tree under a configurable URL prefix (`/page/parent/child` by default), GUI / Markdown / HTML / Blade editors, database or per-locale file storage, per-page custom CSS / JavaScript, a revisions history with restore, draft / published / scheduled statuses, SEO meta integration, and translation overlays via Dixlase Multilingual.
+Static-page management for Dixlase: a hierarchical page tree under a configurable URL prefix (`/page/parent/child` by default), GUI / Markdown / HTML / Blade editors, database or file storage, per-page custom CSS / JavaScript, a revisions history with restore, draft / published / scheduled statuses, SEO-meta integration with DixlaseSEO, and internal-link interoperability with DixlaseMenu.
 
 ## Features
 
@@ -15,7 +15,6 @@ Static-page management for Dixlase: a hierarchical page tree under a configurabl
 - **Revisions** — Every save records a snapshot. Manual and automatic revisions are listed in the admin and can be restored without overwriting the current state (a pre-restore backup is created).
 - **Publish workflow** — Draft / Published / Scheduled (with future `published_at`). Drafts and future-scheduled pages are visible to logged-in admins (preview banner) and 404 to public visitors.
 - **SEO meta** — When the `dixlase-seo` plugin is enabled, the edit form exposes meta-description and OGP-image fields; the values are stored by Dixlase SEO via the `seo-meta` capability contract.
-- **Multilingual** — When `dixlase-multilingual` is enabled, the source language is stored on the page row's `lang` column, with per-locale translation overlays stored by Multilingual. Source language can be changed after creation.
 - **Configurable URL prefix** — The route prefix (default `page`) is stored in admin settings and respected by both the public route and the admin URL preview.
 - **Role-based permission** — Default permissions for the Pages admin menus are declared in `config/admin/roles.php` (index / create: Editor and above, settings: Admin only) and resolved at runtime by the core `PermissionRegistry`.
 - **Internal-link provider** — Implements `RouteSlugProvider` and a Linkable provider so other plugins (e.g. menu, blog) can reference pages by ID and get the correctly composed `/page/parent/child` URL — including under a locale prefix.
@@ -35,20 +34,21 @@ After enable, **Dashboard → Pages** appears in the admin sidebar.
 - **Edit** opens the same editor on an existing row. Live preview is available for HTML / Markdown / GUI editors.
 - **Settings** (admin only) lets you change the URL prefix, default editor type, and minimum publish role.
 
-Public URLs are composed from the prefix and the page's path segments: a top-level page named `about` becomes `/page/about`, and a child page `team` under `about` becomes `/page/about/team`. When the multilingual plugin's locale URL routing is enabled, the same route is mirrored under `/{locale}/page/...`.
+Public URLs are composed from the prefix and the page's path segments: a top-level page named `about` becomes `/page/about`, and a child page `team` under `about` becomes `/page/about/team`. If the site uses locale URL routing, the same route is mirrored under `/{locale}/page/...`.
 
 ## Capabilities
 
-This plugin declares the following capability in `plugin.json`:
+This plugin declares the following capabilities in `plugin.json` so other plugins can plug into it through stable contracts:
 
-- **`multilingual-content`** — Reserved capability key for future multilingual content support. Declared on plugins that store user-editable text intended to be translatable once the supporting runtime is in place.
+- **`seo-meta`** — Contract through which DixlaseSEO reads and writes SEO metadata (meta description, OGP image, etc.) attached to each page. The SEO section of the Pages edit form is wired through this capability when DixlaseSEO is enabled.
+- **`linkable`** — Contract through which internal-link plugins such as DixlaseMenu reference pages by ID. The composed public URL (including the parent path and any locale prefix) is resolved on the Pages side, so consumers only ever store the page ID.
 
 ## License
 
 Dixlase Pages is distributed under a **dual license**:
 
 - **Open Source License**: [GNU General Public License v3](./LICENSE)
-- **Commercial License**: For use cases where GPL v3 compliance is not feasible, a separate commercial license is available — see [LICENSE-COMMERCIAL](./LICENSE-COMMERCIAL) (currently a draft) or contact **info@dixlase.org**.
+- **Commercial License**: A separate commercial license is planned for use cases where GPL v3 compliance is not feasible. **It is not yet available** — only a draft of the eventual terms is present in [LICENSE-COMMERCIAL](./LICENSE-COMMERCIAL). For availability timing or other questions, contact **info@dixlase.org**.
 
 A short overview of how these files fit together is in [NOTICE](./NOTICE) ([日本語](./NOTICE.ja)).
 

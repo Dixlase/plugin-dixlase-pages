@@ -5,11 +5,12 @@ For English, see [README.md](./README.md).
 Dixlase 用の固定ページ管理プラグイン。
 
 - 設定可能な URL プレフィックス配下に階層的なページツリー
-- GUI / Markdown / HTML の 3 種類のエディタ、データベース またはロケール別ファイルストレージ
+- GUI / Markdown / HTML の 3 種類のエディタ、データベース またはファイルでの保存
 - ページごとのカスタム CSS / JavaScript
 - 復元可能なリビジョン履歴
 - 下書き / 公開 / 予約公開のステータス
-- DixlaseSEOを介したSEOオーバーレイを提供します。
+- DixlaseSEO 連携による SEO メタ管理
+- DixlaseMenu からの内部リンク参照に対応
 
 ## 機能
 
@@ -44,7 +45,7 @@ Dixlase 用の固定ページ管理プラグイン。
 
 ## 使い方
 
-有効化すると、管理画面のサイドバーに **ダッシュボード → ページ** が表示されます。
+有効化すると、管理画面のサイドバーに **ページ管理** が表示されます。
 
 - **一覧画面**:
   全ページを検索 / ステータスフィルタ / 列単位ソートで閲覧できます。
@@ -59,17 +60,19 @@ Dixlase 用の固定ページ管理プラグイン。
 
 ## Capabilities
 
-本プラグインは `plugin.json` で以下の capability を宣言しています。
+本プラグインは `plugin.json` で以下の capability を宣言しており、他プラグインとの連携が可能です。
 
-- **`multilingual-content`**
-  — 将来の多言語コンテンツ対応に向けた予約 capability キー。サポート ランタイム整備後に翻訳対象としたい、ユーザー編集可能なテキストを保持するプラグインで宣言します。
+- **`seo-meta`**
+  — DixlaseSEO プラグインから、各ページに対する SEO メタデータ(meta description / OGP 画像など)を読み書きできる契約。Pages 編集フォームの SEO セクションは、DixlaseSEO が有効なときにこの capability 経由で連動します。
+- **`linkable`**
+  — DixlaseMenu などの内部リンクを扱うプラグインから、本プラグインのページを ID 指定で参照できる契約。階層パス込みの公開 URL は自動で組み立てられ、locale プレフィックス配下も追従します。
 
 ## ライセンス
 
 Dixlase Pages は **デュアルライセンス** で配布されています。
 
 - **オープンソースライセンス**: [GNU General Public License v3](./LICENSE)
-- **商用ライセンス**: GPL v3 の遵守が現実的でないユースケース向けに、別途商用ライセンスを提供します。詳細は [LICENSE-COMMERCIAL](./LICENSE-COMMERCIAL)(現在は Draft)を参照するか、**info@dixlase.org** までお問い合わせください。
+- **商用ライセンス**: GPL v3 の遵守が現実的でないユースケース向けに、別途商用ライセンスの提供を予定しています。**現時点では商用ライセンスはまだ提供しておりません**(雛形のみ [LICENSE-COMMERCIAL](./LICENSE-COMMERCIAL) に Draft として置いています)。提供開始時期や条件に関するお問い合わせは **info@dixlase.org** までご連絡ください。
 
 各ファイルの関係概要は [NOTICE.ja](./NOTICE.ja)([English](./NOTICE))にあります。
 
