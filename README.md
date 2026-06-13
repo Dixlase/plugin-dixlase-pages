@@ -6,18 +6,15 @@ Static-page management for Dixlase: a hierarchical page tree under a configurabl
 
 ## Features
 
-- **Hierarchical pages** — Up to three levels deep (`/page/a/b/c`). Choose a parent on the edit form; deleting a parent promotes its children to top-level rather than cascade-deleting them. Slug uniqueness is scoped per parent.
-- **Four editor types** — GUI builder, Markdown, raw HTML, and Blade. Simple mode (admin default) restricts new pages to GUI / Markdown; Advanced mode unlocks HTML and Blade. Existing pages keep editing in whatever type they were created with.
-- **Two storage backends** — Choose at creation time:
-  - **Database** — content lives in the page row. Fastest path for short pages.
-  - **File** — content is written to `storage/app/private/dixlase-pages/{slug}.{ext}` with locale-specific copies (`{slug}.{locale}.{ext}`). Easier to edit through a text editor or commit to Git for long-form pages.
-- **Per-page custom CSS / JS** — Each page can ship its own stylesheet and script, served at `/page/{path}/custom-style.css` and `/page/{path}/custom-script.js` with cache headers and CSP exemptions handled automatically.
-- **Revisions** — Every save records a snapshot. Manual and automatic revisions are listed in the admin and can be restored without overwriting the current state (a pre-restore backup is created).
-- **Publish workflow** — Draft / Published / Scheduled (with future `published_at`). Drafts and future-scheduled pages are visible to logged-in admins (preview banner) and 404 to public visitors.
-- **SEO meta** — When the `dixlase-seo` plugin is enabled, the edit form exposes meta-description and OGP-image fields; the values are stored by Dixlase SEO via the `seo-meta` capability contract.
-- **Configurable URL prefix** — The route prefix (default `page`) is stored in admin settings and respected by both the public route and the admin URL preview.
-- **Role-based permission** — Default permissions for the Pages admin menus are declared in `config/admin/roles.php` (index / create: Editor and above, settings: Admin only) and resolved at runtime by the core `PermissionRegistry`.
-- **Internal-link provider** — Implements `RouteSlugProvider` and a Linkable provider so other plugins (e.g. menu, blog) can reference pages by ID and get the correctly composed `/page/parent/child` URL — including under a locale prefix.
+- **Hierarchical pages** — Up to three levels (`/page/parent/child`). Children are promoted to top-level when a parent is deleted.
+- **Editors** — GUI / Markdown / HTML, switchable per page.
+- **Storage** — Choose database or file storage per page.
+- **Per-page custom CSS / JS** — Each page ships its own stylesheet and script.
+- **Revisions** — Snapshots on every save, restorable anytime.
+- **Publish workflow** — Draft / Published / Scheduled.
+- **Configurable URL prefix** — Change the default `/page/` prefix from admin settings.
+- **Role-based permission** — Per-menu role permissions.
+- **Integrations** — SEO meta via DixlaseSEO, internal-link references via DixlaseMenu.
 
 ## Installation
 
@@ -25,22 +22,17 @@ Open the admin panel under **Dashboard → Plugins**, find this plugin, then dow
 
 ## Usage
 
-After enable, **Dashboard → Pages** appears in the admin sidebar.
+Once enabled, **Pages** appears in the admin sidebar with list / new / edit / settings screens.
 
-- **List view** lists every page with search / status filter and per-column sort.
-- **New page** opens the editor split-view: content area on the left, settings on the right (storage type, slug, parent page, language, status, custom CSS / JS, SEO meta when available).
-- **Edit** opens the same editor on an existing row. Live preview is available for HTML / Markdown / GUI editors.
-- **Settings** (admin only) lets you change the URL prefix, default editor type, and minimum publish role.
-
-Public URLs are composed from the prefix and the page's path segments: a top-level page named `about` becomes `/page/about`, and a child page `team` under `about` becomes `/page/about/team`. If the site uses locale URL routing, the same route is mirrored under `/{locale}/page/...`.
+Public URLs are composed from the prefix and the page's path. Example: an `about` page becomes `/page/about`, and its child `team` becomes `/page/about/team`.
 
 ## Capabilities
 
-This plugin declares the following capabilities in `plugin.json` so other plugins can plug into it through stable contracts:
+This plugin declares the following capabilities in `plugin.json`:
 
-- **`seo-meta`** — Contract through which DixlaseSEO reads and writes SEO metadata (meta description, OGP image, etc.) attached to each page. The SEO section of the Pages edit form is wired through this capability when DixlaseSEO is enabled.
-- **`linkable`** — Contract through which internal-link plugins such as DixlaseMenu reference pages by ID. The composed public URL (including the parent path and any locale prefix) is resolved on the Pages side, so consumers only ever store the page ID.
-- **`multilingual-content`** — Reserved capability key for future multilingual support. It activates once the supporting multilingual runtime ships as a separate plugin. For now it is declared but inert.
+- **`seo-meta`** — Contract for DixlaseSEO to read and write per-page SEO metadata (meta description, OGP image).
+- **`linkable`** — Contract for plugins like DixlaseMenu to reference pages by ID. The full URL (hierarchy + locale prefix) is composed on the Pages side.
+- **`multilingual-content`** — Reserved capability key for future multilingual support. Activates once the multilingual runtime ships as a separate plugin.
 
 ## License
 
