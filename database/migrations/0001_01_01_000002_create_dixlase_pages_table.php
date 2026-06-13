@@ -67,7 +67,14 @@ return new class extends Migration
         //   the pre-folded 00007.
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('parent_id')->nullable()->after('id');
+            // parent_id sits right under id() so the physical column order
+            // is correct without an AFTER clause. The original ALTER-time
+            // ->after('id') modifier was carried over when migration 00007
+            // was folded into this create; MySQL rejects AFTER inside
+            // CREATE TABLE with a 1064 syntax error (SQLite tolerates it
+            // by silently dropping the modifier, which is why local
+            // SQLite-backed tests stayed green while the MySQL CI broke).
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('slug'); // Page URL (slug)
             $table->string('lang', 10)->comment('言語コード'); // Language code
             $table->string('title')->nullable(); // Title
