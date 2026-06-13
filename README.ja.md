@@ -64,6 +64,8 @@ Dixlase 用の固定ページ管理プラグイン。
   — DixlaseSEO プラグインから、各ページに対する SEO メタデータ(meta description / OGP 画像など)を読み書きできる契約。Pages 編集フォームの SEO セクションは、DixlaseSEO が有効なときにこの capability 経由で連動します。
 - **`linkable`**
   — DixlaseMenu などの内部リンクを扱うプラグインから、本プラグインのページを ID 指定で参照できる契約。階層パス込みの公開 URL は自動で組み立てられ、locale プレフィックス配下も追従します。
+- **`multilingual-content`**
+  — 将来の多言語対応に向けた予約 capability キー。対応する多言語ランタイムが別プラグインとして公開された時点で接続されます。現時点では宣言のみで、稼働はしません。
 
 ## ライセンス
 
