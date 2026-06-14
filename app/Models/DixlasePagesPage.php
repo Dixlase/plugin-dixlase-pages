@@ -478,6 +478,30 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
+     * Primary-locale SEO meta description, sourced from DixlaseSEO's meta
+     * store. Exposed as the `seo_description` attribute so the central
+     * translation manager shows it as the source reference when editing
+     * the page's per-locale `seo_description` translations (declared as a
+     * translatable field in plugin.json). Returns null when DixlaseSEO is
+     * not installed; never persisted on this model.
+     */
+    public function getSeoDescriptionAttribute(): ?string
+    {
+        if (! App::bound(SeoMetaProviderInterface::class)) {
+            return null;
+        }
+
+        try {
+            $meta = App::make(SeoMetaProviderInterface::class)
+                ->getMeta('dixlase-pages', (string) $this->getKey());
+
+            return $meta?->description;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Ask the multilingual TranslationResolver directly for a translation
      * value, bypassing TranslatableTrait::getTranslation()'s fallback
      * chain to the default locale and the raw column.

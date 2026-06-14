@@ -56,6 +56,11 @@
                         "name": "content",
                         "type": "richtext",
                         "rules": "nullable|string"
+                    },
+                    {
+                        "name": "seo_description",
+                        "type": "textarea",
+                        "rules": "nullable|string|max:300"
                     }
                 ]
             }
