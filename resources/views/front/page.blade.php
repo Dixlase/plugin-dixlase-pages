@@ -30,6 +30,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @extends('themes::layouts.app')
 
+@php
+    // Declare this page as the current SEO entity so DixlaseSEO can emit
+    // its (locale-aware) meta description. Guarded: the helper only exists
+    // when the DixlaseSEO plugin is installed and enabled.
+    if (function_exists('dls_seo_set_entity')) {
+        dls_seo_set_entity('dixlase-pages', $page->id);
+    }
+@endphp
+
 @section('title', $page->getTranslation('title'))
 
 @php
