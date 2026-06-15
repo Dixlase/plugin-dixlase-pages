@@ -377,6 +377,18 @@ class DixlasePagesPage extends Model implements Revisionable
             if ($found === null && $primaryLocale !== '' && $primaryLocale !== $locale) {
                 $found = (clone $base)->forLang($primaryLocale)->first();
             }
+            if ($found === null) {
+                // Final fallback: the page may be authored in a locale that is
+                // neither the request locale nor the site primary — e.g. a
+                // Japanese-source page on an English-primary site, written in
+                // Japanese first and translated to English afterwards. Match
+                // the row by slug regardless of its authoring lang; the
+                // multilingual overlay then supplies the right translation for
+                // the request locale at render time, falling back to the
+                // source-language content when no overlay exists. Deterministic
+                // by oldest id for the legacy one-row-per-language layout.
+                $found = (clone $base)->orderBy('id')->first();
+            }
 
             if ($found === null) {
                 return null;
