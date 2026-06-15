@@ -186,9 +186,14 @@ class DixlasePagesFrontPageTest extends TestCase
     }
 
     /**
-     * 異なる言語のページが404になることを確認（forLangスコープ）
+     * A page authored in a locale other than the request locale and the
+     * site primary still resolves (it is not filtered out by lang). This
+     * supports the "write in one language first, translate later" workflow:
+     * a Japanese-source page on an English-primary site stays reachable from
+     * every locale URL, with the multilingual overlay supplying the right
+     * translation at render time and the source content as the fallback.
      */
-    public function test_page_with_different_lang_returns_404(): void
+    public function test_page_authored_in_another_locale_is_accessible(): void
     {
         DixlasePagesPage::factory()->published()->create([
             'slug' => 'lang-test',
@@ -199,7 +204,7 @@ class DixlasePagesFrontPageTest extends TestCase
 
         $response = $this->get('/'.$this->pagesDirectory.'/lang-test');
 
-        $response->assertStatus(404);
+        $response->assertStatus(200);
     }
 
     /**
