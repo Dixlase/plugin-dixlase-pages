@@ -4,7 +4,7 @@
 
     Copyright (C) 2026 exc-D inc. <https://exc-d.com>
 
-    Status: Draft / Under Development
+    Status: Placeholder — in preparation
 
 =======================================================================
 
@@ -12,35 +12,40 @@ Dixlase Pages is dual-licensed under:
 
   (a) the GNU General Public License version 3 or later (GPL-3.0); and
 
-  (b) a commercial license available from exc-D inc.
+  (b) a commercial license offered by exc-D inc.
 
-The terms of the commercial license are currently under development.
-This file will be updated when the commercial license terms,
-pricing, and purchase process are finalized.
+The commercial license track is currently **in preparation and not
+yet available**. The terms, pricing, and purchase process are being
+finalized as part of the Dixlase-wide commercial-license framework
+maintained alongside the Dixlase Core repository. This file holds a
+placeholder so that the dual-license structure can be referenced
+consistently across the project; it will be replaced with the
+operative agreement once the framework activates.
 
-If you are interested in obtaining a commercial license — for example,
-to bundle Dixlase Pages into a proprietary product or to be
-released from the GPL distribution requirements — please contact:
+Until that happens, all use of Dixlase Pages — including bundling
+into proprietary products — is governed solely by the GPL-3.0 terms
+in the LICENSE file. There is no separate commercial channel to opt
+into yet.
+
+If you are interested in obtaining a commercial license once the
+framework activates — for example, to bundle Dixlase Pages into a
+proprietary product or to be released from the GPL distribution
+requirements — please get in touch so we can notify you when the
+commercial track opens:
 
   Email:   info@dixlase.org
   Website: https://exc-d.com
 
-Until the commercial license terms are published, all use of
-Dixlase Pages is governed by the GPL-3.0 terms in the LICENSE
-file.
-
-The commercial license for Dixlase Pages is offered separately
+The eventual Dixlase Pages commercial license is offered separately
 from the Dixlase Core commercial license. Holders of a Dixlase Core
-commercial license may already have rights to commercial use of this
-plugin under the bundle terms — check your Dixlase commercial
-license agreement.
+commercial license may already have rights to commercial use of
+this plugin under that agreement's bundle terms — check your
+Dixlase commercial license agreement once it is in place.
 
-For information on contributing to Dixlase Pages, see
-CONTRIBUTING.md, which references the canonical Dixlase CLA in the
-core repository.
+For information on contributing to Dixlase Pages, see CONTRIBUTING.md.
 
 =======================================================================
 
-Last updated: 2026-04-28
+Last updated: 2026-06-13
 
 =======================================================================
