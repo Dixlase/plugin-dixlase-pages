@@ -1,63 +1,70 @@
 # Dixlase Pages へのコントリビューション
 
-**Dixlase Pages** へのコントリビューションにご関心をお寄せいただきありがとうございます。本プラグインは Dixlase プロジェクトの一部であり、コントリビューションはすべて **Dixlase Core リポジトリ** に置かれているプロジェクト全体のポリシーに従います。
+**Dixlase Pages** へのコントリビューションにご関心をお寄せいただきありがとうございます。本プラグインは Dixlase プロジェクトの一部であり、コントリビューションに関する方針はすべて **Dixlase Core リポジトリ** が単一ソースです。
 
 英語版は [CONTRIBUTING.md](./CONTRIBUTING.md) をご覧ください。
 
 ---
 
-## プロジェクト全体のポリシー(正本)
+## 現在のコントリビューション受付状況 (v0.x)
 
-以下の Dixlase Core リポジトリの文書が正本であり、本プラグインを含む全てのコントリビューションに適用されます:
+Dixlase Pages は初期開発期にあり、Dixlase 全体として **現在、外部からのコード Pull Request は受け付けていません**。外部からのコードコントリビューションは、Dixlase 全体で運用する Contributor License Agreement (CLA) の正式法務レビューが完了次第、再開予定です。
 
-- **[コントリビューションガイド](https://github.com/Dixlase/dixlase-core/blob/main/CONTRIBUTING.ja.md)** — 全体的なワークフロー、コーディングスタイル、テスト、PR 規約
-- **[コピーライトポリシー](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.ja.md)** — 高水準のライセンス方針
-- **[個人 CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.ja.md)** — 個人向けコントリビューターライセンス契約
-- **[法人 CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.ja.md)** — 法人向けコントリビューターライセンス契約
+**現在歓迎しているコントリビューション:**
 
-本プラグインは、CLA の独自コピーを保持 **しません**。Core リポジトリの正本 CLA が単一ソースです。これにより、プラグインリポジトリ間でのドリフトを防ぎます。
+- 本リポジトリの [Issues](https://github.com/Dixlase/plugin-dixlase-pages/issues) でのバグ報告
+- Issues での機能提案
+- ドキュメントの誤り・タイポの指摘 (Issues)
+- 横断的なテーマ(Core + 複数プラグインにまたがるもの)は Core リポジトリの [Discussions](https://github.com/Dixlase/dixlase-core/discussions)
 
-## なぜ CLA が必要か
+**現在受け付けていないコントリビューション:**
 
-**Dixlase Pages は GPL-3.0 + exc-D inc. が提供する商用ライセンスのデュアルライセンス方式** で配布されています。このモデルを維持するためには、exc-D が受領したコントリビューションを両方のライセンスでサブライセンスできることが法的に必要です。CLA は、コントリビューターが所有権を保持しつつ、exc-D に対しその目的に必要な権利を許諾するための仕組みです。
+- ソースコードの Pull Request(CLA 法務レビュー完了後に再開)
+- ドキュメントの Pull Request(代わりに Issue でのご指摘をお願いします)
+- 翻訳の Pull Request(CLA 法務レビュー完了後に再開)
 
-CLA に署名することにより、以下に同意したことになります:
+> **バグ報告に含まれるコードスニペットの取り扱い**: バグ修正のためにコードの提案を含めていただくことは歓迎しますが、それは **参考情報としてのみ取り扱われます**。メンテナーは独立して修正を実装し直しますので、提供いただいたスニペットがそのままコミットされることは通常ありません。これは、Dixlase のデュアルライセンスモデルの下では、CLA 法務レビュー完了までは外部からのコードコントリビューションを受け付けることができないためです。
 
-- コントリビューションの **所有権を保持** します
-- exc-D inc. に対し、デュアルライセンス方式を支えるに足る、永続的、全世界的、取消不能、サブライセンス可能なライセンスを **許諾** します
-- 当該ライセンスの行使を妨げる態様で **著作者人格権を主張しない** ことに同意します
-- ライセンス許諾の **権限を有する** ことを確認します(雇用主の許可、原始的創作、第三者素材の開示)
+## なぜコントリビューションを保留しているか
 
-## CLA の提出方法
+**Dixlase Pages は GPL-3.0 + exc-D inc. が提供する商用ライセンスのデュアルライセンス方式** で配布されています。このモデルを維持するためには、exc-D が受領したコントリビューションを両方のライセンスでサブライセンスできることが法的に必要です。コントリビューターが所有権を保持しつつ exc-D に必要な権利を許諾する CLA 枠組みは、現在 Dixlase プロジェクト全体で法務レビュー中です。本プラグインへの PR ベースのコントリビューションは、Core リポジトリ側で Dixlase 全体の CLA が確定し次第、再開します。
 
-Dixlase プロジェクトが v0.1.x の期間中、CLA はメールで提出します:
+枠組みが稼働した後、本プラグインへのコントリビューションは以下に従います:
 
-1. [個人 CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.ja.md) (該当する場合は [法人 CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.ja.md) も) を全文お読みください
-2. コントリビューター情報欄に記入し、末尾に署名してください
-3. 件名 `CLA 提出 — <氏名または組織名>` で **info@dixlase.org** に提出ファイルを添付してメール送信してください。コントリビューションを予定しているプラグインも明記してください
+- 正本 **CLA** (Contributor License Agreement) — 個人・法人いずれの署名区分も 1 本に統合された単一文書。Core リポジトリの [`CLA.md`](https://github.com/Dixlase/dixlase-core/blob/main/CLA.md) を参照
+- Dixlase プロジェクト [コピーライトポリシー](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.ja.md)
+- 稼働後の PR ワークフロー: Core リポジトリの [`CONTRIBUTING-FUTURE.ja.md`](https://github.com/Dixlase/dixlase-core/blob/main/CONTRIBUTING-FUTURE.ja.md)(稼働開始までは情報提供目的)
 
-1 通の CLA で Core および公式プラグイン全体のコントリビューションをカバーします。リポジトリごとに別個の CLA に署名する必要はありません。
-
-将来の v0.1.x リリースで、この手動ワークフローは [CLA Assistant](https://cla-assistant.io/) に置き換わり、PR フロー内で署名収集が自動化されます。その際、本セクションは更新されます。
-
-## プルリクエストの提出方法
-
-1. 本リポジトリを fork し、機能ブランチを作成
-2. [Core コントリビューションガイド](https://github.com/Dixlase/dixlase-core/blob/main/CONTRIBUTING.ja.md) の規約に従って変更を加える
-3. 変更内容に対するテストを追加
-4. 全テストが通り、コードがフォーマット済みであることを確認(`vendor/bin/pint`)
-5. 本プラグインの `main` ブランチに対して PR を開く
-6. 関連する Issue 番号を参照
-7. メンテナがレビューしフィードバックを提供します
+1 通の CLA で Dixlase プロジェクト全体(Core および全公式プラグイン)のコントリビューションをカバーします。リポジトリごとに別個に署名する必要はありません。
 
 ## 不具合報告
 
-- **Dixlase Pages に関する不具合・機能要望**: 本プラグインリポジトリで Issue を作成
-- **複数プラグインまたは Core にまたがる問題**: [Dixlase Core リポジトリ](https://github.com/Dixlase/dixlase-core/issues) で Issue を作成
+不具合を報告する際は、以下を含めてください:
 
-## 行動規範
+- 問題の明確な説明
+- 再現手順
+- 期待される動作と実際の動作
+- 環境の詳細(Dixlase Core のバージョン、PHP のバージョン、MySQL のバージョン、ブラウザ、OS)
+- 関連するログやエラーメッセージ
 
-Dixlase Pages および Dixlase プロジェクト全体へのコントリビューションは、Core リポジトリで公開されている場合 [Dixlase Code of Conduct](https://github.com/Dixlase/dixlase-core/blob/main/CODE_OF_CONDUCT.md) に従います。
+複数プラグインまたは Core にまたがる問題は、[Dixlase Core リポジトリ](https://github.com/Dixlase/dixlase-core/issues) に Issue を作成してください。
+
+## セキュリティ脆弱性の報告
+
+**セキュリティ脆弱性を公開 Issue で報告しないでください。** 非公開報告経路については [SECURITY.ja.md](./SECURITY.ja.md) をご参照ください。
+
+## 商標
+
+「Dixlase」および「Dixlase Pages」の名称・ロゴの使用については、Core リポジトリの [商標ポリシー](https://github.com/Dixlase/dixlase-core/blob/main/TRADEMARK-POLICY.ja.md) に従ってください。
+
+## ご質問
+
+コントリビューションに関するご質問は、以下までお気軽にどうぞ:
+
+- Core リポジトリで [Discussion](https://github.com/Dixlase/dixlase-core/discussions) を開く
+- **info@dixlase.org** までメール
+
+PR 受付再開前であっても、皆様のバグ報告とフィードバックは Dixlase Pages を改善するための貴重な貢献です。ありがとうございます。
 
 ---
 

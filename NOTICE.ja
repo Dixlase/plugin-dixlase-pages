@@ -14,23 +14,48 @@
           (詳細は LICENSE-COMMERCIAL、または
           info@dixlase.org までお問い合わせください)。
 
-    本プラグインリポジトリへのコントリビューションは、
-    Dixlase コピーライトポリシーおよび Dixlase コントリビューター
-    ライセンス契約 (CLA) の対象となります(詳細は CONTRIBUTING.md を
-    参照。CLA の正本は Dixlase Core リポジトリにあります)。
+    注記: 商用ライセンスの枠組みは現在準備中であり、まだ提供されて
+    いません。LICENSE-COMMERCIAL には現時点ではプレースホルダーのみが
+    置かれています。商用トラックが稼働するまで、本プラグインの利用は
+    すべて LICENSE ファイル記載の GPL 条項に従います。
 
-    商用ライセンス契約を締結していない場合、本プロジェクトは
-    LICENSE ファイル記載の GPL の条項の下で配布されます。
+    本プラグインリポジトリへのコントリビューションは、Dixlase 全体で
+    運用する Contributor License Agreement (CLA) が法務レビュー中の
+    ため、現在受付を保留しています。レビュー完了までに歓迎している
+    コントリビューション(Issue でのバグ報告、機能提案など)は
+    CONTRIBUTING.md をご参照ください。レビュー完了後に Pull Request
+    を受け付ける際の枠組みとなる正本 CLA は、Dixlase Core リポジトリ
+    に置かれています。
 
 =======================================================================
 
 ファイル構成:
 
     LICENSE                  GNU General Public License v3 原文
-    LICENSE-COMMERCIAL       商用ライセンス条項(別途契約)
+    LICENSE-COMMERCIAL       商用ライセンスのプレースホルダー
+                             (準備中)
     LICENSE-COMMERCIAL.ja    LICENSE-COMMERCIAL の日本語版
     NOTICE                   プロジェクト著作権とデュアルライセンス概要
                              (英語版)
     NOTICE.ja                本ファイル(日本語版)
+    COPYRIGHT-POLICY.md      プラグイン側コピーライト方針
+                             (正本は Core リポジトリ)
+    COPYRIGHT-POLICY.ja.md   日本語版
+    CONTRIBUTING.md          本プラグインの現在のコントリビューション
+                             方針(英語版)
+    CONTRIBUTING.ja.md       日本語版
+    SECURITY.md              脆弱性報告について(Core への案内)
+    SECURITY.ja.md           日本語版
+
+Dixlase Core リポジトリ側で参照される文書:
+
+    LICENSE-EXCEPTIONS       本プラグインを AGPL コアと共存させるための
+                             AGPL §7 に基づくプラグイン・テーマ例外条項
+    CLA.md                   コントリビューターライセンス契約の正本
+                             (個人・法人どちらの署名区分も 1 本に統合。
+                             現在策定中)
+    TRADEMARK-POLICY.md      商標使用ポリシー
+    PLUGIN-API.md            プラグイン・テーマ例外条項が境界として
+                             参照する Plugin API
 
 =======================================================================

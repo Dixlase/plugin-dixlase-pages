@@ -1,63 +1,70 @@
 # Contributing to Dixlase Pages
 
-Thank you for your interest in contributing to **Dixlase Pages**. This plugin is part of the Dixlase Project, and all contributions are governed by the project-wide policies documented in the **Dixlase Core repository**.
+Thank you for your interest in contributing to **Dixlase Pages**. This plugin is part of the Dixlase Project, and all contribution policies are single-sourced in the **Dixlase Core repository**.
 
 The Japanese version of this guide is published as [CONTRIBUTING.ja.md](./CONTRIBUTING.ja.md).
 
 ---
 
-## Project-wide policies (canonical)
+## Current contribution status (v0.x)
 
-The following documents in the Dixlase Core repository are authoritative and apply to all contributions, including contributions to this plugin:
+Dixlase Pages is in early development, and Dixlase as a whole is **not currently accepting external code Pull Requests**. External code contributions will reopen once the formal legal review of the Dixlase-wide Contributor License Agreement (CLA) is complete.
 
-- **[Contribution Guide](https://github.com/Dixlase/dixlase-core/blob/main/CONTRIBUTING.md)** — overall workflow, code style, testing, PR conventions
-- **[Copyright Policy](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.md)** — high-level licensing stance
-- **[Individual CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.md)** — contributor license agreement for individuals
-- **[Corporate CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.md)** — contributor license agreement for organizations
+**Currently welcomed:**
 
-This plugin does **not** maintain its own copies of the CLA. The canonical CLA in the Core repository is the single source of truth. This avoids drift across plugin repositories.
+- Bug reports via [Issues](https://github.com/Dixlase/plugin-dixlase-pages/issues) on this repository
+- Feature suggestions via Issues
+- Documentation typo / error reports via Issues
+- Cross-cutting topics (Core + multiple plugins) via [Discussions](https://github.com/Dixlase/dixlase-core/discussions) on the Core repository
 
-## Why a CLA is required
+**Not currently accepted:**
 
-**Dixlase Pages is dual-licensed** under GPL-3.0 + a commercial license offered by exc-D inc. Maintaining this dual-license model legally requires that exc-D be able to sublicense incoming contributions under both license tracks. The CLA grants exc-D the rights necessary to do so, while you retain ownership of your contributions.
+- Source code Pull Requests (will reopen after the CLA legal review)
+- Documentation Pull Requests (please file an Issue instead)
+- Translation Pull Requests (will reopen after the CLA legal review)
 
-In summary, by signing the CLA:
+> **A note on code snippets in bug reports.** Code suggestions are welcome as **reference information only**. A maintainer will independently re-implement any fix; your snippet is unlikely to be committed verbatim. This is necessary because external code contributions cannot currently be accepted under Dixlase's dual-license model until the CLA's formal legal review is complete.
 
-- You **retain ownership** of your contribution
-- You **grant exc-D inc.** a perpetual, worldwide, irrevocable, sublicensable license sufficient to support the dual-license model
-- You **agree not to assert moral rights** in a way that would prevent the exercise of that license
-- You **confirm** you are authorized to grant the license (employer permission, original creation, third-party material disclosure)
+## Why contributions are deferred
 
-## How to submit your CLA
+**Dixlase Pages is dual-licensed** under GPL-3.0 + a commercial license offered by exc-D inc. Maintaining this dual-license model legally requires that exc-D be able to sublicense incoming contributions under both license tracks. The CLA framework that grants exc-D those rights — while letting contributors retain ownership of their work — is currently in legal review across the Dixlase Project. PR-based contributions to this plugin will resume once the Dixlase-wide CLA is finalized in the Core repository.
 
-While the Dixlase Project is in v0.1.x, CLA submission is handled by email:
+When the framework activates, contributions to this plugin will be governed by:
 
-1. Read the canonical [Individual CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-INDIVIDUAL.md) (and [Corporate CLA](https://github.com/Dixlase/dixlase-core/blob/main/CLA-CORPORATE.md) if applicable) in full
-2. Fill in the contributor information fields and sign at the bottom
-3. Email the completed file to **info@dixlase.org** with the subject `CLA submission — <your name or organization>` and mention which plugin(s) you intend to contribute to
+- The canonical **CLA** (Contributor License Agreement) in the Dixlase Core repository — a single document that covers both individual and entity signing capacity. See [`CLA.md`](https://github.com/Dixlase/dixlase-core/blob/main/CLA.md) in the Core repository.
+- The Dixlase Project [Copyright Policy](https://github.com/Dixlase/dixlase-core/blob/main/COPYRIGHT-POLICY.md).
+- The future PR workflow documented in [`CONTRIBUTING-FUTURE.md`](https://github.com/Dixlase/dixlase-core/blob/main/CONTRIBUTING-FUTURE.md) in the Core repository (informational until activation).
 
-A single CLA covers contributions to the entire Dixlase Project — Core and all official plugins. You do not need to sign separate CLAs per repository.
+A single CLA will cover contributions to the entire Dixlase Project — Core and all official plugins. You will not need to sign separate CLAs per repository.
 
-In a future v0.1.x release, this manual workflow will be replaced by [CLA Assistant](https://cla-assistant.io/), which automates signature collection in the PR flow. When that happens, this section will be updated.
+## Reporting bugs
 
-## Submitting a pull request
+When reporting a bug, please include:
 
-1. Fork this repository and create a feature branch
-2. Make your changes following the conventions in the [Core Contribution Guide](https://github.com/Dixlase/dixlase-core/blob/main/CONTRIBUTING.md)
-3. Add tests covering your changes
-4. Ensure all tests pass and code is formatted (`vendor/bin/pint`)
-5. Open a pull request against this plugin's `main` branch
-6. Reference any related issue numbers
-7. The maintainers will review and provide feedback
+- A clear description of the problem
+- Steps to reproduce
+- Expected vs. actual behavior
+- Environment details (Dixlase Core version, PHP version, MySQL version, browser, OS)
+- Relevant logs or error messages
 
-## Reporting issues
+For issues spanning multiple plugins or the Core itself, open the Issue on the [Dixlase Core repository](https://github.com/Dixlase/dixlase-core/issues) instead.
 
-- **Bugs and feature requests for Dixlase Pages**: open an issue in this plugin's repository
-- **Issues spanning multiple plugins or the Core**: open an issue in the [Dixlase Core repository](https://github.com/Dixlase/dixlase-core/issues)
+## Reporting security vulnerabilities
 
-## Code of Conduct
+**Do not report security vulnerabilities through public Issues.** See [SECURITY.md](./SECURITY.md) for the private reporting channel.
 
-All contributions to Dixlase Pages and the wider Dixlase Project are subject to the [Dixlase Code of Conduct](https://github.com/Dixlase/dixlase-core/blob/main/CODE_OF_CONDUCT.md), if one is published in the Core repository.
+## Trademark
+
+Use of the "Dixlase" and "Dixlase Pages" names and logos is subject to the Dixlase [Trademark Policy](https://github.com/Dixlase/dixlase-core/blob/main/TRADEMARK-POLICY.md) in the Core repository.
+
+## Questions
+
+If you have questions about contributing, feel free to:
+
+- Open a [Discussion](https://github.com/Dixlase/dixlase-core/discussions) on the Core repository
+- Email **info@dixlase.org**
+
+Even before PRs reopen, your bug reports and feedback are a valuable form of contribution. Thank you for helping make Dixlase Pages better.
 
 ---
 
