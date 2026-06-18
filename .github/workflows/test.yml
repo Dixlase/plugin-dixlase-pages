@@ -43,8 +43,10 @@ jobs:
 
       - name: Place plugin into core directory
         run: |
-          # コアには gitlink で空の plugins/DixlasePages ディレクトリが存在するため
-          # 一度削除してからプラグインを配置する
+          # Core 側に plugins/ ディレクトリは存在しないので、まず作成してから
+          # チェックアウト済みプラグインを所定の位置へ移動する。
+          # 念のため既存パスがあれば事前に除去しておく。
+          mkdir -p core/plugins
           rm -rf core/plugins/DixlasePages
           mv plugin core/plugins/DixlasePages
 
