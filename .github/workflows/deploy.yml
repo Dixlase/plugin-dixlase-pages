@@ -33,7 +33,7 @@ jobs:
             PLUGIN_DIR="DixlasePages"
             EXPECTED_URL="git@github.com:${{ github.repository }}.git"
 
-            for SITE in brand; do
+            for SITE in brand demo; do
               DEST="$BASE/$SITE/plugins/$PLUGIN_DIR"
               CONTAINER_DEST="/var/www/apps/$SITE/plugins/$PLUGIN_DIR"
               echo "=== Deploying plugin $PLUGIN_DIR to $SITE (${{ steps.target.outputs.env }}) ==="
