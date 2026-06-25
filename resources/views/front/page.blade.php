@@ -59,27 +59,34 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     @endpush
 @endif
 
-@section('content')
-    <div class="dixlase-page">
-        <!-- Preview mode banner -->
-        @auth('member')
-            @if($page->status->slug() !== 'published' || ($page->status->slug() === 'scheduled' && $page->published_at && $page->published_at->isFuture()))
-                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                    <div class="max-w-7xl mx-auto flex items-center">
-                        <i class="fas fa-eye mr-3"></i>
-                        <div>
-                            <p class="font-bold">
-                                {{ __('dixlase-pages::front/page.preview_mode') }}
-                            </p>
-                            <p class="text-sm">
-                                {{ __('dixlase-pages::front/page.preview_description', ['status' => $page->status->label()]) }}
-                            </p>
-                        </div>
+{{-- Preview-mode banner: push into Core's front-banner-stack so it sits
+     above the admin bar instead of clashing with the theme header. The
+     stack falls through to a no-op on themes that pre-date
+     <x-ui-front-banner-stack /> — older themes will simply not show the
+     banner, which is preferable to having it tangled in the theme
+     navigation. --}}
+@auth('member')
+    @if($page->status->slug() !== 'published' || ($page->status->slug() === 'scheduled' && $page->published_at && $page->published_at->isFuture()))
+        @push('front-banners')
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+                <div class="max-w-7xl mx-auto flex items-center">
+                    <i class="fas fa-eye mr-3"></i>
+                    <div>
+                        <p class="font-bold">
+                            {{ __('dixlase-pages::front/page.preview_mode') }}
+                        </p>
+                        <p class="text-sm">
+                            {{ __('dixlase-pages::front/page.preview_description', ['status' => $page->status->label()]) }}
+                        </p>
                     </div>
                 </div>
-            @endif
-        @endauth
+            </div>
+        @endpush
+    @endif
+@endauth
 
+@section('content')
+    <div class="dixlase-page">
         @php
             $hasAdminBar = auth('member')->check();
         @endphp
