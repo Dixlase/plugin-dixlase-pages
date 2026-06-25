@@ -137,6 +137,20 @@ class DixlasePagesStorePageRequest extends FormRequest
             $this->merge(['parent_id' => null]);
         }
 
+        // <x-media.picker /> (from DixlaseSEO's <x-seo::meta-fields />)
+        // submits 0 / "0" / "" when nothing is selected. The
+        // `exists:media,id` rule then refuses 0 as a valid id and the
+        // form rejects every save with "選択された seo meta.ogp media id は
+        // 無効です", even though the field is supposed to be optional.
+        // Normalise the "no selection" forms to null so the nullable
+        // chain skips exists cleanly.
+        $ogpId = $this->input('seo_meta.ogp_media_id');
+        if ($ogpId === '' || $ogpId === '0' || $ogpId === 0) {
+            $seoMeta = (array) $this->input('seo_meta', []);
+            $seoMeta['ogp_media_id'] = null;
+            $this->merge(['seo_meta' => $seoMeta]);
+        }
+
         // If language is not specified (e.g. multilingual disabled, so the
         // language picker is not rendered), default to the site-wide locale
         // setting rather than the admin's current UI locale.
