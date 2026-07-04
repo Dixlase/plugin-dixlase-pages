@@ -87,3 +87,40 @@ jobs:
         env:
           APP_KEY: base64:dGVzdGtleWZvcmRpeGxhc2VwYWdlc2NpdGVzdHMxMjM=
         run: ../../vendor/bin/phpunit
+
+  build:
+    # Verify the front-end build still compiles on every push / PR.
+    # release.yml runs the exact same steps on tag push to package the
+    # prebuilt bundle into the release ZIP; catching a broken build here
+    # keeps `vite build` from surprising us mid-release.
+    runs-on: ubuntu-latest
+    name: Frontend Build
+
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Verify build produced the expected outputs
+        # `vite.config.js` outputs into `resources/assets/{js,css}` with a
+        # `manifest.json` alongside. Missing outputs mean either the entry
+        # points changed and the config lags behind, or the build silently
+        # produced nothing — fail loudly here rather than shipping an
+        # empty prebuilt dir in a future release ZIP.
+        run: |
+          test -f resources/assets/manifest.json || { echo "missing resources/assets/manifest.json"; exit 1; }
+          test -f resources/assets/js/app.js || { echo "missing resources/assets/js/app.js"; exit 1; }
+          test -d resources/assets/css || { echo "missing resources/assets/css/"; exit 1; }
+          echo "Build outputs:"
+          ls -la resources/assets/
