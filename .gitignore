@@ -24,7 +24,6 @@ yarn-error.log
 
 /resources/assets/*
 !/resources/assets/thumbnail.*
-package-lock.json
 
 # Claude Code / AI assistant configs
 CLAUDE.md
