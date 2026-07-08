@@ -54,8 +54,13 @@ return [
                     'access_roles' => MemberRole::EDITOR->value,
                     'view_roles' => MemberRole::EDITOR->value,
                 ],
+                // Page settings include publish_min_role (who may publish) and
+                // route_slug (public URL structure). Admins may VIEW the
+                // settings, but only SUPER_ADMIN may EDIT them, so a delegated
+                // admin cannot widen publish rights or change the site's page
+                // URL scheme.
                 'settings' => [
-                    'access_roles' => MemberRole::ADMIN->value,
+                    'access_roles' => MemberRole::SUPER_ADMIN->value,
                     'view_roles' => MemberRole::ADMIN->value,
                 ],
             ],
