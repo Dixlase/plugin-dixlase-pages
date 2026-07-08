@@ -36,6 +36,11 @@ return [
         '_insert_after' => 'front',
         'text' => 'dixlase-pages::admin/navigation.pages.text',
         'icon' => 'fas fa-fw fa-file-alt',
+        // Route the sidebar permission check through this plugin's
+        // config/admin/roles.php. Without it the check falls back to core's
+        // PermissionRegistry (no `pages` entry) and the menu is hidden for
+        // everyone below SUPER_ADMIN. Value is the plugin directory basename.
+        'plugin_slug' => 'DixlasePages',
         'can' => 'admin',
         'children' => [
             'index' => [
