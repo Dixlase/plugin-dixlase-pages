@@ -40,6 +40,7 @@ use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Facades\SiteSettings;
+use App\Helpers\AdminHelper;
 use App\Services\ContentPreviewService;
 use App\Services\RevisionService;
 use App\Traits\AdminInterfaceTrait;
@@ -62,6 +63,12 @@ class DixlasePagesAdminPagesController extends Controller
     use AdminInterfaceTrait;
     use AdminLoggedInTrait;
     use AuthorizesRequests;
+
+    /**
+     * PermissionRegistry resolves plugin roles.php via the PascalCase
+     * directory basename, so this must be the directory name.
+     */
+    private const PLUGIN_SLUG = 'DixlasePages';
 
     protected DixlasePagesPageContentService $contentService;
 
@@ -857,6 +864,8 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function settings()
     {
+        $this->authorizeView('pages.settings');
+
         // Determine admin mode (Simple=0, Advanced=1)
         $isSimpleMode = (int) SiteSettings::get('admin_mode', 0) === 0;
 
@@ -984,6 +993,8 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function updateSettings(DixlasePagesUpdatePagesSettingsRequest $request)
     {
+        $this->authorizeEdit('pages.settings');
+
         $validated = $request->validated();
 
         // Save settings to database
@@ -992,6 +1003,28 @@ class DixlasePagesAdminPagesController extends Controller
         return redirect()
             ->route('dixlase-pages::admin.pages.settings')
             ->with('success', __('dixlase-pages::admin/pages/settings.success'));
+    }
+
+    /**
+     * Abort with 403 unless the current member can VIEW the given menu.
+     * SUPER_ADMIN bypasses; core role_permission_overrides and the plugin
+     * defaults in config/admin/roles.php are honoured via AdminHelper.
+     */
+    private function authorizeView(string $menuKey): void
+    {
+        if (! AdminHelper::canViewPluginMenu(self::PLUGIN_SLUG, $menuKey)) {
+            abort(403, __('http/middleware/check_menu_access.no_access_permission'));
+        }
+    }
+
+    /**
+     * Abort with 403 unless the current member can EDIT the given menu.
+     */
+    private function authorizeEdit(string $menuKey): void
+    {
+        if (! AdminHelper::canEditPluginMenu(self::PLUGIN_SLUG, $menuKey)) {
+            abort(403, __('http/middleware/check_menu_edit.no_edit_permission'));
+        }
     }
 
     /**
