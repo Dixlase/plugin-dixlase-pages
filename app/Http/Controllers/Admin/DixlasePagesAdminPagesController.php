@@ -51,6 +51,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesStorePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePagesSettingsRequest;
@@ -865,6 +866,12 @@ class DixlasePagesAdminPagesController extends Controller
     public function settings()
     {
         $this->authorizeView('pages.settings');
+
+        // Disable the save button for members who may view but not edit this
+        // page. Core's <x-admin.save-button> reads the shared `menuEditable`
+        // flag (normally set by CheckMenuAccess middleware, which does not run
+        // on plugin admin routes), so share it here from the plugin permission.
+        View::share('menuEditable', AdminHelper::canEditPluginMenu(self::PLUGIN_SLUG, 'pages.settings'));
 
         // Determine admin mode (Simple=0, Advanced=1)
         $isSimpleMode = (int) SiteSettings::get('admin_mode', 0) === 0;
