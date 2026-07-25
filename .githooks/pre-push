@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-exec "/Volumes/Data/Works/Dixlase/Sites/Dev/docker/html/.claude/hooks/plugin-pre-push.sh" "$@"
