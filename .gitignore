@@ -33,3 +33,6 @@ CLAUDE.ja.md
 
 # Claude Code sandbox tests
 /tests/Sandbox/
+
+# Local git hooks (Claude Code / dev-only)
+/.githooks/
