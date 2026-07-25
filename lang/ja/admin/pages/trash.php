@@ -3,7 +3,7 @@
 /**
  * This file is part of Dixlase Pages.
  *
- * Copyright (C) 2026 exc-D inc.
+ * Copyright (C) 2026 exc-D inc. and Dixlase contributors
  * Website: https://exc-d.com
  *
  * Dixlase Pages is dual-licensed. You may use this file under either:
