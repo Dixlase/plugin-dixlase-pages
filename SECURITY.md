@@ -24,4 +24,4 @@ This policy covers code in the [`plugin-dixlase-pages`](https://github.com/Dixla
 
 ---
 
-**Contact:** info@dixlase.org
+**Contact:** security@dixlase.org
