@@ -71,8 +71,12 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
         // Register translation files
         $this->loadTranslationsFrom(__DIR__.'/../../lang', 'dixlase-pages');
 
-        // Register migrations
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+        // Migrations are deliberately NOT registered here. They are applied by
+        // PluginMigrator (dls:plugin:install / dls:plugin:update) and recorded in
+        // the dedicated dls_plugin_migrations ledger. Registering them with the
+        // stock migrator makes a bare `php artisan migrate` try to re-create
+        // tables the installer already created (SQLSTATE 42S01).
+        // See PluginLoaderTrait::loadPluginMigrations() in core.
 
         // Note: Routes (routes/web.php, routes/admin.php, routes/api.php) are auto-loaded by PluginServiceProvider
     }
