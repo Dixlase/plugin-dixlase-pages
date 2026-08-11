@@ -113,11 +113,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         @elseif($editorType === 'html')
                             {{-- HTML: output with shortcode processing --}}
                             {!! shortcode_parse($content) !!}
-                        @elseif($editorType === 'blade')
-                            {{-- Blade: render as Blade template with shortcode processing --}}
-                            {!! shortcode_parse(\Illuminate\Support\Facades\Blade::render($content, ['page' => $page])) !!}
                         @else
-                            {{-- Other: escape and output --}}
+                            {{-- Other: escape and output.
+
+                                 A 'blade' branch calling Blade::render($content)
+                                 used to sit above this one. The admin preview
+                                 action builds an unsaved page straight from
+                                 request input, including editor_type, so that
+                                 branch turned a POST body into executed PHP.
+                                 The Blade editor is not offered by this version
+                                 anyway -- the edit screen excludes it from the
+                                 editor options unconditionally -- so nothing
+                                 legitimate reached it. Anything already stored
+                                 with editor_type=blade now lands here and is
+                                 escaped, which is the safe direction. --}}
                             {!! nl2br(e($content)) !!}
                         @endif
                     </div>

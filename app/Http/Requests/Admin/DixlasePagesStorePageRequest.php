@@ -83,7 +83,15 @@ class DixlasePagesStorePageRequest extends FormRequest
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
-            'editor_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentEditorType::cases()))],
+            // BLADE is excluded deliberately. Persisting it would make
+            // Blade::render() run the stored body on every front-end request,
+            // and the edit screen never offers the Blade editor in the first
+            // place (it is excluded from the editor options unconditionally),
+            // so accepting it here only ever widened the attack surface.
+            'editor_type' => ['required', Rule::in(array_values(array_diff(
+                array_map(fn ($case) => $case->slug(), ContentEditorType::cases()),
+                [ContentEditorType::BLADE->slug()]
+            )))],
             'status' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStatus::cases()))],
             'published_at' => ['required_if:status,scheduled', 'nullable', 'date', 'after_or_equal:now'],
             'custom_css' => ['nullable', 'string'],
