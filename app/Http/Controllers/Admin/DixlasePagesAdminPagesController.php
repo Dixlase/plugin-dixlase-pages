@@ -100,9 +100,20 @@ class DixlasePagesAdminPagesController extends Controller
         $page->content = $request->input('content', '');
         $page->custom_css = $request->input('custom_css', '');
         $page->custom_js = $request->input('custom_js', '');
-        $page->editor_type = ContentEditorType::tryFromSlug(
+        // Preview builds an unsaved page straight from request input, so
+        // editor_type is attacker-controlled here in a way it never is for a
+        // stored page. BLADE is downgraded rather than trusted: the front view
+        // used to hand this content to Blade::render(), which turned a POST
+        // body into executed PHP for anyone who could reach this endpoint.
+        // Mirrors ContentPreviewService::renderFromSlug(), which applies the
+        // same downgrade for exactly this reason.
+        $requestedEditorType = ContentEditorType::tryFromSlug(
             $request->input('editor_type', 'html')
         ) ?? ContentEditorType::HTML;
+
+        $page->editor_type = $requestedEditorType === ContentEditorType::BLADE
+            ? ContentEditorType::HTML
+            : $requestedEditorType;
         // In preview, always treat as database and directly display the POSTed content
         $page->storage_type = ContentStorageType::DATABASE;
         $page->status = $request->input('status', 'draft');
