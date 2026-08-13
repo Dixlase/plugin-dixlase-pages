@@ -37,7 +37,7 @@ GNU General Public License for more details.
             {{ __('dixlase-pages::admin/pages/trash.back_to_index') }}
         </a>
 
-        @if($pages->total() > 0)
+        @if($pages->total() > 0 && $canDeletePermanently)
             <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.empty') }}" id="emptyTrashForm">
                 @csrf
             </form>
@@ -158,7 +158,8 @@ GNU General Public License for more details.
                                         :form="'restoreForm-' . $page->id"
                                     />
 
-                                    {{-- Permanent delete --}}
+                                    {{-- Permanent delete: ADMIN only --}}
+                                    @if($canDeletePermanently)
                                     <form method="POST" action="{{ route('dixlase-pages::admin.pages.trash.force-destroy', ['id' => $page->id]) }}" id="forceDeleteForm-{{ $page->id }}">
                                         @csrf
                                         @method('DELETE')
@@ -182,6 +183,7 @@ GNU General Public License for more details.
                                         confirm_color="red"
                                         :form="'forceDeleteForm-' . $page->id"
                                     />
+                                    @endif
                                 </div>
                             </td>
                         </tr>
