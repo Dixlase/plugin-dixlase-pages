@@ -75,6 +75,11 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
         $this->viewParams['retention'] = $this->revisionService->getRetentionCount();
         $this->viewParams['protectedCount'] = $this->revisionService->countProtected($page);
 
+        // Protection decides which revisions retention may prune
+        // later, so it stays with ADMIN while an editor may still
+        // read and restore. The shared component defaults to true.
+        $this->viewParams['canProtect'] = AdminHelper::canEditPluginMenu('DixlasePages', 'pages.revisions.protect');
+
         return view('dixlase-pages::admin.pages.revisions.index', $this->viewParams);
     }
 
@@ -119,6 +124,11 @@ class DixlasePagesAdminPageRevisionController extends AdminLoggedInController
         $this->viewParams['metaDiffs'] = $metaDiffs;
         $this->viewParams['hasChanges'] = ! empty($diffs) || ! empty($metaDiffs);
         $this->viewParams['typeLabels'] = $this->typeLabels();
+
+        // Protection decides which revisions retention may prune
+        // later, so it stays with ADMIN while an editor may still
+        // read and restore. The shared component defaults to true.
+        $this->viewParams['canProtect'] = AdminHelper::canEditPluginMenu('DixlasePages', 'pages.revisions.protect');
 
         return view('dixlase-pages::admin.pages.revisions.show', $this->viewParams);
     }

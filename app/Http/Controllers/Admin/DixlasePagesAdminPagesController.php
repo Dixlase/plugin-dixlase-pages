@@ -814,6 +814,12 @@ class DixlasePagesAdminPagesController extends Controller
             'pages' => $pages,
             'currentSort' => $sort,
             'currentOrder' => $order,
+            // An editor may open this screen to restore their own pages, but
+            // emptying the trash and deleting outright require ADMIN (see
+            // config/admin/roles.php). Without this the controls render for
+            // everyone and answer 403, which reads as a broken screen rather
+            // than a permission boundary.
+            'canDeletePermanently' => AdminHelper::canEditPluginMenu('DixlasePages', 'pages.trash.empty'),
         ]));
     }
 
