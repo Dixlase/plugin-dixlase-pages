@@ -42,6 +42,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         restoreRouteName="dixlase-pages::admin.pages.revisions.restore"
         noteRouteName="dixlase-pages::admin.pages.revisions.note"
         protectRouteName="dixlase-pages::admin.pages.revisions.protect"
+        :canProtect="$canProtect"
         translationPrefix="dixlase-pages::admin/pages/revisions"
     />
 @endsection
