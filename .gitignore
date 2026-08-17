@@ -23,7 +23,6 @@ yarn-error.log
 /.zed
 
 /resources/assets/*
-!/resources/assets/thumbnail.*
 
 # Claude Code / AI assistant configs
 CLAUDE.ja.md
