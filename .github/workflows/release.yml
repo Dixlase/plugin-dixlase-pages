@@ -17,10 +17,10 @@ jobs:
 
     steps:
       - name: Checkout plugin at tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: 'npm'
@@ -104,7 +104,7 @@ jobs:
           ls -lh "${ZIP_NAME}"
 
       - name: Publish GitHub release with ZIP asset
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           # Attaching a real .zip asset here is the whole point of this
           # workflow: Core's GitHubSourceProvider prefers the first
