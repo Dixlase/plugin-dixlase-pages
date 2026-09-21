@@ -158,13 +158,19 @@ class RolesConfigResolvesTest extends TestCase
      * Every key above except `pages.settings.update`, which has no entry of
      * its own and inherits from `pages.settings`.
      *
-     * @return array<string, array{0: string, 1: int}>
+     * Yields the key only: PHPUnit 12 refuses to run a data set that passes
+     * more arguments than the test method accepts.
+     *
+     * @return array<string, array{0: string}>
      */
     public static function keysWithTheirOwnEntry(): array
     {
-        return array_filter(
-            self::routePermissions(),
-            static fn (array $row): bool => $row[0] !== 'pages.settings.update'
+        return array_map(
+            static fn (array $row): array => [$row[0]],
+            array_filter(
+                self::routePermissions(),
+                static fn (array $row): bool => $row[0] !== 'pages.settings.update'
+            )
         );
     }
 
