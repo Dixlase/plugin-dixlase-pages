@@ -155,6 +155,8 @@
     "files": {
         ".backlog/SPINOFF-extension-prebuilt-assets-release.ja.md": "sha256:c5b79561e4d94b9909ac2c2d609620b939b632bc65a085ccafbcdb2c278f4ed8",
         ".backlog/SPINOFF-extension-prebuilt-assets-release.md": "sha256:cb389be98e08fc5839d05e147d3cf1fbe921163de078f577ca8fad5ed2974831",
+        "CHANGELOG.ja.md": "sha256:22fbc2c0cc2ed7ace215e6df255364da7c660ac43770da8d67a57e61518c1f5c",
+        "CHANGELOG.md": "sha256:7338d9c7d6bc6948d5d801b0938c456f434f39bbb5978f23cb49ed517beb6276",
         "CONTRIBUTING.ja.md": "sha256:444da80136fd3fb6c413f59ca79483c9689a4274b0cb7b093384535ed5ed7d02",
         "CONTRIBUTING.md": "sha256:026cb091f12ae9e76d2f439540aeed4d08fa387edb4e3864fe8aae6c23f49d3a",
         "COPYRIGHT-POLICY.ja.md": "sha256:700b70255711f3a34477af8f0b83c262976b0c18d1113e5611f683f9f146c922",
@@ -185,7 +187,7 @@
         "app/Services/DixlasePagesLocalizedUrlProvider.php": "sha256:f338f0a31117ea23ae93fc142c26d20d891b678896874fc0cdf4f719a3cb691b",
         "app/Services/DixlasePagesPageContentService.php": "sha256:9dadc268d32a61a1ccf2d31f56b34633ce3dbcc435dd70e560cced6ad302f938",
         "app/Services/DixlasePagesPageLinkableProvider.php": "sha256:c57979eac9fb1fc8a77dba39cc2e222d0492b18cd727dc269c4bdafe1ca3d4a3",
-        "composer.json": "sha256:1dc929ac422a2f8fdd7523fdfc2c660f8269716cd88d8e4550efd783309b7639",
+        "composer.json": "sha256:9655561441c2e2074f1ece62c86f70f5ccb163942545bc8573f1fd788ee54ae5",
         "config/admin.php": "sha256:07fcb036cd79904d559a2dc68758c6fa53112f0540018a775a022394cafc1e37",
         "config/admin/navigation.php": "sha256:6bf816092844871019c9a2209ff85f5eac736f29041281175f160030d9f3c2f1",
         "config/admin/roles.php": "sha256:839f1a099ecb1a02c89fdf6a2fd0d21538de2eac6bef9d5703d422636c2efec7",
@@ -196,6 +198,8 @@
         "database/seeders/DatabaseSeeder.php": "sha256:bfff0fc0bf9048fec5ccfc4d425128a8c563a3002ac9c2a4a2bf4ba8ed683dfe",
         "database/seeders/DixlasePagesPageSettingsSeeder.php": "sha256:6221343c6de6c9f14536a695d1a41747a6ae65614feb5bd8ec32bf029b596975",
         "database/seeders/DixlasePagesPagesTableSeeder.php": "sha256:c2545960ee9222b217934196e52e33f7e46fcb60b462d12139a5bfac2cad52cd",
+        "docs/admin-usage.md": "sha256:c27856be7337b1f45d4df3733a0d3573787cd5156eaff0ba5ed7cdb9b61c8ea5",
+        "docs/index.md": "sha256:2ed028005b38852cbb4a3e990fdf603d200535497c67378436415d68903f547b",
         "lang/en/admin.php": "sha256:12732b2115adc80a5a08278c4a1bcfa2c9fbbd23f9ab16b1e87d36ab73340a26",
         "lang/en/admin/navigation.php": "sha256:0c12045f1d8116619fae284c336283c45169ad9f4750f440ca1626c006233861",
         "lang/en/admin/pages/create.php": "sha256:2853c115c8c8750a2daea209c2fde44d3cd84cd0bf90efa0d6df1a9b7a0388a1",
@@ -281,14 +285,14 @@
         "tests/Unit/DixlasePagesRouteSlugProviderTest.php": "sha256:277481bf2e0b3af80d240d9ae204c30073e735a2508feee86c00508b8df02bde",
         "tests/Unit/Models/DixlasePagesPageHierarchyTest.php": "sha256:5722d652b338eb19edd510abd5aab8568fd0b7542740469fc2f96529eb3b9e43",
         "tests/Unit/Models/DixlasePagesPageModelTest.php": "sha256:e6fe57ec7292366835f4c284cdaba9e0d2c8e61fb1dc7afad85a434ec7d2e5c2",
-        "tests/Unit/RolesConfigResolvesTest.php": "sha256:db2176f400e12f4d24030677446a918936303dd630fc273f2d967fbdaf3e7f4e",
+        "tests/Unit/RolesConfigResolvesTest.php": "sha256:3b7fd18c1c0902aa7e9fd1ded6b127a00988f52d70f443dca2d1e8a78e35a7a2",
         "tests/Unit/VersionManifestConsistencyTest.php": "sha256:17ef22ec3d4d3eb4d304bb80f767e38bad75efacd1c0a8134154c4fb9fcaf97c",
-        "thumbnail.png": "sha256:86e590593447c8d4657c046bca5772088efe6fbd96c6bd5a0819f58fab36c5bd",
-        "vite.config.js": "sha256:4fd4a10058c8bead139bee2197fd227b67b35ab3b9468462d66b71389644e491"
+        "thumbnail.png": "sha256:918764116027f2ea03fa5100779def43a32e3eaca257ffc4ec7719e6d8bf4dbc",
+        "vite.config.js": "sha256:78002e78197945b94a3a554ac4d8f630b4e484d60bb988b0f0b8b054de47598e"
     },
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-09-15T13:06:44+00:00"
+        "signed_at": "2026-09-25T16:24:41+00:00"
     }
 }
