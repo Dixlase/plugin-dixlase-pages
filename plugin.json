@@ -12,7 +12,7 @@
     "authority_key_id": "dixlase-authority-2026",
     "email": "info@dixlase.org",
     "url": "https://exc-d.com",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "license_template": "license-dual-gpl.txt",
     "commercial_license": {
         "available": false,
