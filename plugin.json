@@ -187,7 +187,7 @@
         "app/Services/DixlasePagesLocalizedUrlProvider.php": "sha256:f338f0a31117ea23ae93fc142c26d20d891b678896874fc0cdf4f719a3cb691b",
         "app/Services/DixlasePagesPageContentService.php": "sha256:9dadc268d32a61a1ccf2d31f56b34633ce3dbcc435dd70e560cced6ad302f938",
         "app/Services/DixlasePagesPageLinkableProvider.php": "sha256:c57979eac9fb1fc8a77dba39cc2e222d0492b18cd727dc269c4bdafe1ca3d4a3",
-        "composer.json": "sha256:9655561441c2e2074f1ece62c86f70f5ccb163942545bc8573f1fd788ee54ae5",
+        "composer.json": "sha256:b1f60ed1330e3901d7f112cab3257d790d427c3f1620d1180048268986cf3833",
         "config/admin.php": "sha256:07fcb036cd79904d559a2dc68758c6fa53112f0540018a775a022394cafc1e37",
         "config/admin/navigation.php": "sha256:6bf816092844871019c9a2209ff85f5eac736f29041281175f160030d9f3c2f1",
         "config/admin/roles.php": "sha256:839f1a099ecb1a02c89fdf6a2fd0d21538de2eac6bef9d5703d422636c2efec7",
@@ -293,6 +293,6 @@
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-09-25T16:24:41+00:00"
+        "signed_at": "2026-09-25T16:56:00+00:00"
     }
 }
