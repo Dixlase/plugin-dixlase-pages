@@ -34,3 +34,4 @@ CLAUDE.ja.md
 
 # Local git hooks (Claude Code / dev-only)
 /.githooks/
+CLAUDE.md
