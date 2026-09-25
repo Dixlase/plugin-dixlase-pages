@@ -69,7 +69,7 @@
     "requires": {
         "dixlase": "^0.1.0",
         "dixlase_api": "^0.1",
-        "php": ">=8.0"
+        "php": ">=8.3"
     },
     "provides": {
         "admin_menu": true,
