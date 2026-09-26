@@ -155,8 +155,8 @@
     "files": {
         ".backlog/SPINOFF-extension-prebuilt-assets-release.ja.md": "sha256:c5b79561e4d94b9909ac2c2d609620b939b632bc65a085ccafbcdb2c278f4ed8",
         ".backlog/SPINOFF-extension-prebuilt-assets-release.md": "sha256:cb389be98e08fc5839d05e147d3cf1fbe921163de078f577ca8fad5ed2974831",
-        "CHANGELOG.ja.md": "sha256:1fa17091cf5c448e57d786f5e42434fcc0ebfd4e97f563bf2085fc74468d87b9",
-        "CHANGELOG.md": "sha256:f47aed805f337c6e9024e998dbb5c1b17a5ae3e4e0b3ee756b86d79a6000f55c",
+        "CHANGELOG.ja.md": "sha256:635e05567045487ddedfaf7211918cef61fbdf487068c2c296a9e71a8d58dae3",
+        "CHANGELOG.md": "sha256:e4106e9a63072b2fb63ed2e7f6f69424be719fbe5b6fe55b91efb33276c2aa42",
         "CONTRIBUTING.ja.md": "sha256:ac820817fcf5ed262e8c2682ba53b83b1c1d7eb5534d5be533e33c4a8d66502b",
         "CONTRIBUTING.md": "sha256:5fbdd10d5e28524543990de605a1b647414eea9d469c68a14683267104304a81",
         "COPYRIGHT-POLICY.ja.md": "sha256:700b70255711f3a34477af8f0b83c262976b0c18d1113e5611f683f9f146c922",
@@ -166,8 +166,8 @@
         "LICENSE-COMMERCIAL.ja": "sha256:f1e8d579772ec764b91c07973943363d260770f66f05bb83b0f74b45b6ce059a",
         "NOTICE": "sha256:1c328d2548bd115132f28b2844ef69c30be40c036abdf16e8236372105519993",
         "NOTICE.ja": "sha256:bc5f76d6e18abdfb7ffb9583336cde63fb66ae24b700ea0484c66846ee8a3bbf",
-        "README.ja.md": "sha256:de9f8ed37eb6f6f7e750d5a8bef6f4035c6caca2987b43408f27798103dfae16",
-        "README.md": "sha256:630cb165c1c3583101db2e13147c11503777da4c867c4bd836c85a947c53d1fb",
+        "README.ja.md": "sha256:faba9192bf012e9c6d475b95c169502f50fdf6b90fd843e5baa40c8df471d6ac",
+        "README.md": "sha256:b464ca04bbe937a20a9235de0ad81767e52248bfd5437761b2ccf4235d8d44f3",
         "SECURITY.ja.md": "sha256:4a59dbdc3379eb0b8a96a147351cd47e7ff889512ba47f4777f0c915cc58b609",
         "SECURITY.md": "sha256:e8a67d8b2cb6a2cc9732d866ec51a39b3f7878c3f7b1d71bc4fe6a9b2a862503",
         "app/Actions/Page/RestoreDixlasePagesPageRevisionAction.php": "sha256:5d2deae4cd0be1e4049e0cfd480a991aef114d22dfaf75e0ad67d236e3ab9a60",
@@ -199,7 +199,7 @@
         "database/seeders/DixlasePagesPageSettingsSeeder.php": "sha256:6221343c6de6c9f14536a695d1a41747a6ae65614feb5bd8ec32bf029b596975",
         "database/seeders/DixlasePagesPagesTableSeeder.php": "sha256:c2545960ee9222b217934196e52e33f7e46fcb60b462d12139a5bfac2cad52cd",
         "docs/admin-usage.md": "sha256:c27856be7337b1f45d4df3733a0d3573787cd5156eaff0ba5ed7cdb9b61c8ea5",
-        "docs/index.md": "sha256:2ed028005b38852cbb4a3e990fdf603d200535497c67378436415d68903f547b",
+        "docs/index.md": "sha256:a1bcea53c5a772ea72c2edeae17f67629c6102db49a7122c033721f277a9b99a",
         "lang/en/admin.php": "sha256:12732b2115adc80a5a08278c4a1bcfa2c9fbbd23f9ab16b1e87d36ab73340a26",
         "lang/en/admin/navigation.php": "sha256:0c12045f1d8116619fae284c336283c45169ad9f4750f440ca1626c006233861",
         "lang/en/admin/pages/create.php": "sha256:2853c115c8c8750a2daea209c2fde44d3cd84cd0bf90efa0d6df1a9b7a0388a1",
@@ -293,6 +293,6 @@
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-09-26T03:03:47+00:00"
+        "signed_at": "2026-09-26T07:26:38+00:00"
     }
 }
