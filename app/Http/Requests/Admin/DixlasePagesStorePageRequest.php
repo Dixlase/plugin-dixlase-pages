@@ -42,6 +42,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
+use Plugins\DixlasePages\App\Services\ScriptAuthoringPolicy;
 
 class DixlasePagesStorePageRequest extends FormRequest
 {
@@ -83,15 +84,13 @@ class DixlasePagesStorePageRequest extends FormRequest
             'title' => ['nullable', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
-            // BLADE is excluded deliberately. Persisting it would make
-            // Blade::render() run the stored body on every front-end request,
-            // and the edit screen never offers the Blade editor in the first
-            // place (it is excluded from the editor options unconditionally),
-            // so accepting it here only ever widened the attack surface.
-            'editor_type' => ['required', Rule::in(array_values(array_diff(
-                array_map(fn ($case) => $case->slug(), ContentEditorType::cases()),
-                [ContentEditorType::BLADE->slug()]
-            )))],
+            // BLADE is never accepted: persisting it would make
+            // Blade::render() run the stored body on every front-end request.
+            // HTML is accepted only from members who may author scripts, and
+            // not in Simple mode -- see ScriptAuthoringPolicy.
+            'editor_type' => ['required', Rule::in(
+                ScriptAuthoringPolicy::creatableEditorSlugs(Auth::guard('member')->user())
+            )],
             'status' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStatus::cases()))],
             'published_at' => ['required_if:status,scheduled', 'nullable', 'date', 'after_or_equal:now'],
             'custom_css' => ['nullable', 'string'],
@@ -169,6 +168,19 @@ class DixlasePagesStorePageRequest extends FormRequest
         // If slug is empty, auto-generate from title
         if (empty($this->slug) && ! empty($this->title)) {
             $this->merge(['slug' => $this->convertToSlug($this->title)]);
+        }
+
+        // Custom CSS / JS are only served for HTML-editor pages, and only
+        // members who may author scripts can create those. Drop them for
+        // every other editor type so nothing script-capable is stored.
+        if ($this->input('editor_type') !== ContentEditorType::HTML->slug()) {
+            $this->merge(['custom_css' => null, 'custom_js' => null]);
+        }
+
+        // Simple mode stores pages in the database only (the form hides the
+        // file option); enforce it rather than trusting the hidden input.
+        if (ScriptAuthoringPolicy::isSimpleMode()) {
+            $this->merge(['storage_type' => ContentStorageType::DATABASE->slug()]);
         }
 
         // Public permission check: force status to draft for members without permission

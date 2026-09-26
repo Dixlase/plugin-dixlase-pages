@@ -37,8 +37,10 @@ namespace Plugins\DixlasePages\App\Actions\Page;
 use App\Actions\AbstractAction;
 use App\Contracts\Action\Actor;
 use App\DTO\Action\ActionResult;
+use App\Enums\ContentEditorType;
 use App\Enums\Permission;
 use App\Services\RevisionService;
+use Illuminate\Validation\ValidationException;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageRevision;
 
@@ -58,6 +60,32 @@ class RestoreDixlasePagesPageRevisionAction extends AbstractAction
     protected function requiredPermission(): ?Permission
     {
         return Permission::SETTINGS_BASE;
+    }
+
+    /**
+     * Refuse to restore a snapshot stored with the Blade editor type.
+     *
+     * RevisionService::restore() writes the snapshot back as-is, so an old
+     * Blade revision would re-arm a page whose body is executed on render.
+     * Pages can no longer be created or edited as Blade; neither can they be
+     * restored as Blade.
+     */
+    protected function validate(Actor $actor, array $data): void
+    {
+        $stored = ($this->revision->snapshot ?? [])['editor_type'] ?? null;
+
+        $editorType = match (true) {
+            $stored instanceof ContentEditorType => $stored,
+            is_int($stored), is_string($stored) && ctype_digit($stored) => ContentEditorType::tryFrom((int) $stored),
+            is_string($stored) => ContentEditorType::tryFromSlug($stored),
+            default => null,
+        };
+
+        if ($editorType === ContentEditorType::BLADE) {
+            throw ValidationException::withMessages([
+                'revision' => __('dixlase-pages::admin/pages/validation.revision_blade_not_restorable'),
+            ]);
+        }
     }
 
     protected function auditAction(): string

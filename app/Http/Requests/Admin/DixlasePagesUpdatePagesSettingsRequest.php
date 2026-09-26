@@ -59,7 +59,11 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
         return [
             'route_slug' => ['required', 'string', 'max:255', 'alpha_dash', UniqueRouteSlug::for('dixlase-pages:route_slug')],
             'default_status' => 'required|in:published,draft,scheduled',
-            'default_editor_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentEditorType::cases()))],
+            // Blade is never a valid editor for new pages (it executes on render).
+            'default_editor_type' => ['required', Rule::in(array_values(array_diff(
+                array_map(fn ($case) => $case->slug(), ContentEditorType::cases()),
+                [ContentEditorType::BLADE->slug()]
+            )))],
             'default_storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
             'publish_min_role' => ['required', 'integer', Rule::in(array_map(fn ($case) => $case->value, MemberRole::cases()))],
         ];

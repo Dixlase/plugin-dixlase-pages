@@ -156,13 +156,17 @@ return [
                             'access_roles' => MemberRole::EDITOR->value,
                             'view_roles' => MemberRole::EDITOR->value,
                         ],
+                        // Restoring and annotating revisions run through
+                        // Actions that require Permission::SETTINGS_BASE
+                        // (ADMIN); declare the same role here so the button
+                        // is not offered to editors only to fail with 403.
                         'restore' => [
-                            'access_roles' => MemberRole::EDITOR->value,
-                            'view_roles' => MemberRole::EDITOR->value,
+                            'access_roles' => MemberRole::ADMIN->value,
+                            'view_roles' => MemberRole::ADMIN->value,
                         ],
                         'note' => [
-                            'access_roles' => MemberRole::EDITOR->value,
-                            'view_roles' => MemberRole::EDITOR->value,
+                            'access_roles' => MemberRole::ADMIN->value,
+                            'view_roles' => MemberRole::ADMIN->value,
                         ],
                         // Protection decides which revisions may be pruned
                         // later, so it sits with the permanent-deletion group

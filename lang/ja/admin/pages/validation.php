@@ -47,5 +47,6 @@ return [
     'at_least_one_title_required' => 'タイトルは必須です。',
     'parent_self' => 'ページを自分自身の親に設定することはできません。',
     'parent_cycle' => '親ページにこのページの子孫を指定することはできません。',
+    'revision_blade_not_restorable' => 'このリビジョンは Blade エディタで保存されているため、復元できません。',
     'parent_depth_exceeded' => 'ページ階層は 3 階層までです。',
 ];

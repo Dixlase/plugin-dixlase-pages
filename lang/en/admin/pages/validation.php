@@ -47,5 +47,6 @@ return [
     'at_least_one_title_required' => 'Title is required.',
     'parent_self' => 'A page cannot be its own parent.',
     'parent_cycle' => 'The parent page cannot be one of this page\'s descendants.',
+    'revision_blade_not_restorable' => 'This revision uses the Blade editor, which can no longer be restored.',
     'parent_depth_exceeded' => 'Page hierarchy is limited to 3 levels.',
 ];

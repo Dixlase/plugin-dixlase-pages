@@ -108,8 +108,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 <div>
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         @if($editorType === 'markdown')
-                            {{-- Markdown: parse and output with shortcode processing --}}
-                            {!! shortcode_parse(\Illuminate\Support\Str::markdown($content)) !!}
+                            {{-- Markdown: rendered by core exactly as the preview renders it
+                                 (javascript: links stripped, same heading normalisation) --}}
+                            {!! shortcode_parse(app(\App\Services\ContentPreviewService::class)->render($content, \App\Enums\ContentEditorType::MARKDOWN)) !!}
                         @elseif($editorType === 'html')
                             {{-- HTML: output with shortcode processing --}}
                             {!! shortcode_parse($content) !!}
