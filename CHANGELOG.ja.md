@@ -19,5 +19,4 @@ Dixlase Pages プラグインの主要な変更はすべてこのファイルに
   OGP 画像を提供。
 - Menus プラグインなどの利用者向けに、ページをリンク先として公開
   （`linkable` capability）。
-- 多言語ページコンテンツ（`multilingual-content` capability）。
 - 設定可能なページ URL スラッグのために `RouteSlugProvider` 契約を実装。

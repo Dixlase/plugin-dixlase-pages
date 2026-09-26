@@ -18,5 +18,4 @@ Initial release. Requires Dixlase `^0.1.0` (Plugin API `^0.1`), PHP `>= 8.3`.
   image when an SEO plugin implementing `SeoMetaProviderInterface` is installed.
 - Exposes pages as link targets for the Menus plugin and other consumers
   (`linkable` capability).
-- Multilingual page content (`multilingual-content` capability).
 - Implements the `RouteSlugProvider` contract for configurable page URL slugs.

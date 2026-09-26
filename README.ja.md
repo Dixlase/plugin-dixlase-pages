@@ -40,7 +40,6 @@ Dixlase 用の固定ページ管理プラグイン。
 
 - **`seo-meta`** — DixlaseSEO から SEO メタ(meta description / OGP 画像)を読み書きするための契約。
 - **`linkable`** — DixlaseMenu などからページを ID 参照するための契約。階層パスと locale プレフィックス込みで URL を自動構築します。
-- **`multilingual-content`** — 将来の多言語対応に向けた予約 capability キー。対応する多言語ランタイムがリリースされた時点で稼働します。
 
 ## ライセンス
 

@@ -32,7 +32,6 @@ This plugin declares the following capabilities in `plugin.json`:
 
 - **`seo-meta`** — Contract for DixlaseSEO to read and write per-page SEO metadata (meta description, OGP image).
 - **`linkable`** — Contract for plugins like DixlaseMenu to reference pages by ID. The full URL (hierarchy + locale prefix) is composed on the Pages side.
-- **`multilingual-content`** — Reserved capability key for future multilingual support. Activates once the multilingual runtime ships as a separate plugin.
 
 ## License
 
