@@ -11,7 +11,7 @@ Dixlase as a whole is **not currently accepting external code Pull Requests**. T
 **Welcomed now**
 
 - Bug reports and feature suggestions via [Issues](https://github.com/Dixlase/plugin-dixlase-pages/issues)
-- Cross-cutting topics via [Core Discussions](https://github.com/Dixlase/dixlase-core/discussions)
+- Cross-cutting topics via [Core Issues](https://github.com/Dixlase/dixlase-core/issues)
 
 **Not accepted now**
 

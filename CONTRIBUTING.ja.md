@@ -11,7 +11,7 @@ Dixlase 全体として **現在、外部からのコード Pull Request は受�
 **現在歓迎しているもの**
 
 - バグ報告・機能提案 — 本リポジトリの [Issues](https://github.com/Dixlase/plugin-dixlase-pages/issues)
-- 横断的なテーマ — Core リポジトリの [Discussions](https://github.com/Dixlase/dixlase-core/discussions)
+- 横断的なテーマ — Core リポジトリの [Issues](https://github.com/Dixlase/dixlase-core/issues)
 
 **現在受け付けていないもの**
 
