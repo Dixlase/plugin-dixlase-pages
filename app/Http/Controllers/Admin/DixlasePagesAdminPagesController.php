@@ -58,6 +58,7 @@ use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePagesSettings
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
+use Plugins\DixlasePages\App\Services\ScriptAuthoringPolicy;
 
 class DixlasePagesAdminPagesController extends Controller
 {
@@ -152,7 +153,10 @@ class DixlasePagesAdminPagesController extends Controller
         $previewService = app(ContentPreviewService::class);
         $rawContent = $page->getContentByEditorType() ?? '';
         $initialRenderedContent = $rawContent
-            ? $previewService->render($rawContent, $page->editor_type)
+            // renderFromSlug() downgrades Blade to HTML: a stored Blade body
+            // (legacy row, restored revision) must never execute here, just
+            // as preview() and previewRender() never execute it.
+            ? $previewService->renderFromSlug($rawContent, $page->editor_type->slug())
             : '';
 
         return view('dixlase-pages::admin.pages.preview-frame', [
@@ -376,8 +380,12 @@ class DixlasePagesAdminPagesController extends Controller
         $currentEditorSlug = $page->exists ? $page->editor_type->slug() : null;
         $isAdvancedEditor = $currentEditorSlug && ! in_array($currentEditorSlug, $simpleEditorSlugs);
 
-        // Editor slugs to exclude in Simple mode
-        $excludeSlugs = $isSimpleMode && ! $isAdvancedEditor ? ['html', 'blade'] : ['blade'];
+        // Editor slugs to exclude: Blade always; HTML in Simple mode (unless
+        // the page already uses it) and for members who may not author
+        // scripts (ScriptAuthoringPolicy -- the request enforces the same).
+        $hideHtml = ($isSimpleMode && ! $isAdvancedEditor)
+            || ! ScriptAuthoringPolicy::canAuthorScripts($this->member);
+        $excludeSlugs = $hideHtml ? ['html', 'blade'] : ['blade'];
 
         // Editor type radio card options (for common components)
         $editorManager = app(\App\Services\Editor\EditorManager::class);
@@ -544,6 +552,12 @@ class DixlasePagesAdminPagesController extends Controller
             ) ?? ContentStorageType::DATABASE;
         }
 
+        // A default the member may not use (HTML for an editor) falls back
+        // to Markdown instead of pre-selecting an option the form hides.
+        if (! in_array($page->editor_type->slug(), ScriptAuthoringPolicy::creatableEditorSlugs($this->member), true)) {
+            $page->editor_type = ContentEditorType::MARKDOWN;
+        }
+
         $formData = $this->prepareFormData($page);
 
         return view('dixlase-pages::admin.pages.create', array_merge(
@@ -632,6 +646,11 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function edit(DixlasePagesPage $page)
     {
+        // HTML (and legacy Blade) pages are script-capable; only members who
+        // may author scripts may open them for editing (the update request
+        // refuses the save as well).
+        abort_unless(ScriptAuthoringPolicy::canEditEditorType($this->member, $page->editor_type), 403);
+
         // For file storage, load content from file
         $fileContents = null;
         $customCss = null;
@@ -1049,47 +1068,5 @@ class DixlasePagesAdminPagesController extends Controller
         if (! AdminHelper::canEditPluginMenu(self::PLUGIN_SLUG, $menuKey)) {
             abort(403, __('http/middleware/check_menu_edit.no_edit_permission'));
         }
-    }
-
-    /**
-     * Get file content for a specific editor type (API endpoint).
-     */
-    public function getFileContent(DixlasePagesPage $page, string $editorType)
-    {
-        // Return empty if not file storage
-        if ($page->storage_type !== ContentStorageType::FILE) {
-            return response()->json(['content' => '']);
-        }
-
-        $content = $this->contentService->loadFromFile(
-            $page->slug,
-            app()->getLocale(),
-            $editorType
-        );
-
-        return response()->json(['content' => $content ?? '']);
-    }
-
-    /**
-     * Get content for a specific storage type and editor type (API endpoint).
-     * Used when switching storage type or editor type.
-     */
-    public function getContent(DixlasePagesPage $page, string $storageType, string $editorType)
-    {
-        $content = '';
-
-        if ($storageType === 'file') {
-            // Load content from file
-            $content = $this->contentService->loadFromFile(
-                $page->slug,
-                app()->getLocale(),
-                $editorType
-            ) ?? '';
-        } else {
-            // Load content column from DB
-            $content = $page->content ?? '';
-        }
-
-        return response()->json(['content' => $content]);
     }
 }

@@ -32,6 +32,7 @@
 
 namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
+use App\Enums\ContentEditorType;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
@@ -39,7 +40,9 @@ use App\Rules\UniqueContentSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
+use Plugins\DixlasePages\App\Services\ScriptAuthoringPolicy;
 
 class DixlasePagesUpdatePageRequest extends FormRequest
 {
@@ -48,6 +51,16 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        // An HTML (or legacy Blade) body is script-capable: only members who
+        // may author scripts may change such a page. See ScriptAuthoringPolicy.
+        $page = $this->route('page');
+        if ($page instanceof DixlasePagesPage) {
+            return ScriptAuthoringPolicy::canEditEditorType(
+                Auth::guard('member')->user(),
+                $page->editor_type
+            );
+        }
+
         return true;
     }
 
@@ -163,6 +176,22 @@ class DixlasePagesUpdatePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $page = $this->route('page');
+        if ($page instanceof DixlasePagesPage) {
+            // Custom CSS / JS are only served for HTML-editor pages (the
+            // editor type cannot change on update), so never store them on
+            // any other page.
+            if ($page->editor_type !== ContentEditorType::HTML) {
+                $this->merge(['custom_css' => null, 'custom_js' => null]);
+            }
+
+            // Simple mode hides the file option: a database page stays in the
+            // database. (An existing file page keeps its choice.)
+            if (ScriptAuthoringPolicy::isSimpleMode() && $page->storage_type === ContentStorageType::DATABASE) {
+                $this->merge(['storage_type' => ContentStorageType::DATABASE->slug()]);
+            }
+        }
+
         // The parent_id <select> emits "" for the "Top-level page" option.
         // Coerce that to null before validation so the `nullable|integer`
         // rule chain skips cleanly and $validated['parent_id'] holds null

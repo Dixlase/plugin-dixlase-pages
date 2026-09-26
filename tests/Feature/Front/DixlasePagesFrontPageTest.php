@@ -359,4 +359,59 @@ class DixlasePagesFrontPageTest extends TestCase
         $response->assertViewHas('hasCustomJs');
         $response->assertViewHas('customAssetVersion');
     }
+
+    /**
+     * A Markdown page must render javascript: links exactly as the preview
+     * does -- stripped -- not as live hrefs.
+     */
+    public function test_markdown_page_strips_javascript_links(): void
+    {
+        DixlasePagesPage::factory()->published()->create([
+            'slug' => 'md-links',
+            'title' => 'Links',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::MARKDOWN,
+            'content' => "[click](javascript:alert(1))\n\n[ok](https://example.com)",
+            'lang' => app()->getLocale(),
+        ]);
+
+        $response = $this->get('/'.$this->pagesDirectory.'/md-links');
+
+        $response->assertStatus(200);
+        $response->assertDontSee('javascript:alert', false);
+        $response->assertSee('href="https://example.com"', false);
+    }
+
+    /**
+     * A draft's custom assets are served only to logged-in members, so a
+     * shared cache must never store them; a published page's may be cached.
+     */
+    public function test_draft_assets_are_not_publicly_cacheable(): void
+    {
+        DixlasePagesPage::factory()->draft()->create([
+            'slug' => 'draft-assets',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'custom_js' => 'console.log(1);',
+            'lang' => app()->getLocale(),
+        ]);
+        DixlasePagesPage::factory()->published()->create([
+            'slug' => 'live-assets',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'custom_js' => 'console.log(2);',
+            'lang' => app()->getLocale(),
+        ]);
+
+        $this->actingAs(\App\Models\Member::factory()->create(), 'member');
+
+        $draft = $this->get('/'.$this->pagesDirectory.'/draft-assets/custom-script.js');
+        $draft->assertStatus(200);
+        $this->assertStringContainsString('no-store', (string) $draft->headers->get('Cache-Control'));
+        $this->assertStringNotContainsString('public', (string) $draft->headers->get('Cache-Control'));
+
+        $live = $this->get('/'.$this->pagesDirectory.'/live-assets/custom-script.js');
+        $live->assertStatus(200);
+        $this->assertStringContainsString('public', (string) $live->headers->get('Cache-Control'));
+    }
 }

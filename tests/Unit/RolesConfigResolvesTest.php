@@ -104,8 +104,8 @@ class RolesConfigResolvesTest extends TestCase
             // pruned later, so it sits with the deletion group.
             'revision list' => ['pages.revisions.index', $editor],
             'revision view' => ['pages.revisions.show', $editor],
-            'revision restore' => ['pages.revisions.restore', $editor],
-            'revision note' => ['pages.revisions.note', $editor],
+            'revision restore' => ['pages.revisions.restore', $admin],
+            'revision note' => ['pages.revisions.note', $admin],
             'revision protect' => ['pages.revisions.protect', $admin],
 
             // publish_min_role and route_slug live here, so a delegated admin

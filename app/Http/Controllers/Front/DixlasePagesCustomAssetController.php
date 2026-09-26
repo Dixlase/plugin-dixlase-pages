@@ -56,13 +56,13 @@ class DixlasePagesCustomAssetController extends Controller
      */
     public function script(Request $request): Response
     {
-        $content = $this->resolveContent($this->resolvePath($request), 'js');
+        $asset = $this->resolveContent($this->resolvePath($request), 'js');
 
-        if ($content === null) {
+        if ($asset === null) {
             abort(404);
         }
 
-        return $this->buildResponse($content, 'application/javascript');
+        return $this->buildResponse($asset['content'], 'application/javascript', $asset['published']);
     }
 
     /**
@@ -70,13 +70,13 @@ class DixlasePagesCustomAssetController extends Controller
      */
     public function style(Request $request): Response
     {
-        $content = $this->resolveContent($this->resolvePath($request), 'css');
+        $asset = $this->resolveContent($this->resolvePath($request), 'css');
 
-        if ($content === null) {
+        if ($asset === null) {
             abort(404);
         }
 
-        return $this->buildResponse($content, 'text/css');
+        return $this->buildResponse($asset['content'], 'text/css', $asset['published']);
     }
 
     /**
@@ -99,7 +99,10 @@ class DixlasePagesCustomAssetController extends Controller
      * page HTML loads (the page route has its own admin bypass) but the
      * asset routes return 404, leaving the preview unstyled.
      */
-    private function resolveContent(string $path, string $type): ?string
+    /**
+     * @return array{content: string, published: bool}|null
+     */
+    private function resolveContent(string $path, string $type): ?array
     {
         $locale = App::getLocale();
 
@@ -125,19 +128,21 @@ class DixlasePagesCustomAssetController extends Controller
             return null;
         }
 
-        return $content;
+        return ['content' => $content, 'published' => $page->isPublished()];
     }
 
     /**
      * Build a cacheable response with proper headers
      */
-    private function buildResponse(string $content, string $contentType): Response
+    private function buildResponse(string $content, string $contentType, bool $published): Response
     {
         $etag = '"'.md5($content).'"';
 
         return response($content, 200, [
             'Content-Type' => $contentType.'; charset=UTF-8',
-            'Cache-Control' => 'public, max-age=3600',
+            // A draft's assets are served only to logged-in members; a shared
+            // cache must never keep them and hand them to anonymous visitors.
+            'Cache-Control' => $published ? 'public, max-age=3600' : 'private, no-store',
             'ETag' => $etag,
         ]);
     }

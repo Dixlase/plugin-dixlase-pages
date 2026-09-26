@@ -11,6 +11,10 @@ namespace Plugins\DixlasePages\Tests\Unit;
 
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStorageType;
+use App\Enums\MemberRole;
+use App\Models\Member;
+use App\Models\SiteSetting;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesStorePageRequest;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Tests\TestCase;
@@ -28,6 +32,8 @@ use Tests\TestCase;
  */
 class BladeExecutionPathRemovedTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * The sink itself. Nothing in this plugin may hand content to Blade::render()
      * -- not the front view, not a partial, not a helper.
@@ -85,6 +91,10 @@ class BladeExecutionPathRemovedTest extends TestCase
      */
     public function test_store_request_rejects_the_blade_editor_type(): void
     {
+        // The widest set of editor types: an administrator in Advanced mode.
+        SiteSetting::setValue('admin_mode', '1');
+        $this->actingAs(Member::factory()->create(['role' => MemberRole::ADMIN]), 'member');
+
         $rules = (new DixlasePagesStorePageRequest())->rules();
 
         $editorTypeRules = array_filter(
@@ -136,6 +146,25 @@ class BladeExecutionPathRemovedTest extends TestCase
             '{{ 7*6 }}',
             $page->getContentByEditorType(),
             'The body must reach the view verbatim so the escaping branch, not a template engine, handles it.'
+        );
+    }
+
+    /**
+     * previewFrame() renders the stored body. A page row can still carry the
+     * Blade editor type (legacy rows, restored revisions), so it must go
+     * through renderFromSlug(), which downgrades Blade to HTML -- never through
+     * render() with the stored enum, which executes Blade.
+     */
+    public function test_admin_controller_never_hands_a_stored_editor_type_to_render(): void
+    {
+        $source = (string) file_get_contents(
+            dirname(__DIR__, 2).'/app/Http/Controllers/Admin/DixlasePagesAdminPagesController.php'
+        );
+
+        $this->assertDoesNotMatchRegularExpression(
+            '/->render\(\s*\$[A-Za-z]+\s*,\s*\$page->editor_type\s*\)/',
+            $source,
+            'Use renderFromSlug() so a stored Blade editor type is downgraded to HTML.'
         );
     }
 }
