@@ -66,12 +66,9 @@ jobs:
           rsync -a \
             --exclude='/.git' \
             --exclude='/.github' \
-            --exclude='/.gitignore' \
             --exclude='/.gitattributes' \
             --exclude='/.editorconfig' \
             --exclude='/node_modules' \
-            --exclude='/tests' \
-            --exclude='/phpunit.xml' \
             --exclude='/phpunit.xml.dist' \
             --exclude='/.phpunit.cache' \
             --exclude='/.phpunit.result.cache' \
@@ -79,7 +76,6 @@ jobs:
             --exclude='/CLAUDE.ja.md' \
             --exclude='/.claude' \
             --exclude='/.mcp.json' \
-            --exclude='/.backlog' \
             --exclude='/.vscode' \
             --exclude='/.idea' \
             --exclude='/.fleet' \
