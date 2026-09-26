@@ -288,11 +288,11 @@
         "tests/Unit/RolesConfigResolvesTest.php": "sha256:99313f3f0632b31d007ded99695f22b2a68d05780e67be9d2a294674d0910b17",
         "tests/Unit/VersionManifestConsistencyTest.php": "sha256:17ef22ec3d4d3eb4d304bb80f767e38bad75efacd1c0a8134154c4fb9fcaf97c",
         "thumbnail.png": "sha256:918764116027f2ea03fa5100779def43a32e3eaca257ffc4ec7719e6d8bf4dbc",
-        "vite.config.js": "sha256:78002e78197945b94a3a554ac4d8f630b4e484d60bb988b0f0b8b054de47598e"
+        "vite.config.js": "sha256:478f3dd9c74628f5189981400195c7227eb20c6c77843975f2175d66d91bdbe6"
     },
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-09-26T07:49:07+00:00"
+        "signed_at": "2026-09-26T13:41:14+00:00"
     }
 }
