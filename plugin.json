@@ -157,8 +157,8 @@
         ".backlog/SPINOFF-extension-prebuilt-assets-release.md": "sha256:cb389be98e08fc5839d05e147d3cf1fbe921163de078f577ca8fad5ed2974831",
         "CHANGELOG.ja.md": "sha256:1fa17091cf5c448e57d786f5e42434fcc0ebfd4e97f563bf2085fc74468d87b9",
         "CHANGELOG.md": "sha256:f47aed805f337c6e9024e998dbb5c1b17a5ae3e4e0b3ee756b86d79a6000f55c",
-        "CONTRIBUTING.ja.md": "sha256:444da80136fd3fb6c413f59ca79483c9689a4274b0cb7b093384535ed5ed7d02",
-        "CONTRIBUTING.md": "sha256:026cb091f12ae9e76d2f439540aeed4d08fa387edb4e3864fe8aae6c23f49d3a",
+        "CONTRIBUTING.ja.md": "sha256:ac820817fcf5ed262e8c2682ba53b83b1c1d7eb5534d5be533e33c4a8d66502b",
+        "CONTRIBUTING.md": "sha256:5fbdd10d5e28524543990de605a1b647414eea9d469c68a14683267104304a81",
         "COPYRIGHT-POLICY.ja.md": "sha256:700b70255711f3a34477af8f0b83c262976b0c18d1113e5611f683f9f146c922",
         "COPYRIGHT-POLICY.md": "sha256:efd4aeceb98b0bdad7f1f43de29c6db6c1ec78934f6578c55daf1a987d9e6030",
         "LICENSE": "sha256:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
@@ -293,6 +293,6 @@
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-09-25T18:20:15+00:00"
+        "signed_at": "2026-09-26T03:03:47+00:00"
     }
 }
