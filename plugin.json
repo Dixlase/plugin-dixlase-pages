@@ -24,6 +24,7 @@
         "attributions_file": null,
         "third_party": []
     },
+    "thumbnail": "thumbnail.png",
     "namespace": "Plugins\\DixlasePages",
     "providers": [
         "Plugins\\DixlasePages\\App\\Providers\\DixlasePagesServiceProvider"
@@ -293,6 +294,6 @@
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-09-27T10:02:21+00:00"
+        "signed_at": "2026-09-27T10:16:33+00:00"
     }
 }
