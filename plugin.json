@@ -288,12 +288,12 @@
         "tests/Unit/Models/DixlasePagesPageModelTest.php": "sha256:e6fe57ec7292366835f4c284cdaba9e0d2c8e61fb1dc7afad85a434ec7d2e5c2",
         "tests/Unit/RolesConfigResolvesTest.php": "sha256:99313f3f0632b31d007ded99695f22b2a68d05780e67be9d2a294674d0910b17",
         "tests/Unit/VersionManifestConsistencyTest.php": "sha256:17ef22ec3d4d3eb4d304bb80f767e38bad75efacd1c0a8134154c4fb9fcaf97c",
-        "thumbnail.png": "sha256:3c5b597f5630f634687c25e3b40d71456333892e9a9d9a0154c0b118f39ec3b8",
+        "thumbnail.png": "sha256:f67c61ad566dfafe8d69e2809f3d388da33f9680999d3b9eba67b024e403d284",
         "vite.config.js": "sha256:478f3dd9c74628f5189981400195c7227eb20c6c77843975f2175d66d91bdbe6"
     },
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-09-27T10:16:33+00:00"
+        "signed_at": "2026-09-28T09:26:14+00:00"
     }
 }
