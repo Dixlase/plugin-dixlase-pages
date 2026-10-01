@@ -5,6 +5,22 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.1.2] — 2026-10-01
+
+### Security
+
+- Raw HTML inside a Markdown page is now shown as text instead of being rendered (#36).
+  Markdown is open to editors below ADMIN, and writing HTML is reserved for ADMIN and
+  above, but `<img onerror>`, `<form>`, `<meta http-equiv>` and similar tags passed through.
+  This applies to the published page, the preview and the live preview, which now renders
+  Markdown on the server so it matches the published page. Requires Dixlase core 0.1.3;
+  on an older core, Markdown renders as before.
+
+### Changed
+
+- A Markdown page that relied on raw HTML now shows that HTML as text. Move such content
+  to an HTML page (ADMIN and above). The bundled sample pages are not affected.
+
 ## [0.1.1] — 2026-10-01
 
 ### Changed
