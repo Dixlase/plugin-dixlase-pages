@@ -1,6 +1,6 @@
 {
     "name": "dixlase-pages",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Dixlase Pages — plugin providing static page management for Dixlase",
     "private": true,
     "type": "module",
