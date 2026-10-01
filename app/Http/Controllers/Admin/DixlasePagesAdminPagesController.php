@@ -156,7 +156,7 @@ class DixlasePagesAdminPagesController extends Controller
             // renderFromSlug() downgrades Blade to HTML: a stored Blade body
             // (legacy row, restored revision) must never execute here, just
             // as preview() and previewRender() never execute it.
-            ? $previewService->renderFromSlug($rawContent, $page->editor_type->slug())
+            ? $previewService->renderFromSlug($rawContent, $page->editor_type->slug(), false, false)
             : '';
 
         return view('dixlase-pages::admin.pages.preview-frame', [
@@ -226,10 +226,11 @@ class DixlasePagesAdminPagesController extends Controller
     }
 
     /**
-     * Server-side preview rendering (for Blade/GUI editors)
+     * Server-side preview rendering (for Markdown, Blade and GUI editors)
      *
-     * Converts content from editor types (Blade, GUI) that cannot be rendered client-side
-     * to HTML for real-time preview within iframe.
+     * Converts content to HTML for real-time preview within the iframe.
+     * Markdown is rendered here rather than in the browser so the preview
+     * escapes raw HTML exactly as the published page does.
      */
     public function previewRender(Request $request): JsonResponse
     {
@@ -237,7 +238,7 @@ class DixlasePagesAdminPagesController extends Controller
         $editorTypeSlug = $request->input('editor_type', 'html');
 
         $previewService = app(ContentPreviewService::class);
-        $html = $previewService->renderFromSlug($content, $editorTypeSlug);
+        $html = $previewService->renderFromSlug($content, $editorTypeSlug, false, false);
 
         return response()->json(['html' => $html]);
     }

@@ -109,8 +109,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         @if($editorType === 'markdown')
                             {{-- Markdown: rendered by core exactly as the preview renders it
-                                 (javascript: links stripped, same heading normalisation) --}}
-                            {!! shortcode_parse(app(\App\Services\ContentPreviewService::class)->render($content, \App\Enums\ContentEditorType::MARKDOWN)) !!}
+                                 (javascript: links stripped, same heading normalisation).
+                                 Raw HTML is escaped: editors below ADMIN write Markdown,
+                                 and HTML authoring is reserved for ADMIN and above. --}}
+                            {!! shortcode_parse(app(\App\Services\ContentPreviewService::class)->render($content, \App\Enums\ContentEditorType::MARKDOWN, false)) !!}
                         @elseif($editorType === 'html')
                             {{-- HTML: output with shortcode processing --}}
                             {!! shortcode_parse($content) !!}
