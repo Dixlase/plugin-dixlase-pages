@@ -169,6 +169,31 @@ class DixlasePagesFrontPageTest extends TestCase
     }
 
     /**
+     * Raw HTML in a Markdown page is shown as text, not rendered. Markdown is
+     * open to editors below ADMIN, and HTML authoring is ADMIN-only.
+     */
+    public function test_markdown_page_escapes_raw_html(): void
+    {
+        DixlasePagesPage::factory()->published()->create([
+            'slug' => 'markdown-html',
+            'title' => 'Markdown HTML',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::MARKDOWN,
+            'content' => "# Heading\n\n<img src=x onerror=alert(1)>\n\n<form action=\"https://evil.example\"><input></form>\n\n[link](javascript:alert(1))",
+            'lang' => app()->getLocale(),
+        ]);
+
+        $response = $this->get('/'.$this->pagesDirectory.'/markdown-html');
+
+        $response->assertStatus(200);
+        $response->assertSee('<h1>Heading</h1>', false);
+        $response->assertSee('&lt;img src=x onerror=alert(1)&gt;', false);
+        $response->assertDontSee('<img src=x', false);
+        $response->assertDontSee('<form action="https://evil.example"', false);
+        $response->assertDontSee('href="javascript:', false);
+    }
+
+    /**
      * 下書きページが未ログインでは404になることを確認
      */
     public function test_draft_page_returns_404_for_guests(): void

@@ -210,11 +210,11 @@ document.addEventListener('alpine:init', () => {
                 const content = document.getElementById('content')?.value || '';
                 if (!this.previewReady) return;
 
+                // Markdown goes through the server too: the published page
+                // escapes raw HTML inside Markdown, and a browser-side
+                // marked.parse() would render it instead.
                 if (this.editorType === 'html') {
                     this.postToIframe('updateContent', { html: content });
-                } else if (this.editorType === 'markdown') {
-                    const html = window.marked ? window.marked.parse(content) : content;
-                    this.postToIframe('updateContent', { html });
                 } else {
                     this.serverRenderAndSend(content);
                 }
