@@ -113,14 +113,20 @@ jobs:
         run: npm run build
 
       - name: Verify build produced the expected outputs
-        # `vite.config.js` outputs into `resources/assets/{js,css}` with a
-        # `manifest.json` alongside. Missing outputs mean either the entry
-        # points changed and the config lags behind, or the build silently
-        # produced nothing — fail loudly here rather than shipping an
-        # empty prebuilt dir in a future release ZIP.
+        # `vite.config.js` outputs hashed files into `resources/assets/{js,css}`
+        # with a `manifest.json` alongside. Check that the manifest exists and
+        # that every file it references was built. Missing outputs mean either
+        # the entry points changed and the config lags behind, or the build
+        # silently produced nothing — fail loudly here rather than shipping an
+        # empty prebuilt dir in a future release ZIP. (The old check looked for
+        # an unhashed js/app.js, which only passed because a stale copy was
+        # committed.)
         run: |
           test -f resources/assets/manifest.json || { echo "missing resources/assets/manifest.json"; exit 1; }
-          test -f resources/assets/js/app.js || { echo "missing resources/assets/js/app.js"; exit 1; }
-          test -d resources/assets/css || { echo "missing resources/assets/css/"; exit 1; }
+          files=$(jq -r '.[] | .file, (.css // [])[]' resources/assets/manifest.json)
+          test -n "$files" || { echo "manifest.json references no files"; exit 1; }
+          for f in $files; do
+            test -f "resources/assets/$f" || { echo "missing resources/assets/$f"; exit 1; }
+          done
           echo "Build outputs:"
           ls -la resources/assets/
