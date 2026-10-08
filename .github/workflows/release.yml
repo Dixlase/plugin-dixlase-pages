@@ -88,10 +88,17 @@ jobs:
           # produced must actually be in the staged payload — otherwise
           # `auto` mode on the target host will silently fall back to a
           # rebuild (or a hard failure on npm-less production).
+          # Vite writes hashed names (js/app-<hash>.js), so check every file
+          # the manifest lists rather than a fixed js/app.js (#39).
           test -f "${STAGE}/resources/assets/manifest.json" \
             || { echo "resources/assets/manifest.json not staged into ZIP"; exit 1; }
-          test -f "${STAGE}/resources/assets/js/app.js" \
-            || { echo "resources/assets/js/app.js not staged into ZIP"; exit 1; }
+          ASSET_FILES=$(jq -r '.[] | .file, (.css // [])[]' "${STAGE}/resources/assets/manifest.json" | sort -u)
+          test -n "${ASSET_FILES}" \
+            || { echo "resources/assets/manifest.json lists no files"; exit 1; }
+          for f in ${ASSET_FILES}; do
+            test -f "${STAGE}/resources/assets/${f}" \
+              || { echo "resources/assets/${f} is in manifest.json but not staged into ZIP"; exit 1; }
+          done
 
           (cd "${STAGE_ROOT}" && zip -qr "${GITHUB_WORKSPACE}/${ZIP_NAME}" "${WRAPPER}")
 
