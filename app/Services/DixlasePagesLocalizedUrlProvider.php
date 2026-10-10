@@ -37,40 +37,38 @@ use App\Helpers\LocaleHelper;
 use Illuminate\Http\Request;
 
 /**
- * Pages-side LocalizedUrlProvider implementation.
+ * The same Pages page in every supported locale, for hreflang links.
  *
- * Returns the locale-prefix-swapped equivalent of the current request URL
- * for every supported locale, but only when the current request is
- * resolved to a Pages-owned route (route name starts with "dixlase-pages::").
- * For non-Pages requests it returns an empty array so the multilingual
- * plugin's LocalizedUrlAggregator can let other plugins answer.
+ * Answers only for the front page route (dixlase-pages::page.show), and
+ * only on the /{locale} copy of it that DixlaseMultilingual mounts. Admin
+ * and custom CSS / JS routes get nothing. Each alternate is the current
+ * route with another locale; the page path is shared across languages,
+ * and DixlaseMultilingual keeps only the enabled locales.
  *
- * Phase D ships the route-name + path-swap heuristic only. A future phase
- * may consult plg_dixlase_multilingual_translations to drop locales that
- * have no published translation, so unpublished translations no longer
- * appear in &lt;link rel="alternate" hreflang&gt; tags.
+ * Every locale, the default one included, gets a /{locale} URL, as in
+ * DixlaseBlog. Dixlase/plugin-dixlase-multilingual#43 settles the
+ * default-locale convention for hreflang; follow it there.
  */
 class DixlasePagesLocalizedUrlProvider implements LocalizedUrlProvider
 {
+    private const PAGE_ROUTE = 'dixlase-pages::page.show';
+
     public function getAlternateUrls(Request $request): array
     {
         $route = $request->route();
-        if ($route === null) {
+
+        if ($route === null || $route->getName() !== self::PAGE_ROUTE
+            || ! in_array('locale', $route->parameterNames(), true)) {
             return [];
         }
 
-        $name = (string) $route->getName();
-        if ($name === '' || ! str_starts_with($name, 'dixlase-pages::')) {
-            return [];
-        }
-
-        $currentPath = '/'.ltrim($request->path(), '/');
+        $parameters = array_diff_key($route->parameters(), ['locale' => true]);
         $query = $request->getQueryString();
         $suffix = $query !== null && $query !== '' ? '?'.$query : '';
 
         $urls = [];
         foreach (LocaleHelper::supportedLocales() as $locale) {
-            $urls[$locale] = LocaleHelper::switchLocaleUrl($currentPath, $locale).$suffix;
+            $urls[$locale] = route(self::PAGE_ROUTE, ['locale' => $locale] + $parameters).$suffix;
         }
 
         return $urls;
