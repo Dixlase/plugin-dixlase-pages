@@ -86,7 +86,7 @@ jobs:
             PLUGIN_DIR="DixlasePages"
             EXPECTED_URL="git@github.com:${{ github.repository }}.git"
 
-            for SITE in brand demo; do
+            for SITE in brand demo docs; do
               # Resolve the site layout. A Docker Installer instance keeps the app in
               # $BASE/$SITE/html and runs its own PHP container named after
               # CONTAINER_PREFIX in $BASE/$SITE/.env, with files owned by
