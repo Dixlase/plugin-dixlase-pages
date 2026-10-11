@@ -1,6 +1,6 @@
 {
     "algo": "ed25519",
     "key_id": "dixlase-authority-2026",
-    "signature": "VYOVipJWn7x8n4P+4AO5vNin+PQC5GfZe5ImUGyavKN3V7NweiClBB3ISzpB7mM+zDzQihvRwp1lKQrkQ15oCA==",
-    "signed_at": "2026-10-01T11:40:13+00:00"
+    "signature": "FFSQwKNaxXF121I6SJGR54388VV7SWQ27OZYBU5Ga77t9y5NDTrMUZYprFqPOVC8UbV9yOVvdloo2A0rz3cgCQ==",
+    "signed_at": "2026-10-11T11:52:10+00:00"
 }

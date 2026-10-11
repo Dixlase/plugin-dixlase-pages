@@ -5,6 +5,25 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.1.3] — 2026-10-11
+
+### Fixed
+
+- hreflang alternate URLs are now built from the page's own route, so a page whose
+  slug differs between locales gets the correct URL for each locale (#48).
+- Re-signed. The signature no longer matched the tree, so sites reported the plugin
+  as `signature_invalid` and deducted from its health score. Changes had reached
+  `main` through pull-request merges, which do not run the local signing hook.
+
+### Changed
+
+- Built front-end assets are no longer tracked in git; the release build produces
+  them (#38).
+- CI and dependency maintenance: `source-map-js` 1.2.1 → 1.2.2 (#41), the dead
+  `COMPOSER_AUTH` block removed (#43), the checkout token no longer passed as a
+  secret (#44), the release check now reads `manifest.json` instead of a fixed
+  `app.js` (#40), and the deploy also covers the documentation site (#46).
+
 ## [0.1.2] — 2026-10-01
 
 ### Security
