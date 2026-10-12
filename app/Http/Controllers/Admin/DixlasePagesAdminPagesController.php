@@ -636,10 +636,14 @@ class DixlasePagesAdminPagesController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * There is no dedicated detail view -- clicking a page from the index
+     * always leads to the editor -- so a direct hit on /admin/pages/{page}
+     * is sent to the same place rather than 500-ing on a missing view.
      */
     public function show(DixlasePagesPage $page)
     {
-        return view('dixlase-pages::admin.pages.show', array_merge($this->viewParams, compact('page')));
+        return redirect()->route('dixlase-pages::admin.pages.edit', ['page' => $page->id]);
     }
 
     /**
