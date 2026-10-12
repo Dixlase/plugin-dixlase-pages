@@ -5,6 +5,20 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.2.1] — 2026-10-13
+
+### Fixed
+
+- Opening `/admin/pages/{page}` directly no longer fails with a server error; it
+  redirects to the page's edit screen (#53, fixes #52).
+- Re-signed. Changes merged after 0.2.0 had not been signed, so sites reported the
+  plugin as `signature_invalid`.
+
+### Development
+
+- A smoke test opens every admin GET route of the plugin as the admin and the editor
+  role and checks that none returns a server error (#54, fixes #51).
+
 ## [0.2.0] — 2026-10-12
 
 ### Added
