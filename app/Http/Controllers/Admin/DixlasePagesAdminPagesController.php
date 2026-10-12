@@ -643,11 +643,17 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function show(DixlasePagesPage $page)
     {
-        // Pass the id explicitly rather than the model: implicit binding
-        // produced the show URL back (not /edit) under the route-collection
-        // state the plugin test harness sees once PluginServiceProvider has
-        // already registered the routes once from boot.
-        return redirect()->route('dixlase-pages::admin.pages.edit', ['page' => $page->id]);
+        // Resolve the URL once with route(), then hand it to ->to(). In CI,
+        // `return redirect()->route('name', ...)` was producing the show URL
+        // back from inside the controller even though the same route() call
+        // in the test context resolved correctly to the edit URL -- captured
+        // via a dump that showed Location=/admin/pages/1 while
+        // route('...edit', ['page' => 1]) returned /admin/pages/1/edit.
+        // Precomputing the string sidesteps whatever state RedirectResponse
+        // was looking up at render time.
+        $target = route('dixlase-pages::admin.pages.edit', ['page' => $page->id]);
+
+        return redirect()->to($target);
     }
 
     /**
