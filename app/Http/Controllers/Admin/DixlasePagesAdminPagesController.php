@@ -643,7 +643,11 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function show(DixlasePagesPage $page)
     {
-        return redirect()->route('dixlase-pages::admin.pages.edit', $page);
+        // Pass the id explicitly rather than the model: implicit binding
+        // produced the show URL back (not /edit) under the route-collection
+        // state the plugin test harness sees once PluginServiceProvider has
+        // already registered the routes once from boot.
+        return redirect()->route('dixlase-pages::admin.pages.edit', ['page' => $page->id]);
     }
 
     /**
