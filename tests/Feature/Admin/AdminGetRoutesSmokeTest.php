@@ -194,14 +194,6 @@ class AdminGetRoutesSmokeTest extends TestCase
                 continue;
             }
 
-            // TODO (triage): remove once dixlase-pages fix PR lands.
-            // Temporarily skip routes known to 500 so the smoke sweep
-            // can surface everything in one pass instead of stopping
-            // at the first failure.
-            if (in_array($name, ['dixlase-pages::admin.pages.show'], true)) {
-                continue;
-            }
-
             $uri = $route->uri();
             $uri = str_replace('{page}', (string) $this->page->id, $uri);
             $uri = str_replace('{id}', (string) $this->revision->id, $uri);
