@@ -643,15 +643,12 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function show(DixlasePagesPage $page)
     {
-        // Resolve the URL once with route(), then hand it to ->to(). In CI,
-        // `return redirect()->route('name', ...)` was producing the show URL
-        // back from inside the controller even though the same route() call
-        // in the test context resolved correctly to the edit URL -- captured
-        // via a dump that showed Location=/admin/pages/1 while
-        // route('...edit', ['page' => 1]) returned /admin/pages/1/edit.
-        // Precomputing the string sidesteps whatever state RedirectResponse
-        // was looking up at render time.
         $target = route('dixlase-pages::admin.pages.edit', ['page' => $page->id]);
+        // DEBUG: dump from inside the controller to see what route() returns
+        // from this context (vs the same call in a test).
+        fwrite(STDERR, "[show-debug] in-controller target={$target}\n");
+        fwrite(STDERR, '[show-debug] page_id='.$page->id."\n");
+        fwrite(STDERR, '[show-debug] page_class='.get_class($page)."\n");
 
         return redirect()->to($target);
     }

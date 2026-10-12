@@ -113,7 +113,7 @@ class AdminPagesShowRedirectTest extends TestCase
         fwrite(STDERR, '[debug] route-edit='.route('dixlase-pages::admin.pages.edit', ['page' => $page->id])."\n");
         fwrite(STDERR, '[debug] route-show='.route('dixlase-pages::admin.pages.show', ['page' => $page->id])."\n");
         $body = $response->getContent();
-        fwrite(STDERR, '[debug] body-head='.substr((string) $body, 0, 400)."\n");
+        fwrite(STDERR, '[debug] body-head='.substr((string) $body, 0, 1500)."\n");
 
         $response->assertRedirect(route('dixlase-pages::admin.pages.edit', ['page' => $page->id]));
     }
