@@ -5,13 +5,13 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
-## [Unreleased]
+## [0.2.0] — 2026-10-12
 
 ### Added
 
 - The page edit screen shows DixlaseMultilingual's "Translate" button below the page
   meta, linking to the translation screen for the page. It appears only when that
-  plugin provides the button and the page has been saved (#49).
+  plugin provides the button and the page has been saved (#50, fixes #49).
 
 ## [0.1.3] — 2026-10-11
 
