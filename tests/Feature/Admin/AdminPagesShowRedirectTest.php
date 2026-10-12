@@ -104,6 +104,17 @@ class AdminPagesShowRedirectTest extends TestCase
 
         $response = $this->actingAs($admin, 'member')->get("/admin/pages/{$page->id}");
 
-        $response->assertRedirect(route('dixlase-pages::admin.pages.edit', $page));
+        // Debug dump: CI reported Location=/admin/pages/1 (same as show)
+        // instead of /edit. Surface the status + headers + body so we can
+        // tell whether the redirect fired at all, or something else
+        // short-circuited the response.
+        fwrite(STDERR, "[debug] status={$response->status()}\n");
+        fwrite(STDERR, '[debug] location='.($response->headers->get('Location') ?? '(none)')."\n");
+        fwrite(STDERR, '[debug] route-edit='.route('dixlase-pages::admin.pages.edit', ['page' => $page->id])."\n");
+        fwrite(STDERR, '[debug] route-show='.route('dixlase-pages::admin.pages.show', ['page' => $page->id])."\n");
+        $body = $response->getContent();
+        fwrite(STDERR, '[debug] body-head='.substr((string) $body, 0, 400)."\n");
+
+        $response->assertRedirect(route('dixlase-pages::admin.pages.edit', ['page' => $page->id]));
     }
 }
