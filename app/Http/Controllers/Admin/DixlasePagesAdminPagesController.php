@@ -643,14 +643,7 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function show(DixlasePagesPage $page)
     {
-        $target = route('dixlase-pages::admin.pages.edit', ['page' => $page->id]);
-        // DEBUG: dump from inside the controller to see what route() returns
-        // from this context (vs the same call in a test).
-        fwrite(STDERR, "[show-debug] in-controller target={$target}\n");
-        fwrite(STDERR, '[show-debug] page_id='.$page->id."\n");
-        fwrite(STDERR, '[show-debug] page_class='.get_class($page)."\n");
-
-        return redirect()->to($target);
+        return redirect()->route('dixlase-pages::admin.pages.edit', ['page' => $page->id]);
     }
 
     /**
