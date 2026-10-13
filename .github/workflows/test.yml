@@ -72,7 +72,13 @@ jobs:
           else
             touch .env
           fi
-          echo "APP_KEY=${APP_KEY}" >> .env
+          # .env.example does not end with a newline, so a plain append glues
+          # the key onto its last line and CheckInstallationReady regenerates
+          # one, redirecting the first request of the run to itself. Drop any
+          # existing APP_KEY line and start the key on a fresh line.
+          sed -i.bak '/^APP_KEY=/d' .env && rm -f .env.bak
+          printf '\nAPP_KEY=%s\n' "${APP_KEY}" >> .env
+          grep -qx "APP_KEY=${APP_KEY}" .env || { echo "APP_KEY is not on a line of its own in .env" >&2; exit 1; }
 
       - name: Run PHPUnit tests
         working-directory: core/plugins/DixlasePages
