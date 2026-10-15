@@ -38,23 +38,31 @@ use App\Actions\AbstractAction;
 use App\Contracts\Action\Actor;
 use App\DTO\Action\ActionResult;
 use App\Enums\ContentEditorType;
+use App\Enums\ContentStorageType;
 use App\Enums\Permission;
 use App\Services\RevisionService;
 use Illuminate\Validation\ValidationException;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageRevision;
+use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
 
 /**
  * Action to restore a page from a specified revision
  *
  * A backup is automatically created as TYPE_RESTORE_BACKUP only if the state before restoration
  * differs from the latest revision (logic on the RevisionService side).
+ *
+ * RevisionService::restore() writes the snapshot to the DB columns only. A
+ * page stored as a file is rendered from its files, so they are brought in
+ * line with the restored columns afterwards: the files of the state before
+ * the restore are removed, and the files of the restored state are written.
  */
 class RestoreDixlasePagesPageRevisionAction extends AbstractAction
 {
     public function __construct(
         protected readonly DixlasePagesPageRevision $revision,
         protected readonly RevisionService $revisionService,
+        protected readonly ?DixlasePagesPageContentService $contentService = null,
     ) {}
 
     protected function requiredPermission(): ?Permission
@@ -100,13 +108,59 @@ class RestoreDixlasePagesPageRevisionAction extends AbstractAction
 
     protected function handle(Actor $actor, array $data): ActionResult
     {
+        $before = DixlasePagesPage::find($this->revision->page_id);
+
         /** @var DixlasePagesPage $page */
         $page = $this->revisionService->restore($this->revision, $actor->getActorId());
+
+        $this->syncFiles($before, $page);
 
         return ActionResult::success(
             model: $page,
             label: (string) $this->revision->id,
         );
+    }
+
+    /**
+     * Bring the page's files in line with its restored columns.
+     *
+     * The restore may change the slug, the storage type or the content, so
+     * the files of the previous state are removed first and the files of the
+     * restored state written from the DB copy.
+     */
+    private function syncFiles(?DixlasePagesPage $before, DixlasePagesPage $page): void
+    {
+        $files = $this->contentService ?? app(DixlasePagesPageContentService::class);
+        $locale = $page->lang ?? app()->getLocale();
+
+        if ($before !== null && $before->storage_type === ContentStorageType::FILE) {
+            $files->deleteFile($before->slug, $locale, $before->editor_type?->slug() ?? 'html');
+            $files->deleteCssFile($before->slug, $locale);
+            $files->deleteJsFile($before->slug, $locale);
+        }
+
+        if ($page->storage_type !== ContentStorageType::FILE) {
+            return;
+        }
+
+        // Read the columns themselves: the model's accessors may answer with
+        // a translation overlay rather than the restored source text.
+        $attributes = $page->getAttributes();
+        $files->saveToFile(
+            $page->slug,
+            $locale,
+            $page->editor_type?->slug() ?? 'html',
+            (string) ($attributes['content'] ?? ''),
+        );
+
+        $css = (string) ($attributes['custom_css'] ?? '');
+        $js = (string) ($attributes['custom_js'] ?? '');
+        if ($css !== '') {
+            $files->saveCssToFile($page->slug, $locale, $css);
+        }
+        if ($js !== '') {
+            $files->saveJsToFile($page->slug, $locale, $js);
+        }
     }
 
     /**

@@ -14,6 +14,12 @@ and this plugin follows Semantic Versioning.
   (fixes #59). Emptying the trash writes one entry per page. Who may do each of these
   is unchanged.
 
+### Fixed
+
+- Restoring a revision of a page stored as a file now rewrites its files. Before, only
+  the database copy changed, so the public page and the edit screen kept showing the
+  file as it was (fixes #58).
+
 ## [0.2.1] — 2026-10-13
 
 ### Fixed
