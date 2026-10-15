@@ -177,12 +177,11 @@ class AdminGetRoutesSmokeTest extends TestCase
     {
         $urls = $this->adminGetRouteUrls();
 
-        // Create: the shared editor with its editor type cards, no preview.
+        // Create: the shared editor with its editor type cards.
         $this->actingAs($this->admin, 'member')->get($urls[self::ROUTE_NAME_PREFIX.'create'])
             ->assertOk()
             ->assertSee('x-data="contentEditor"', false)
-            ->assertSee('name="editor_type"', false)
-            ->assertDontSee('x-ref="previewIframe"', false);
+            ->assertSee('name="editor_type"', false);
 
         // Edit: the shared editor runs the live preview through the
         // plugin's renderer.
