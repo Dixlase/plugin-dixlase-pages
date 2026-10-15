@@ -32,6 +32,7 @@
 
 namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
+use App\Actors\MemberActor;
 use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
 use App\Contracts\Repositories\MediaRepositoryInterface;
 use App\DTO\PluginIntegration\SeoMetaDTO;
@@ -52,6 +53,11 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use Plugins\DixlasePages\App\Actions\Page\CreateDixlasePagesPageAction;
+use Plugins\DixlasePages\App\Actions\Page\DeleteDixlasePagesPageAction;
+use Plugins\DixlasePages\App\Actions\Page\ForceDeleteDixlasePagesPageAction;
+use Plugins\DixlasePages\App\Actions\Page\RestoreDixlasePagesPageFromTrashAction;
+use Plugins\DixlasePages\App\Actions\Page\UpdateDixlasePagesPageAction;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesStorePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePagesSettingsRequest;
@@ -575,56 +581,10 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $validated = $request->validated();
 
-        $storageTypeSlug = $validated['storage_type'];
-        $editorTypeSlug = $validated['editor_type'];
-        $content = $validated['content'] ?? '';
-        $customCss = $validated['custom_css'] ?? '';
-        $customJs = $validated['custom_js'] ?? '';
-        $lang = $validated['lang'] ?? app()->getLocale();
-
-        // For file save, also save to file
-        if ($storageTypeSlug === 'file') {
-            $this->contentService->saveToFile(
-                $validated['slug'],
-                $lang,
-                $editorTypeSlug,
-                $content
-            );
-
-            // Save CSS/JS files as well
-            if (! empty($customCss)) {
-                $this->contentService->saveCssToFile($validated['slug'], $lang, $customCss);
-            }
-            if (! empty($customJs)) {
-                $this->contentService->saveJsToFile($validated['slug'], $lang, $customJs);
-            }
-        }
-
-        // Convert from slug to enum instance (int-backed enums need conversion from slug)
-        $storageType = ContentStorageType::tryFromSlug($storageTypeSlug) ?? ContentStorageType::DATABASE;
-        $editorType = ContentEditorType::tryFromSlug($editorTypeSlug) ?? ContentEditorType::HTML;
-
-        // Create page (always save content to DB as well = backup)
-        $page = DixlasePagesPage::create([
-            'parent_id' => $validated['parent_id'] ?? null,
-            'slug' => $validated['slug'],
-            'lang' => $lang,
-            'title' => $validated['title'] ?? null,
-            'storage_type' => $storageType,
-            'editor_type' => $editorType,
-            'status' => $validated['status'],
-            'published_at' => $validated['published_at'] ?? null,
-            'content' => $content,
-            'custom_css' => $customCss,
-            'custom_js' => $customJs,
-        ]);
-
-        // Record revision (manual because it's an explicit save by user)
-        $this->revisionService->record(
-            $page->fresh() ?? $page,
-            type: RevisionService::TYPE_MANUAL,
-            userId: $this->member?->id,
-        );
+        /** @var DixlasePagesPage $page */
+        $page = (new CreateDixlasePagesPageAction($this->contentService, $this->revisionService))
+            ->execute($this->actor(), $validated)
+            ->model;
 
         // Save SEO meta (only when SEO plugin is enabled)
         $this->saveSeoMeta($page, $validated);
@@ -688,98 +648,8 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $validated = $request->validated();
 
-        // editor_type maintains the existing model value (cannot be changed during editing)
-        $editorTypeSlug = $page->editor_type->slug();
-        $storageTypeSlug = $validated['storage_type'];
-        $newStorageType = ContentStorageType::tryFromSlug($storageTypeSlug) ?? ContentStorageType::DATABASE;
-
-        $oldSlug = $page->slug;
-        $oldStorageType = $page->storage_type;
-        $locale = app()->getLocale();
-
-        // If slug is changed, rename the file
-        if ($oldStorageType === ContentStorageType::FILE && $oldSlug !== $validated['slug']) {
-            $this->contentService->renameFile($oldSlug, $validated['slug'], $editorTypeSlug, $locale);
-            // Rename CSS/JS files as well
-            $this->contentService->renameAssetFiles($oldSlug, $validated['slug'], $locale);
-        }
-
-        $content = $validated['content'] ?? '';
-        $customCss = $validated['custom_css'] ?? '';
-        $customJs = $validated['custom_js'] ?? '';
-
-        // Handle storage method changes
-        if ($oldStorageType !== $newStorageType) {
-            if ($oldStorageType === ContentStorageType::FILE && $newStorageType === ContentStorageType::DATABASE) {
-                // File→DB: Delete file (no need to load since DB always has backup)
-                $this->contentService->deleteFile($validated['slug'], $locale, $editorTypeSlug);
-                $this->contentService->deleteCssFile($validated['slug'], $locale);
-                $this->contentService->deleteJsFile($validated['slug'], $locale);
-            }
-        }
-
-        // For file save, also save to file
-        if ($newStorageType === ContentStorageType::FILE) {
-            $this->contentService->saveToFile(
-                $validated['slug'],
-                $locale,
-                $editorTypeSlug,
-                $content
-            );
-
-            // Save CSS/JS files as well
-            if (! empty($customCss)) {
-                $this->contentService->saveCssToFile($validated['slug'], $locale, $customCss);
-            } else {
-                $this->contentService->deleteCssFile($validated['slug'], $locale);
-            }
-            if (! empty($customJs)) {
-                $this->contentService->saveJsToFile($validated['slug'], $locale, $customJs);
-            } else {
-                $this->contentService->deleteJsFile($validated['slug'], $locale);
-            }
-        }
-
-        // Update page (always save content to DB as backup)
-        $page->update([
-            'parent_id' => $validated['parent_id'] ?? null,
-            'slug' => $validated['slug'],
-            'lang' => $validated['lang'] ?? app()->getLocale(),
-            'title' => $validated['title'] ?? null,
-            'storage_type' => $newStorageType,
-            'status' => $validated['status'],
-            'published_at' => $validated['published_at'] ?? null,
-            'content' => $content,
-            'custom_css' => $customCss,
-            'custom_js' => $customJs,
-        ]);
-
-        // Keep any existing multilingual translation overlay in sync with the
-        // column write. Without this, an overlay row that already exists for
-        // the current locale (e.g. one the operator authored via the
-        // translation manager earlier) shadows the column on display, so
-        // edits made here would silently "revert" the moment the page is
-        // re-rendered. We only touch overlays that already exist — new ones
-        // are still owned by the translation manager, so a fresh page won't
-        // suddenly grow overlay rows just because someone saved it once.
-        if (\Illuminate\Support\Facades\App::bound(\App\Contracts\TranslationResolver::class)) {
-            $resolver = app(\App\Contracts\TranslationResolver::class);
-            $currentLocale = app()->getLocale();
-            $titleValue = $validated['title'] ?? '';
-            foreach ([['title', $titleValue], ['content', $content]] as [$field, $value]) {
-                if ($resolver->exists($page, $field, $currentLocale)) {
-                    $resolver->store($page, $field, $value, $currentLocale);
-                }
-            }
-        }
-
-        // Record revision (manual because it's an explicit save by user)
-        // Skipped if there are no changes from the previous revision
-        $this->revisionService->record(
-            $page->fresh() ?? $page,
-            type: RevisionService::TYPE_MANUAL,
-            userId: $this->member?->id,
-        );
+        (new UpdateDixlasePagesPageAction($page, $this->contentService, $this->revisionService))
+            ->execute($this->actor(), $validated);
 
         // Save SEO meta (only when SEO plugin is enabled)
         $this->saveSeoMeta($page, $validated);
@@ -795,7 +665,7 @@ class DixlasePagesAdminPagesController extends Controller
     public function destroy(DixlasePagesPage $page)
     {
         // Soft delete to move to trash (files and SEO meta are deleted on forceDelete)
-        $page->delete();
+        (new DeleteDixlasePagesPageAction($page))->execute($this->actor(), []);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.index')
@@ -865,7 +735,7 @@ class DixlasePagesAdminPagesController extends Controller
                 ->with('error', __('dixlase-pages::admin/pages/trash.restore_slug_conflict', ['slug' => $page->slug]));
         }
 
-        $page->restore();
+        (new RestoreDixlasePagesPageFromTrashAction($page))->execute($this->actor(), []);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.trash')
@@ -878,7 +748,7 @@ class DixlasePagesAdminPagesController extends Controller
     public function forceDestroy(int $id)
     {
         $page = DixlasePagesPage::onlyTrashed()->findOrFail($id);
-        $page->forceDelete();
+        (new ForceDeleteDixlasePagesPageAction($page))->execute($this->actor(), []);
 
         return redirect()
             ->route('dixlase-pages::admin.pages.trash')
@@ -891,8 +761,10 @@ class DixlasePagesAdminPagesController extends Controller
     public function emptyTrash()
     {
         $count = 0;
-        DixlasePagesPage::onlyTrashed()->each(function ($page) use (&$count) {
-            $page->forceDelete();
+        $actor = $this->actor();
+        DixlasePagesPage::onlyTrashed()->each(function ($page) use (&$count, $actor) {
+            // One audit entry per page, so each deletion can be traced
+            (new ForceDeleteDixlasePagesPageAction($page))->execute($actor, []);
             $count++;
         });
 
@@ -1051,6 +923,14 @@ class DixlasePagesAdminPagesController extends Controller
         return redirect()
             ->route('dixlase-pages::admin.pages.settings')
             ->with('success', __('dixlase-pages::admin/pages/settings.success'));
+    }
+
+    /**
+     * The signed-in member as the actor of an audited page action.
+     */
+    private function actor(): MemberActor
+    {
+        return new MemberActor(AdminHelper::getMember());
     }
 
     /**
