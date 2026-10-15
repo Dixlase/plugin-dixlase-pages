@@ -5,6 +5,15 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [Unreleased]
+
+### Security
+
+- Creating, updating, moving to the trash, restoring from the trash and permanently
+  deleting a page now each write an audit log entry with the actor and the page
+  (fixes #59). Emptying the trash writes one entry per page. Who may do each of these
+  is unchanged.
+
 ## [0.2.1] — 2026-10-13
 
 ### Fixed
