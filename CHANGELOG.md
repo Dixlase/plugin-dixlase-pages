@@ -5,7 +5,7 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
-## [Unreleased]
+## [0.2.2] — 2026-10-16
 
 ### Security
 
@@ -19,6 +19,12 @@ and this plugin follows Semantic Versioning.
 - Restoring a revision of a page stored as a file now rewrites its files. Before, only
   the database copy changed, so the public page and the edit screen kept showing the
   file as it was (fixes #58).
+
+### Development
+
+- A self-audit test replays the admin plugin audit's own checks: it fails when a
+  permission declared in `plugin.json` does not match the code, or when a view breaks
+  the CSP strict mode (#64, fixes #63).
 
 ## [0.2.1] — 2026-10-13
 
