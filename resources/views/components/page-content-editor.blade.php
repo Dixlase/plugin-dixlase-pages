@@ -100,7 +100,6 @@ Layout:
 <div x-data="pageEditor({
         storageType: '{{ old('storage_type', $storageType) }}',
         editorType: '{{ old('editor_type', $editorType) }}',
-        content: @js(old('content', $content)),
         identifier: @js($identifier),
         status: '{{ $statusValue }}',
         slug: @js(old('slug', $slugValue)),
@@ -110,10 +109,6 @@ Layout:
         parentPaths: @js($parentPaths),
         isEditMode: {{ $isEditMode ? 'true' : 'false' }},
         fileStorageBasePath: '{{ $fileStorageBasePath }}',
-        previewFrameUrl: '{{ $previewFrameUrl }}',
-        previewRenderUrl: '{{ $previewRenderUrl }}',
-        customCss: @js(old('custom_css', $customCss)),
-        customJs: @js(old('custom_js', $customJs)),
         lang: '{{ $langValue }}',
         isSimpleMode: {{ $isSimpleMode ? 'true' : 'false' }},
         isAdvancedEditor: {{ $isAdvancedEditor ? 'true' : 'false' }},
@@ -122,193 +117,37 @@ Layout:
 
         {{-- ===== Main Content Area ===== --}}
 
-        {{-- 1. Editor Type Selection --}}
-        <div class="mb-6">
-            @if ($isEditMode)
-                {{-- Edit mode: Show preview toggle only (editor type, language, storage format are shown in right column meta info) --}}
-                <input type="hidden" name="editor_type" value="{{ $editorType }}">
-                @if($previewFrameUrl)
-                    <div class="flex flex-wrap items-center gap-3 text-xs">
-                        <button type="button" @click="togglePreview()"
-                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-colors"
-                            :class="previewVisible
-                                ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-700'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300'"
-                            :title="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'">
-                            <i class="fas" :class="previewVisible ? 'fa-eye' : 'fa-eye-slash'"></i>
-                            <span x-text="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'"></span>
-                        </button>
-                    </div>
-                @endif
-            @else
-                {{-- Create mode: Editor type radio card selection --}}
-                @include('components::form-label', [
-                    'for' => 'editor_type',
-                    'text' => __('common.content_editor.label'),
-                ])
-                <x-form-radio-card-group
-                    name="editor_type"
-                    :options="$editorCardOptions"
-                    :value="old('editor_type', $editorType)"
-                    :columns="3"
-                    xModel="editorType"
-                />
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    {{ __('dixlase-pages::components/page-content-editor.editor_type_help') }}
-                </p>
-                @include('components::form-error', ['name' => 'editor_type'])
-            @endif
-
-            {{-- Preview toggle button (create mode) --}}
-            @if($previewFrameUrl && !$isEditMode)
-                <div class="mt-3">
-                    <button type="button" @click="togglePreview()"
-                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-colors text-xs"
-                        :class="previewVisible
-                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-700'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300'"
-                        :title="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'">
-                        <i class="fas" :class="previewVisible ? 'fa-eye' : 'fa-eye-slash'"></i>
-                        <span x-text="previewVisible ? '{{ __('components/content-editor.preview_hide') }}' : '{{ __('components/content-editor.preview_show') }}'"></span>
-                    </button>
-                </div>
-            @endif
-        </div>
-
-        {{-- 3. Content Editor (split pane) --}}
-        <div x-ref="splitContainer"
-             class="flex gap-4 overflow-hidden"
-             :class="[
-                 isHorizontal ? 'flex-row' : 'flex-col',
-                 (isDragging || isResizingPreview) ? 'select-none' : ''
-             ]">
-
-            {{-- Editor pane --}}
-            <div x-ref="editorPane"
-                 class="w-full min-w-0"
-                 :class="isHorizontal && previewVisible ? 'overflow-y-auto' : ''"
-                 :style="isHorizontal && previewVisible ? { width: (splitRatio * 100) + '%', maxHeight: 'calc(100vh - 160px)' } : {}">
-
-                <div class="space-y-4">
-                    @include('components::form-label', [
-                        'for' => 'content',
-                        'text' => __('common.content'),
-                    ])
-
-                    {{-- GUI editor --}}
-                    <div x-show="editorType === 'gui'" x-cloak>
-                        @if($guiEditorInfo)
-                            @include($guiEditorInfo->viewName, [
-                                'contentFieldName' => 'content',
-                                'editorInfo' => $guiEditorInfo,
-                            ])
-                        @else
-                            <div class="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center">
-                                <i class="fas fa-paint-brush text-4xl text-gray-400 mb-4"></i>
-                                <p class="text-gray-600 dark:text-gray-400">
-                                    {{ __('common.content_editor.gui_coming_soon') }}
-                                </p>
-                            </div>
-                            <input type="hidden" name="content" x-model="content">
-                        @endif
-                    </div>
-
-                    {{-- Text editor (common for HTML / Markdown) --}}
-                    <div x-show="editorType !== 'gui'" x-cloak>
-                        @if(!$isSimpleMode)
-                            {{-- Tab navigation (HTML editor only) --}}
-                            <nav x-show="editorType === 'html'" class="flex border-b border-gray-200 dark:border-gray-600 mb-4" role="tablist">
-                                <button type="button"
-                                        @click="activeTab = 'content'"
-                                        :class="activeTab === 'content'
-                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                        class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                        role="tab"
-                                        :aria-selected="activeTab === 'content'">
-                                    <i class="fas fa-code mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_content') }}
-                                </button>
-                                <button type="button"
-                                        @click="activeTab = 'css'"
-                                        :class="activeTab === 'css'
-                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                        class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                        role="tab"
-                                        :aria-selected="activeTab === 'css'">
-                                    <i class="fab fa-css3-alt mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_css') }}
-                                </button>
-                                <button type="button"
-                                        @click="activeTab = 'js'"
-                                        :class="activeTab === 'js'
-                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
-                                        class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors"
-                                        role="tab"
-                                        :aria-selected="activeTab === 'js'">
-                                    <i class="fab fa-js mr-1"></i> {{ __('dixlase-pages::components/page-content-editor.tab_js') }}
-                                </button>
-                            </nav>
-                        @endif
-
-                        {{-- Content textarea --}}
-                        <div x-show="activeTab === 'content' || editorType !== 'html'" role="tabpanel">
-                            <x-form-textarea
-                                id="content"
-                                name="content"
-                                :value="$content"
-                                rows="6"
-                                class="font-mono text-sm !bg-gray-950 !text-gray-200 !border-gray-600 focus:!border-blue-500"
-                                xModel="content"
-                            />
-                        </div>
-
-                        @if(!$isSimpleMode)
-                            {{-- CSS tab (HTML editor only) --}}
-                            <div x-show="activeTab === 'css' && editorType === 'html'" x-cloak role="tabpanel">
-                                <x-form-textarea
-                                    id="custom_css"
-                                    name="custom_css"
-                                    :value="$customCss"
-                                    rows="6"
-                                    :placeholder="__('dixlase-pages::components/page-content-editor.css_placeholder')"
-                                    class="font-mono text-sm !bg-gray-950 !text-gray-200 !border-gray-600 focus:!border-blue-500 !overflow-hidden !resize-none"
-                                    xModel="customCss"
-                                    data-auto-resize
-                                />
-                            </div>
-
-                            {{-- JS tab (HTML editor only) --}}
-                            <div x-show="activeTab === 'js' && editorType === 'html'" x-cloak role="tabpanel">
-                                <x-form-textarea
-                                    id="custom_js"
-                                    name="custom_js"
-                                    :value="$customJs"
-                                    rows="6"
-                                    :placeholder="__('dixlase-pages::components/page-content-editor.js_placeholder')"
-                                    class="font-mono text-sm !bg-gray-950 !text-gray-200 !border-gray-600 focus:!border-blue-500 !overflow-hidden !resize-none"
-                                    xModel="customJs"
-                                    data-auto-resize
-                                />
-                            </div>
-                        @endif
-                    </div>
-
-                    @include('components::form-error', ['name' => 'content'])
-                </div>
-            </div>
-
-            {{-- Preview pane (edit mode only) --}}
-            @if($previewFrameUrl)
-                @include('components.content-editor.preview-pane')
-            @endif
-        </div>
-
-        {{-- Scroll button (edit mode only) --}}
-        @if($previewFrameUrl)
-            @include('components.content-editor.scroll-buttons')
-        @endif
+        {{-- Core's shared content editor: editor type cards (create; the
+             cards the form offers, already narrowed by mode and role), the
+             Markdown / HTML field with "Insert image", the CSS / JS tabs
+             (advanced mode, HTML) and the split-pane live preview (edit).
+             Every preview render goes through previewRenderUrl, so it
+             follows the published page's rules (raw HTML inside Markdown is
+             escaped). pageEditor keeps the page's own state (slug, parent,
+             status, storage) and hears the editor type through
+             editor-type-changed. --}}
+        <x-form-content-editor
+            :storageType="old('storage_type', $storageType)"
+            :editorType="old('editor_type', $editorType)"
+            :content="old('content', $content)"
+            :identifier="$identifier"
+            :showStorageSelector="false"
+            :showEditorSelector="! $isEditMode"
+            :editors="collect($editorCardOptions)->pluck('value')->all()"
+            :editorHelp="$isEditMode ? null : __('dixlase-pages::components/page-content-editor.editor_type_help')"
+            :guiEditorInfo="$guiEditorInfo"
+            :preview="(bool) $previewFrameUrl"
+            :previewFrameUrl="$previewFrameUrl"
+            :previewUrl="$previewRenderUrl"
+            previewRender="server"
+            :assetTabs="! $isSimpleMode"
+            :customCss="old('custom_css', $customCss)"
+            :customJs="old('custom_js', $customJs)"
+            :cssPlaceholder="__('dixlase-pages::components/page-content-editor.css_placeholder')"
+            :jsPlaceholder="__('dixlase-pages::components/page-content-editor.js_placeholder')"
+        />
+        @include('components::form-error', ['name' => 'editor_type'])
+        @include('components::form-error', ['name' => 'content'])
 
         {{-- ===== Right Sidebar ===== --}}
         <x-admin.right-sidebar

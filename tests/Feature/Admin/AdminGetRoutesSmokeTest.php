@@ -173,6 +173,25 @@ class AdminGetRoutesSmokeTest extends TestCase
         }
     }
 
+    public function test_the_page_screens_use_core_shared_editor(): void
+    {
+        $urls = $this->adminGetRouteUrls();
+
+        // Create: the shared editor with its editor type cards.
+        $this->actingAs($this->admin, 'member')->get($urls[self::ROUTE_NAME_PREFIX.'create'])
+            ->assertOk()
+            ->assertSee('x-data="contentEditor"', false)
+            ->assertSee('name="editor_type"', false);
+
+        // Edit: the shared editor runs the live preview through the
+        // plugin's renderer.
+        $this->actingAs($this->admin, 'member')->get($urls[self::ROUTE_NAME_PREFIX.'edit'])
+            ->assertOk()
+            ->assertSee('x-data="contentEditor"', false)
+            ->assertSee('x-ref="previewIframe"', false)
+            ->assertSee('&quot;previewRender&quot;:&quot;server&quot;', false);
+    }
+
     /**
      * Discover every admin GET route and fill its placeholders.
      *

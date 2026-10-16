@@ -11,286 +11,120 @@
  */
 
 /**
- * ページエディタ Alpine.js コンポーネント
- * フォーム状態管理 + スプリットペイン + ライブプレビューを担当する。
- * コア共通ミックスイン（preview-mixin, split-pane-mixin）を
- * window.Dixlase.mixins ランタイム API 経由で使用する。
+ * Page editor Alpine.js component: the page form's own state around core's
+ * shared content editor, which draws the editor and the live preview.
  */
 
-const DEBOUNCE_DELAYS = {
-    html: 150,
-    markdown: 200,
-    blade: 400,
-    gui: 400,
-};
-
 document.addEventListener('alpine:init', () => {
-    const { previewMixin, splitPaneMixin, mergeMixins } = window.Dixlase.mixins;
+    // The page's own state: slug, parent, status, storage and the derived
+    // URL and file path. The editor itself (type cards, field, CSS / JS
+    // tabs, live preview) is core's shared <x-form-content-editor>, which
+    // reports its editor type through the editor-type-changed event.
+    Alpine.data('pageEditor', (config = {}) => ({
+        storageType: config.storageType || 'database',
+        editorType: config.editorType || 'html',
+        identifier: config.identifier || '',
+        status: config.status || 'draft',
+        slug: config.slug || '',
+        publishedAt: config.publishedAt || '',
+        slugBaseUrl: config.slugBaseUrl || '',
+        // Selected parent page id ('' or null = top-level). Bound to the
+        // parent_id <select> via x-model so the URL preview updates live.
+        parentId: config.parentId ?? '',
+        // Map of [parent_id => "ancestor-slug/.../parent-slug"] used by
+        // the pageUrl getter to prepend the parent path.
+        parentPaths: config.parentPaths || {},
+        isEditMode: config.isEditMode || false,
+        fileStorageBasePath: config.fileStorageBasePath || '',
+        lang: config.lang || '',
+        isSimpleMode: config.isSimpleMode || false,
+        isAdvancedEditor: config.isAdvancedEditor || false,
 
-    Alpine.data('pageEditor', (config = {}) => {
-        // プレビューフレームURLが設定されている場合のみミックスインを適用
-        const hasPreview = !!config.previewFrameUrl;
+        init() {
+            // Tell the layout the page has a right sidebar.
+            this.$dispatch('right-sidebar-active');
 
-        const editorState = {
-            // フォーム状態
-            storageType: config.storageType || 'database',
-            editorType: config.editorType || 'html',
-            content: config.content || '',
-            identifier: config.identifier || '',
-            status: config.status || 'draft',
-            slug: config.slug || '',
-            publishedAt: config.publishedAt || '',
-            slugBaseUrl: config.slugBaseUrl || '',
-            // Selected parent page id ('' or null = top-level). Bound to the
-            // parent_id <select> via x-model so the URL preview updates live.
-            parentId: config.parentId ?? '',
-            // Map of [parent_id => "ancestor-slug/.../parent-slug"] used by
-            // the pageUrl getter to prepend the parent path.
-            parentPaths: config.parentPaths || {},
-            isEditMode: config.isEditMode || false,
-            fileStorageBasePath: config.fileStorageBasePath || '',
-            // CSS/JSタブ
-            activeTab: 'content',
-            customCss: config.customCss || '',
-            customJs: config.customJs || '',
-            // 言語
-            lang: config.lang || '',
-            // Simple mode
-            isSimpleMode: config.isSimpleMode || false,
-            isAdvancedEditor: config.isAdvancedEditor || false,
+            // On create, open the right sidebar on phones and tablets too.
+            if (!this.isEditMode) {
+                window.dispatchEvent(new CustomEvent('right-sidebar-force-open'));
+            }
 
-            // 内部状態
-            _debounceTimer: null,
-            _cssDebounceTimer: null,
-            _abortController: null,
-
-            init() {
-                // 右サイドバーの有効化をレイアウトに通知
-                this.$dispatch('right-sidebar-active');
-
-                // 新規作成時はモバイル/タブレットでも右サイドバーを開く
-                if (!this.isEditMode) {
-                    window.dispatchEvent(new CustomEvent('right-sidebar-force-open'));
+            this._onEditorType = (event) => {
+                if (event.detail?.editorType) {
+                    this.editorType = event.detail.editorType;
                 }
+            };
+            window.addEventListener('editor-type-changed', this._onEditorType);
 
-                // プレビューミックスイン初期化（編集モードのみ）
-                if (hasPreview) {
-                    this.initPreview();
-                    this.initSplitPane();
+            // The editor's preview renders the body; the title travels
+            // from the sidebar field, now and whenever the frame reloads.
+            this._title = document.getElementById('title');
+            this._onTitle = () => this.sendTitle();
+            this._title?.addEventListener('input', this._onTitle);
+            this._onMessage = (event) => {
+                if (event.origin === window.location.origin && event.data?.type === 'dixlase-preview-ready') {
+                    this.sendTitle();
                 }
+            };
+            window.addEventListener('message', this._onMessage);
+        },
 
-                // ストレージタイプ変更時にエディタータイプを連動更新（新規作成時のみ）
-                this.$watch('storageType', () => {
-                    if (!this.isEditMode) {
-                        this.updateEditorType();
-                    }
-                });
+        destroy() {
+            window.removeEventListener('editor-type-changed', this._onEditorType);
+            this._title?.removeEventListener('input', this._onTitle);
+            window.removeEventListener('message', this._onMessage);
+        },
 
-                if (hasPreview) {
-                    this.$nextTick(() => {
-                        this.initAutoResizeTextareas();
-                        this.watchContentChanges();
-                    });
-                }
-            },
+        sendTitle() {
+            const iframe = document.querySelector('iframe[x-ref="previewIframe"]');
+            iframe?.contentWindow?.postMessage(
+                { type: 'dixlase-preview-update', action: 'updateTitle', title: this._title?.value || '' },
+                window.location.origin,
+            );
+        },
 
-            /**
-             * 現在のストレージタイプで利用可能なエディター一覧を返す
-             */
-            get availableEditors() {
-                if (this.isEditMode) {
-                    return [this.editorType];
-                }
-                const editors = {
-                    'database': ['gui', 'markdown', 'html'],
-                    'file': ['gui', 'markdown', 'html'],
-                };
-                let available = editors[this.storageType] || [];
-                if (this.isSimpleMode && !this.isAdvancedEditor) {
-                    available = available.filter(e => ['gui', 'markdown'].includes(e));
-                }
-                return available;
-            },
+        /**
+         * Whether the page is stored as a file.
+         */
+        get isFileStorage() {
+            return this.storageType === 'file';
+        },
 
-            /**
-             * ファイル保存モードかどうかを返す
-             */
-            get isFileStorage() {
-                return this.storageType === 'file';
-            },
+        /**
+         * Whether the page uses the HTML editor.
+         */
+        get isHtmlEditor() {
+            return this.editorType === 'html';
+        },
 
-            /**
-             * HTMLエディタかどうかを返す
-             */
-            get isHtmlEditor() {
-                return this.editorType === 'html';
-            },
+        /**
+         * Path of the page's file when it is stored as a file.
+         */
+        get filePath() {
+            if (!this.isFileStorage || !this.slug) {
+                return '';
+            }
+            const extensions = {
+                'blade': 'blade.php',
+                'markdown': 'md',
+                'html': 'html',
+                'gui': 'json',
+            };
+            const ext = extensions[this.editorType] || 'txt';
+            return `${this.fileStorageBasePath}/${this.slug}.${ext}`;
+        },
 
-            /**
-             * ファイル保存時のファイルパスを返す
-             */
-            get filePath() {
-                if (!this.isFileStorage || !this.slug) {
-                    return '';
-                }
-                const extensions = {
-                    'blade': 'blade.php',
-                    'markdown': 'md',
-                    'html': 'html',
-                    'gui': 'json',
-                };
-                const ext = extensions[this.editorType] || 'txt';
-                return `${this.fileStorageBasePath}/${this.slug}.${ext}`;
-            },
-
-            /**
-             * ページURLプレビューを返す。親ページが選択されているときは
-             * 親パス (/page/parent/) の後ろに自身のスラッグを付けた階層 URL を返す。
-             */
-            get pageUrl() {
-                const parentPath = this.parentId
-                    ? (this.parentPaths[this.parentId] || '')
-                    : '';
-                return parentPath
-                    ? `${this.slugBaseUrl}${parentPath}/${this.slug}`
-                    : `${this.slugBaseUrl}${this.slug}`;
-            },
-
-            /**
-             * ストレージタイプ変更時にエディタータイプを更新する
-             */
-            updateEditorType() {
-                if (!this.availableEditors.includes(this.editorType)) {
-                    this.editorType = this.availableEditors[0] || 'html';
-                }
-            },
-
-
-            // --- コンテンツ監視（プレビュー用） ---
-            watchContentChanges() {
-                const titleEl = document.getElementById('title');
-                if (titleEl) {
-                    titleEl.addEventListener('input', () => this.onTitleChange());
-                }
-
-                const contentEl = document.getElementById('content');
-                if (contentEl) {
-                    contentEl.addEventListener('input', () => this.onContentChange());
-                }
-
-                const cssEl = document.getElementById('custom_css');
-                if (cssEl) {
-                    cssEl.addEventListener('input', () => this.onCssChange());
-                }
-            },
-
-            onTitleChange() {
-                const title = document.getElementById('title')?.value || '';
-                if (this.previewReady) {
-                    this.postToIframe('updateTitle', { title });
-                }
-            },
-
-            onContentChange() {
-                clearTimeout(this._debounceTimer);
-                const delay = DEBOUNCE_DELAYS[this.editorType] ?? 400;
-                this._debounceTimer = setTimeout(() => this.renderAndSend(), delay);
-            },
-
-            onCssChange() {
-                clearTimeout(this._cssDebounceTimer);
-                this._cssDebounceTimer = setTimeout(() => {
-                    const css = document.getElementById('custom_css')?.value || '';
-                    this.postToIframe('updateCustomCss', { css });
-                }, 200);
-            },
-
-            // --- プレビューレンダリング ---
-            renderAndSend() {
-                const content = document.getElementById('content')?.value || '';
-                if (!this.previewReady) return;
-
-                // Markdown goes through the server too: the published page
-                // escapes raw HTML inside Markdown, and a browser-side
-                // marked.parse() would render it instead.
-                if (this.editorType === 'html') {
-                    this.postToIframe('updateContent', { html: content });
-                } else {
-                    this.serverRenderAndSend(content);
-                }
-            },
-
-            async serverRenderAndSend(content) {
-                if (this._abortController) {
-                    this._abortController.abort();
-                }
-                this._abortController = new AbortController();
-
-                try {
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                    const response = await fetch(config.previewRenderUrl || '', {
-                        method: 'POST',
-                        signal: this._abortController.signal,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken?.content || '',
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            content: content,
-                            editor_type: this.editorType,
-                        }),
-                    });
-
-                    if (!response.ok) return;
-                    const data = await response.json();
-                    this.postToIframe('updateContent', { html: data.html || '' });
-                } catch (error) {
-                    if (error.name !== 'AbortError') {
-                        console.error('Preview render failed:', error);
-                    }
-                }
-            },
-
-            sendContentToPreview() {
-                this.renderAndSend();
-                if (this.isHtmlEditor) {
-                    const css = document.getElementById('custom_css')?.value || '';
-                    if (css) {
-                        this.postToIframe('updateCustomCss', { css });
-                    }
-                }
-            },
-
-            // --- textarea自動リサイズ ---
-            initAutoResizeTextareas() {
-                const MIN_HEIGHT = 150;
-                const MAX_HEIGHT_VH = 0.6;
-                ['content', 'custom_css', 'custom_js'].forEach((id) => {
-                    const textarea = document.getElementById(id);
-                    if (!textarea) return;
-                    textarea.style.overflow = 'hidden';
-                    textarea.style.resize = 'none';
-                    textarea.style.minHeight = MIN_HEIGHT + 'px';
-                    const resize = () => {
-                        textarea.style.height = 'auto';
-                        const maxH = Math.max(MIN_HEIGHT, window.innerHeight * MAX_HEIGHT_VH);
-                        const h = Math.min(Math.max(textarea.scrollHeight, MIN_HEIGHT), maxH);
-                        textarea.style.height = h + 'px';
-                        textarea.style.overflow = h >= maxH ? 'auto' : 'hidden';
-                    };
-                    textarea.addEventListener('input', resize);
-                    resize();
-                });
-            },
-        };
-
-        // プレビュー有効時はミックスインをマージ、無効時はそのまま返す
-        if (hasPreview) {
-            const base = mergeMixins(splitPaneMixin(), previewMixin(config));
-            return mergeMixins(base, editorState);
-        }
-
-        return editorState;
-    });
+        /**
+         * The page URL preview. With a parent page chosen, the parent's
+         * path (/page/parent/) comes before the page's own slug.
+         */
+        get pageUrl() {
+            const parentPath = this.parentId
+                ? (this.parentPaths[this.parentId] || '')
+                : '';
+            return parentPath
+                ? `${this.slugBaseUrl}${parentPath}/${this.slug}`
+                : `${this.slugBaseUrl}${this.slug}`;
+        },
+    }));
 });

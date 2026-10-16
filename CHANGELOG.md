@@ -5,6 +5,15 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [Unreleased]
+
+### Changed
+
+- The page editor is built on core's shared content editor (#62): the editor type cards, the
+  Markdown / HTML field with "Insert image", the CSS / JS tabs and the live preview come from core,
+  and the plugin keeps the page's own state (slug, parent, status, storage). Every preview render
+  goes through the page renderer. Requires Dixlase 0.1.13.
+
 ## [0.2.2] — 2026-10-16
 
 ### Security
