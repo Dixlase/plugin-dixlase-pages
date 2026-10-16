@@ -5,7 +5,7 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
-## [Unreleased]
+## [0.2.3] — 2026-10-17
 
 ### Changed
 
