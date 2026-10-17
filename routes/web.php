@@ -69,6 +69,9 @@ Route::middleware(['front.ip'])->group(
 
             // Admins see drafts and future-scheduled pages so the admin
             // preview works; public visitors only get published rows.
+            // auth('member') cannot answer this on a front request: the
+            // admin login lives in the member guard's own session row, so
+            // core's SignedInMemberResolver is asked instead.
             // Two storage patterns are supported:
             //
             //   1. Legacy "one row per language" — distinct rows per
@@ -84,7 +87,7 @@ Route::middleware(['front.ip'])->group(
             $page = DixlasePagesPage::resolvePath(
                 $path,
                 $locale,
-                publishedOnly: ! auth('member')->check()
+                publishedOnly: ! app(\App\Services\Auth\SignedInMemberResolver::class)->check()
             );
 
             if ($page === null) {
@@ -110,7 +113,7 @@ Route::middleware(['front.ip'])->group(
             $hasCustomJs = ! empty($contentService->getJsContent($page, $locale));
             $customAssetVersion = $page->updated_at?->timestamp ?? time();
 
-            return view('dixlase-pages::front.page', compact(
+            $response = response()->view('dixlase-pages::front.page', compact(
                 'page',
                 'editorType',
                 'content',
@@ -118,6 +121,14 @@ Route::middleware(['front.ip'])->group(
                 'hasCustomJs',
                 'customAssetVersion',
             ));
+
+            // An unpublished page is served only to a signed-in member; a
+            // shared cache must never keep it and hand it to a visitor.
+            if (! $page->isPublished()) {
+                $response->header('Cache-Control', 'private, no-store');
+            }
+
+            return $response;
         })->where('path', '.+')->name('dixlase-pages::page.show');
     }
 );

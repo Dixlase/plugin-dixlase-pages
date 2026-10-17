@@ -33,11 +33,11 @@
 namespace Plugins\DixlasePages\App\Http\Controllers\Front;
 
 use App\Enums\ContentEditorType;
+use App\Services\Auth\SignedInMemberResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
 
@@ -109,7 +109,7 @@ class DixlasePagesCustomAssetController extends Controller
         $page = DixlasePagesPage::resolvePath(
             $path,
             $locale,
-            publishedOnly: ! Auth::guard('member')->check()
+            publishedOnly: ! app(SignedInMemberResolver::class)->check()
         );
 
         if ($page === null) {
