@@ -20,27 +20,57 @@ document.addEventListener('alpine:init', () => {
     // URL and file path. The editor itself (type cards, field, CSS / JS
     // tabs, live preview) is core's shared <x-form-content-editor>, which
     // reports its editor type through the editor-type-changed event.
-    Alpine.data('pageEditor', (config = {}) => ({
-        storageType: config.storageType || 'database',
-        editorType: config.editorType || 'html',
-        identifier: config.identifier || '',
-        status: config.status || 'draft',
-        slug: config.slug || '',
-        publishedAt: config.publishedAt || '',
-        slugBaseUrl: config.slugBaseUrl || '',
+    // The initial state comes from the root element's
+    // data-page-editor-config attribute (JSON), read in init(), so the
+    // x-data directive carries no object literal.
+    Alpine.data('pageEditor', () => ({
+        storageType: 'database',
+        editorType: 'html',
+        identifier: '',
+        status: 'draft',
+        slug: '',
+        publishedAt: '',
+        slugBaseUrl: '',
         // Selected parent page id ('' or null = top-level). Bound to the
         // parent_id <select> via x-model so the URL preview updates live.
-        parentId: config.parentId ?? '',
+        parentId: '',
         // Map of [parent_id => "ancestor-slug/.../parent-slug"] used by
         // the pageUrl getter to prepend the parent path.
-        parentPaths: config.parentPaths || {},
-        isEditMode: config.isEditMode || false,
-        fileStorageBasePath: config.fileStorageBasePath || '',
-        lang: config.lang || '',
-        isSimpleMode: config.isSimpleMode || false,
-        isAdvancedEditor: config.isAdvancedEditor || false,
+        parentPaths: {},
+        isEditMode: false,
+        fileStorageBasePath: '',
+        lang: '',
+        isSimpleMode: false,
+        isAdvancedEditor: false,
+
+        configure(config) {
+            this.storageType = config.storageType || 'database';
+            this.editorType = config.editorType || 'html';
+            this.identifier = config.identifier || '';
+            this.status = config.status || 'draft';
+            this.slug = config.slug || '';
+            this.publishedAt = config.publishedAt || '';
+            this.slugBaseUrl = config.slugBaseUrl || '';
+            this.parentId = config.parentId ?? '';
+            this.parentPaths = config.parentPaths || {};
+            this.isEditMode = config.isEditMode || false;
+            this.fileStorageBasePath = config.fileStorageBasePath || '';
+            this.lang = config.lang || '';
+            this.isSimpleMode = config.isSimpleMode || false;
+            this.isAdvancedEditor = config.isAdvancedEditor || false;
+        },
+
+        readConfig() {
+            try {
+                return JSON.parse(this.$el.dataset.pageEditorConfig || '{}') || {};
+            } catch {
+                return {};
+            }
+        },
 
         init() {
+            this.configure(this.readConfig());
+
             // Tell the layout the page has a right sidebar.
             this.$dispatch('right-sidebar-active');
 

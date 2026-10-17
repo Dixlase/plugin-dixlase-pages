@@ -192,6 +192,19 @@ class AdminGetRoutesSmokeTest extends TestCase
             ->assertSee('&quot;previewRender&quot;:&quot;server&quot;', false);
     }
 
+    public function test_the_page_form_passes_its_state_without_an_x_data_literal(): void
+    {
+        $urls = $this->adminGetRouteUrls();
+
+        foreach (['create', 'edit'] as $screen) {
+            $this->actingAs($this->admin, 'member')->get($urls[self::ROUTE_NAME_PREFIX.$screen])
+                ->assertOk()
+                ->assertSee('x-data="pageEditor"', false)
+                ->assertSee('data-page-editor-config="{&quot;storageType&quot;:', false)
+                ->assertDontSee('x-data="pageEditor(', false);
+        }
+    }
+
     /**
      * Discover every admin GET route and fill its placeholders.
      *
