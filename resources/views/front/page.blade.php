@@ -65,7 +65,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
      <x-ui-front-banner-stack /> — older themes will simply not show the
      banner, which is preferable to having it tangled in the theme
      navigation. --}}
-@auth('member')
+@php
+    $signedIn = app(\App\Services\Auth\SignedInMemberResolver::class)->check();
+@endphp
+@if($signedIn)
     @if($page->status->slug() !== 'published' || ($page->status->slug() === 'scheduled' && $page->published_at && $page->published_at->isFuture()))
         @push('front-banners')
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
@@ -83,12 +86,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </div>
         @endpush
     @endif
-@endauth
+@endif
 
 @section('content')
     <div class="dixlase-page">
         @php
-            $hasAdminBar = auth('member')->check();
+            $hasAdminBar = $signedIn;
         @endphp
         <!-- Main content -->
         {{-- No card wrapper: the article sits flat on the page background so

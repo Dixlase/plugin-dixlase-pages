@@ -36,12 +36,12 @@ use App\Enums\ContentEditorType;
 use App\Enums\ContentStorageType;
 use App\Http\Middleware\CheckInstallationReady;
 use App\Http\Middleware\CheckMaintenanceMode;
+use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Plugins\DixlasePages\App\Http\Controllers\Front\DixlasePagesCustomAssetController;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
-use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
 use Tests\TestCase;
 
 /**
@@ -98,53 +98,17 @@ class DixlasePagesFrontPageTest extends TestCase
     }
 
     /**
-     * フロントルートをテスト用に登録
+     * Register the plugin's real front routes, under the same `web` group
+     * core loads them in, so the tests exercise routes/web.php itself rather
+     * than a copy of it.
      */
     private function registerFrontRoutes(): void
     {
-        $dir = $this->pagesDirectory;
+        Route::middleware('web')->group(base_path('plugins/DixlasePages/routes/web.php'));
 
-        Route::middleware(['front.ip'])
-            ->group(function () use ($dir) {
-                Route::get($dir.'/{path}/custom-style.css', [DixlasePagesCustomAssetController::class, 'style'])
-                    ->where('path', '.+')
-                    ->name('dixlase-pages::page.custom-style');
-
-                Route::get($dir.'/{path}/custom-script.js', [DixlasePagesCustomAssetController::class, 'script'])
-                    ->where('path', '.+')
-                    ->name('dixlase-pages::page.custom-script');
-
-                Route::get($dir.'/{path}', function (\Illuminate\Http\Request $request) {
-                    $path = (string) ($request->route('path') ?? '');
-                    $locale = app()->getLocale();
-
-                    $page = DixlasePagesPage::resolvePath(
-                        $path,
-                        $locale,
-                        publishedOnly: ! auth('member')->check()
-                    );
-
-                    if ($page === null) {
-                        abort(404);
-                    }
-
-                    $contentService = app(DixlasePagesPageContentService::class);
-                    $editorType = $page->editor_type->slug() ?? 'html';
-                    $content = $page->getContentByEditorType() ?? '';
-                    $hasCustomCss = ! empty($contentService->getCssContent($page, $locale));
-                    $hasCustomJs = ! empty($contentService->getJsContent($page, $locale));
-                    $customAssetVersion = $page->updated_at?->timestamp ?? time();
-
-                    return view('dixlase-pages::front.page', compact(
-                        'page',
-                        'editorType',
-                        'content',
-                        'hasCustomCss',
-                        'hasCustomJs',
-                        'customAssetVersion',
-                    ));
-                })->where('path', '.+')->name('dixlase-pages::page.show');
-            });
+        $routes = app('router')->getRoutes();
+        $routes->refreshNameLookups();
+        $routes->refreshActionLookups();
     }
 
     /**
@@ -438,5 +402,118 @@ class DixlasePagesFrontPageTest extends TestCase
         $live = $this->get('/'.$this->pagesDirectory.'/live-assets/custom-script.js');
         $live->assertStatus(200);
         $this->assertStringContainsString('public', (string) $live->headers->get('Cache-Control'));
+    }
+
+    /**
+     * A member signed in to the admin is served a draft, with the preview
+     * banner, and the response is kept out of shared caches.
+     *
+     * The admin login lives in the member guard's own session row, which a
+     * front request does not open, so the guard sees nobody here; the row
+     * is written by hand under the request's session id, as on a live site.
+     */
+    public function test_a_member_signed_in_to_the_admin_sees_a_draft(): void
+    {
+        DixlasePagesPage::factory()->draft()->create([
+            'slug' => 'draft-preview',
+            'title' => 'Draft Preview',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'content' => '<p>Not yet public</p>',
+            'lang' => app()->getLocale(),
+        ]);
+
+        $response = $this->asMemberSignedInToTheAdmin()
+            ->get('/'.$this->pagesDirectory.'/draft-preview');
+
+        $response->assertStatus(200);
+        $response->assertSee('Not yet public');
+        $response->assertSee(__('dixlase-pages::front/page.preview_mode'));
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
+        $this->assertStringNotContainsString('public', (string) $response->headers->get('Cache-Control'));
+    }
+
+    /**
+     * The same member also sees a page scheduled for later, and its custom
+     * assets, so the preview is styled.
+     */
+    public function test_a_member_signed_in_to_the_admin_sees_a_scheduled_page_and_its_assets(): void
+    {
+        DixlasePagesPage::factory()->scheduled()->create([
+            'slug' => 'scheduled-preview',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'content' => '<p>Coming soon</p>',
+            'custom_css' => '.soon { color: green; }',
+            'published_at' => now()->addWeek(),
+            'lang' => app()->getLocale(),
+        ]);
+
+        $this->asMemberSignedInToTheAdmin()
+            ->get('/'.$this->pagesDirectory.'/scheduled-preview')
+            ->assertStatus(200)
+            ->assertSee('Coming soon');
+
+        $this->asMemberSignedInToTheAdmin()
+            ->get('/'.$this->pagesDirectory.'/scheduled-preview/custom-style.css')
+            ->assertStatus(200)
+            ->assertSee('.soon { color: green; }');
+    }
+
+    /**
+     * A visitor still gets 404 for a page scheduled for later and for its
+     * assets.
+     */
+    public function test_a_scheduled_page_returns_404_for_guests(): void
+    {
+        DixlasePagesPage::factory()->scheduled()->create([
+            'slug' => 'scheduled-hidden',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'custom_css' => '.soon { color: green; }',
+            'published_at' => now()->addWeek(),
+            'lang' => app()->getLocale(),
+        ]);
+
+        $this->get('/'.$this->pagesDirectory.'/scheduled-hidden')->assertStatus(404);
+        $this->get('/'.$this->pagesDirectory.'/scheduled-hidden/custom-style.css')->assertStatus(404);
+    }
+
+    /**
+     * A published page carries no preview banner, even for a member.
+     */
+    public function test_a_published_page_shows_no_preview_banner(): void
+    {
+        DixlasePagesPage::factory()->published()->create([
+            'slug' => 'live-page',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::HTML,
+            'lang' => app()->getLocale(),
+        ]);
+
+        $this->asMemberSignedInToTheAdmin()
+            ->get('/'.$this->pagesDirectory.'/live-page')
+            ->assertStatus(200)
+            ->assertDontSee(__('dixlase-pages::front/page.preview_mode'));
+    }
+
+    /**
+     * Send the request with a session cookie whose id has a signed-in row
+     * in the member guard's session table, and nobody on the guard.
+     */
+    private function asMemberSignedInToTheAdmin(): static
+    {
+        $sessionId = str_repeat('a', 40);
+        $member = Member::factory()->create();
+
+        DB::table('members_sessions')->updateOrInsert(['id' => $sessionId], [
+            'member_id' => $member->id,
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'phpunit',
+            'payload' => base64_encode(serialize([])),
+            'last_activity' => time(),
+        ]);
+
+        return $this->withCookie((string) config('session.cookie'), $sessionId);
     }
 }
