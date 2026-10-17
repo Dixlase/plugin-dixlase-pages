@@ -40,14 +40,13 @@ use Illuminate\Http\Request;
  * The same Pages page in every supported locale, for hreflang links.
  *
  * Answers only for the front page route (dixlase-pages::page.show), and
- * only on the /{locale} copy of it that DixlaseMultilingual mounts. Admin
+ * only on its copy in the locale-prefixed (/{locale}) route group. Admin
  * and custom CSS / JS routes get nothing. Each alternate is the current
  * route with another locale; the page path is shared across languages,
- * and DixlaseMultilingual keeps only the enabled locales.
+ * and the alternates are narrowed to the enabled locales downstream.
  *
  * Every locale, the default one included, gets a /{locale} URL, as in
- * DixlaseBlog. Dixlase/plugin-dixlase-multilingual#43 settles the
- * default-locale convention for hreflang; follow it there.
+ * DixlaseBlog.
  */
 class DixlasePagesLocalizedUrlProvider implements LocalizedUrlProvider
 {

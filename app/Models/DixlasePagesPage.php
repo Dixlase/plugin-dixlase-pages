@@ -57,11 +57,10 @@ class DixlasePagesPage extends Model implements Revisionable
     use HasFactory, HasRevisions, SoftDeletes, TranslatableTrait;
 
     /**
-     * Translatable fields. The DixlaseMultilingual plugin's
-     * TranslationResolver (when bound) reads / writes these fields against
-     * the polymorphic plg_dixlase_multilingual_translations table per
-     * locale; without that plugin the trait silently falls back to the
-     * raw column value, so existing single-locale installs keep working.
+     * Translatable fields. When a TranslationResolver is bound, it reads /
+     * writes these fields per locale; without one the trait silently falls
+     * back to the raw column value, so existing single-locale installs keep
+     * working.
      *
      * Phase E adds the content body alongside the title. The content is
      * stored as the same source format (markdown / HTML / Blade) the
