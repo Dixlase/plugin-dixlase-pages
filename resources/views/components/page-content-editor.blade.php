@@ -97,23 +97,27 @@ Layout:
 +----------------------------------+---+----------------+
 --}}
 
-<div x-data="pageEditor({
-        storageType: '{{ old('storage_type', $storageType) }}',
-        editorType: '{{ old('editor_type', $editorType) }}',
-        identifier: @js($identifier),
-        status: '{{ $statusValue }}',
-        slug: @js(old('slug', $slugValue)),
-        publishedAt: '{{ $publishedAtValue }}',
-        slugBaseUrl: '{{ $slugBaseUrl }}',
-        parentId: @js(old('parent_id', $parentValue)),
-        parentPaths: @js($parentPaths),
-        isEditMode: {{ $isEditMode ? 'true' : 'false' }},
-        fileStorageBasePath: '{{ $fileStorageBasePath }}',
-        lang: '{{ $langValue }}',
-        isSimpleMode: {{ $isSimpleMode ? 'true' : 'false' }},
-        isAdvancedEditor: {{ $isAdvancedEditor ? 'true' : 'false' }},
-        hasGuiEditor: {{ $hasGuiEditor ? 'true' : 'false' }}
-     })">
+@php
+    // pageEditor's initial state, read by its init() from one data
+    // attribute so the directive carries no object literal.
+    $pageEditorConfig = [
+        'storageType' => old('storage_type', $storageType),
+        'editorType' => old('editor_type', $editorType),
+        'identifier' => $identifier,
+        'status' => $statusValue,
+        'slug' => old('slug', $slugValue),
+        'publishedAt' => $publishedAtValue,
+        'slugBaseUrl' => $slugBaseUrl,
+        'parentId' => old('parent_id', $parentValue),
+        'parentPaths' => $parentPaths,
+        'isEditMode' => (bool) $isEditMode,
+        'fileStorageBasePath' => $fileStorageBasePath,
+        'lang' => $langValue,
+        'isSimpleMode' => (bool) $isSimpleMode,
+        'isAdvancedEditor' => (bool) $isAdvancedEditor,
+    ];
+@endphp
+<div x-data="pageEditor" data-page-editor-config="{{ json_encode($pageEditorConfig) }}">
 
         {{-- ===== Main Content Area ===== --}}
 
