@@ -5,6 +5,31 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.2.4] — 2026-10-18
+
+### Fixed
+
+- A member signed in to the admin can open a draft or a page scheduled for later on the front,
+  with the preview banner and the page's custom CSS / JS (#73, fixes #66). Visitors still get
+  404, and an unpublished page is sent with `Cache-Control: private, no-store`.
+- Saving the plugin's settings leaves an entry in the audit log, with the changed keys and their
+  old and new values (#72, fixes #69). A save that changes nothing writes no entry.
+- `plugin.json` declares the contracts the plugin implements (`LinkableProviderInterface`,
+  `LocalizedUrlProvider`, `Revisionable`) and its role configuration (#76, fixes #70; #79,
+  fixes #78).
+
+### Changed
+
+- The settings screen and the page editor register their Alpine data instead of passing object
+  literals in `x-data`, in preparation for Alpine's CSP build (#74, fixes #71; #77, fixes #75).
+- The README, comments, tests, language files and this changelog no longer name plugins that are not distributed publicly. Each integration is
+  described by the core mechanism it goes through (#68, fixes #67; #84, fixes #82). No behaviour changed.
+
+### Development
+
+- The settings audit test compares the recorded changes regardless of key order, so it also
+  passes on MySQL 8 (#81, fixes #80).
+
 ## [0.2.3] — 2026-10-17
 
 ### Changed
