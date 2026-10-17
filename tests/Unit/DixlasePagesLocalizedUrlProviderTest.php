@@ -42,7 +42,7 @@ use Tests\TestCase;
  * nothing for admin, asset or locale-less routes.
  *
  * Routes are registered in the order the site registers them: the
- * /{locale} copy from DixlaseMultilingual first, then the bare route under
+ * /{locale} copy in the locale-prefixed group first, then the bare route under
  * the same name. Laravel resolves a shared name to the first one.
  */
 class DixlasePagesLocalizedUrlProviderTest extends TestCase

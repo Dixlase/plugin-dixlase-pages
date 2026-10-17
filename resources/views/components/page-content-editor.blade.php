@@ -202,9 +202,9 @@ Layout:
                         {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
                     </p>
 
-                    {{-- Translate button from DixlaseMultilingual. The view check stays:
+                    {{-- Translate button, when a plugin provides it. The view check stays:
                          <x-dynamic-component> throws when the component is missing, so
-                         a site without the plugin would get a 500 on this screen. --}}
+                         a site without the button would get a 500 on this screen. --}}
                     @if (view()->exists('dixlase-multilingual::components.translate-button'))
                         <div class="mt-3">
                             <x-dynamic-component

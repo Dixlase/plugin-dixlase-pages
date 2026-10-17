@@ -78,7 +78,7 @@ Route::middleware(['front.ip'])->group(
             //      (slug, lang). resolvePath() tries the current locale
             //      first via forLang($locale).
             //
-            //   2. DixlaseMultilingual translation overlay — a single
+            //   2. Translation overlay (TranslationResolver) — a single
             //      row at the site's primary locale plus per-locale
             //      overlays. resolvePath() falls back to the primary
             //      locale when forLang($locale) misses, and the

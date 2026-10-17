@@ -36,10 +36,10 @@ use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
- * The page editor embeds DixlaseMultilingual's translate button on a saved
- * page, and still renders when that plugin's views are not there.
+ * The page editor embeds the translate button on a saved page, and still
+ * renders when no plugin provides the button.
  *
- * The dixlase-multilingual view namespace is pointed at a stand-in that
+ * The button's view namespace is pointed at a stand-in that
  * prints its props, or at an empty directory, so each test controls
  * whether the component exists.
  */
