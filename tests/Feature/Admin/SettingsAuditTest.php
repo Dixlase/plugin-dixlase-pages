@@ -117,11 +117,13 @@ class SettingsAuditTest extends TestCase
         $log = $logs->first();
         $this->assertSame((new MemberActor($this->superAdmin))->getActorName(), $log->actor_name);
         $this->assertEqualsCanonicalizing(['default_status', 'publish_min_role'], $log->context['changed_keys'] ?? []);
-        $this->assertSame(
+        // assertEquals, not assertSame: MySQL's JSON type reorders object
+        // keys, so the entry reads back as to/from rather than from/to.
+        $this->assertEquals(
             ['from' => 'draft', 'to' => 'published'],
             $log->context['diff']['default_status'] ?? null,
         );
-        $this->assertSame(
+        $this->assertEquals(
             ['from' => (string) MemberRole::EDITOR->value, 'to' => (string) MemberRole::ADMIN->value],
             $log->context['diff']['publish_min_role'] ?? null,
         );
