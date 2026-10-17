@@ -133,11 +133,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                 {{ __('dixlase-pages::admin/pages/settings.publish_permission.description') }}
             </p>
 
-            <div x-data="{
-                publishIndex: {{ $publishRoleIndex }},
-                roleValues: {{ json_encode(array_values($publishRoleValues)) }},
-                get publishValue() { return this.roleValues[this.publishIndex] || this.roleValues[0]; }
-            }">
+            <div
+                x-data="pagesPublishRole"
+                data-publish-index="{{ $publishRoleIndex }}"
+                data-role-values="{{ json_encode(array_values($publishRoleValues)) }}"
+            >
                 <x-form-label
                     :text="__('dixlase-pages::admin/pages/settings.publish_permission.min_role')"
                     class="mb-2"
