@@ -58,6 +58,7 @@ use Plugins\DixlasePages\App\Actions\Page\DeleteDixlasePagesPageAction;
 use Plugins\DixlasePages\App\Actions\Page\ForceDeleteDixlasePagesPageAction;
 use Plugins\DixlasePages\App\Actions\Page\RestoreDixlasePagesPageFromTrashAction;
 use Plugins\DixlasePages\App\Actions\Page\UpdateDixlasePagesPageAction;
+use Plugins\DixlasePages\App\Actions\Settings\UpdateDixlasePagesSettingsAction;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesStorePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePageRequest;
 use Plugins\DixlasePages\App\Http\Requests\Admin\DixlasePagesUpdatePagesSettingsRequest;
@@ -915,10 +916,7 @@ class DixlasePagesAdminPagesController extends Controller
     {
         $this->authorizeEdit('pages.settings');
 
-        $validated = $request->validated();
-
-        // Save settings to database
-        DixlasePagesPageSetting::setMany($validated);
+        (new UpdateDixlasePagesSettingsAction())->execute($this->actor(), $request->validated());
 
         return redirect()
             ->route('dixlase-pages::admin.pages.settings')
