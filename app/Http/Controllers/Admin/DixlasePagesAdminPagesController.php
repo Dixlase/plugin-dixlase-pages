@@ -430,12 +430,12 @@ class DixlasePagesAdminPagesController extends Controller
             ? route('dixlase-pages::admin.pages.preview-render')
             : '';
 
-        // Whether the multilingual plugin's locale URL routing is on. Drives
-        // the language picker visibility on the create/edit form. We check
-        // the same config flag the multilingual plugin itself gates its
-        // runtime locale wiring on; the resolver binding alone is not a
-        // reliable signal because the multilingual plugin always registers
-        // it (even when the operator has the master toggle off).
+        // Whether locale-prefixed URL routing is on. Drives the language
+        // picker visibility on the create/edit form. We read the config
+        // flag the translation provider gates its runtime locale wiring on;
+        // a bound TranslationResolver alone is not a reliable signal, since
+        // the provider binds it even when the operator has the master
+        // toggle off. Reading it through core instead is tracked in #83.
         $multilingualEnabled = (bool) config('dixlase_multilingual.locale_url_routing_enabled', false);
 
         // Language options (get labels according to locale from translation keys)

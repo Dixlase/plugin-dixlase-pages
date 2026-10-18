@@ -412,10 +412,10 @@ class DixlasePagesPage extends Model implements Revisionable
      *   source-locale text and never updated) would otherwise mask the
      *   newer overlay content the operator just saved.
      * - DB storage: route through the TranslatableTrait so the
-     *   multilingual plugin's resolver can return a per-locale
-     *   translation when one is published. The trait falls back to the
-     *   raw `content` column when no translation row exists or when the
-     *   multilingual plugin is not installed.
+     *   bound TranslationResolver can return a per-locale translation
+     *   when one is published. The trait falls back to the raw `content`
+     *   column when no translation row exists or when no translation
+     *   provider is installed.
      */
     public function getContentByEditorType(): ?string
     {
@@ -513,12 +513,12 @@ class DixlasePagesPage extends Model implements Revisionable
     }
 
     /**
-     * Ask the multilingual TranslationResolver directly for a translation
+     * Ask the bound TranslationResolver directly for a translation
      * value, bypassing TranslatableTrait::getTranslation()'s fallback
      * chain to the default locale and the raw column.
      *
-     * Returns null when no resolver is bound (the multilingual plugin is
-     * not installed or its master toggle is off) or when no published
+     * Returns null when no resolver is bound (no translation provider is
+     * installed, or its master toggle is off) or when no published
      * translation exists for this (entity, locale, field). The FILE
      * branch of getContentByEditorType() uses that null to drop through
      * to its disk-file fallback rather than mistakenly returning the

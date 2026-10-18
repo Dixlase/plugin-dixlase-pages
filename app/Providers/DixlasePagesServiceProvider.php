@@ -52,10 +52,10 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
         // Tag it so it can be retrieved from the menu plugin
         $this->app->tag([DixlasePagesPageLinkableProvider::class], 'linkable.providers');
 
-        // Phase D: tag the LocalizedUrlProvider implementation so the
-        // multilingual plugin's LocalizedUrlAggregator can collect it
+        // Phase D: tag the LocalizedUrlProvider implementation so whatever
+        // collects the `localized-url.providers` tag can include pages
         // when emitting alternate-language URLs (hreflang, sitemap, etc.).
-        // Optional dependency: nothing breaks if multilingual is absent.
+        // Optional dependency: nothing breaks if no extension collects it.
         $this->app->singleton(DixlasePagesLocalizedUrlProvider::class);
         $this->app->tag([DixlasePagesLocalizedUrlProvider::class], 'localized-url.providers');
     }

@@ -79,8 +79,8 @@ class AdminGetRoutesSmokeTest extends TestCase
         $_ENV['INSTALLED'] = 'true';
         $_SERVER['INSTALLED'] = 'true';
 
-        // Pin a known-good 32-byte AES-256-CBC key (see Inquiry / Cookie /
-        // SEO / Multilingual smoke tests for the full rationale).
+        // Pin a known-good 32-byte AES-256-CBC key (see the Inquiry /
+        // Cookie / SEO smoke tests for the full rationale).
         $rawKey = random_bytes(32);
         config([
             'app.key' => 'base64:'.base64_encode($rawKey),
