@@ -32,22 +32,27 @@
 
 namespace Plugins\DixlasePages\App\Http\Controllers\Admin;
 
+use App\Actions\Content\PublishFileContentAction;
 use App\Actors\MemberActor;
 use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
 use App\Contracts\Repositories\MediaRepositoryInterface;
 use App\DTO\PluginIntegration\SeoMetaDTO;
 use App\Enums\ContentEditorType;
+use App\Enums\ContentPublishMode;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Facades\SiteSettings;
 use App\Helpers\AdminHelper;
+use App\Presenters\Admin\RevisionDiffPresenter;
+use App\Services\Content\FileContentPublisher;
 use App\Services\ContentPreviewService;
 use App\Services\RevisionService;
 use App\Traits\AdminInterfaceTrait;
 use App\Traits\AdminLoggedInTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -623,23 +628,76 @@ class DixlasePagesAdminPagesController extends Controller
         $customJs = null;
         $locale = app()->getLocale();
 
+        // A file-stored page edits its files: the working copy, which may
+        // hold changes that are not published yet.
+        $publisher = app(FileContentPublisher::class);
         if ($page->storage_type === ContentStorageType::FILE) {
             $fileContents = $this->contentService->loadFromFile(
                 $page->slug,
                 $locale,
                 $page->editor_type->slug()
             );
-            $customCss = $this->contentService->getCssContent($page, $locale);
-            $customJs = $this->contentService->getJsContent($page, $locale);
+            $files = $publisher->readFiles($page);
+            $customCss = $files['custom_css'] ?? null;
+            $customJs = $files['custom_js'] ?? null;
         }
 
         $formData = $this->prepareFormData($page, $fileContents, $customCss, $customJs);
 
+        // Changes made to the files outside the admin that are not published
+        $publisher->check($page);
+        $diffPresenter = new RevisionDiffPresenter();
+        $fileChanges = [];
+        foreach ($publisher->pendingChanges($page) as $part => $change) {
+            $fileChanges[$part] = $diffPresenter->buildSideBySide($change['published'], $change['file']);
+        }
+
         return view('dixlase-pages::admin.pages.edit', array_merge(
             $this->viewParams,
-            compact('page'),
+            compact('page', 'fileChanges'),
+            ['canPublishFile' => $this->canPublishFile($page)],
             $formData,
         ));
+    }
+
+    /**
+     * Publish the changes made to a file-stored page's files outside the
+     * admin
+     */
+    public function publishFile(DixlasePagesPage $page): RedirectResponse
+    {
+        abort_unless($this->canPublishFile($page), 403);
+
+        $result = (new PublishFileContentAction($page, null, app(FileContentPublisher::class)))
+            ->execute($this->actor(), []);
+
+        return redirect()
+            ->route('dixlase-pages::admin.pages.edit', $page)
+            ->with($result->success ? 'success' : 'error', $result->success
+                ? __('dixlase-pages::admin/pages/edit.publish_file_success')
+                : $result->message);
+    }
+
+    /**
+     * Whether the signed-in member may publish a page's file changes
+     *
+     * The same members who may save the page: script-capable pages need
+     * script authoring rights, and a page that is not a draft needs the
+     * publish_min_role setting, since publishing changes what visitors see.
+     */
+    private function canPublishFile(DixlasePagesPage $page): bool
+    {
+        if (! ScriptAuthoringPolicy::canEditEditorType($this->member, $page->editor_type)) {
+            return false;
+        }
+
+        if ($page->status === ContentStatus::DRAFT) {
+            return true;
+        }
+
+        $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
+
+        return $this->member !== null && $this->member->role->value >= $publishMinRole;
     }
 
     /**
@@ -895,6 +953,8 @@ class DixlasePagesAdminPagesController extends Controller
         $currentPublishMinRole = (int) ($settings['publish_min_role'] ?? MemberRole::EDITOR->value);
         $publishRoleIndex = $publishValueToIndex[$currentPublishMinRole] ?? 0;
 
+        $this->viewParams['publishMode'] = ContentPublishMode::fromSetting($settings[DixlasePagesPage::PUBLISH_MODE_SETTING] ?? null)->value;
+        $this->viewParams['publishModeOptions'] = ContentPublishMode::options();
         $this->viewParams['settings'] = $settings;
         $this->viewParams['statusCardOptions'] = $statusCardOptions;
         $this->viewParams['editorTypeCardOptions'] = $editorTypeCardOptions;

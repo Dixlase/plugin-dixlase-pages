@@ -129,6 +129,34 @@ class SettingsAuditTest extends TestCase
         );
     }
 
+    public function test_changing_the_publish_mode_is_audited(): void
+    {
+        $this->actingAs($this->superAdmin, 'member')
+            ->post(route('dixlase-pages::admin.pages.settings.update'), $this->settingsInput([
+                'publish_mode' => 'file_save',
+            ]))
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $logs = $this->settingsLogs();
+        $this->assertCount(1, $logs);
+        $this->assertEquals(
+            ['from' => 'admin', 'to' => 'file_save'],
+            $logs->first()->context['diff']['publish_mode'] ?? null,
+        );
+    }
+
+    public function test_an_unknown_publish_mode_is_refused(): void
+    {
+        $this->actingAs($this->superAdmin, 'member')
+            ->post(route('dixlase-pages::admin.pages.settings.update'), $this->settingsInput([
+                'publish_mode' => 'sometimes',
+            ]))
+            ->assertSessionHasErrors('publish_mode');
+
+        $this->assertSame('admin', DixlasePagesPageSetting::getValue('publish_mode'));
+    }
+
     public function test_saving_without_a_change_is_not_audited(): void
     {
         $this->actingAs($this->superAdmin, 'member')
@@ -151,6 +179,7 @@ class SettingsAuditTest extends TestCase
             'default_editor_type' => 'html',
             'default_storage_type' => 'database',
             'publish_min_role' => MemberRole::EDITOR->value,
+            'publish_mode' => 'admin',
         ], $overrides);
     }
 

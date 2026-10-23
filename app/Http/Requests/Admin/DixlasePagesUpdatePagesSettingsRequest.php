@@ -33,6 +33,7 @@
 namespace Plugins\DixlasePages\App\Http\Requests\Admin;
 
 use App\Enums\ContentEditorType;
+use App\Enums\ContentPublishMode;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Rules\UniqueRouteSlug;
@@ -66,6 +67,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
             )))],
             'default_storage_type' => ['required', Rule::in(array_map(fn ($case) => $case->slug(), ContentStorageType::cases()))],
             'publish_min_role' => ['required', 'integer', Rule::in(array_map(fn ($case) => $case->value, MemberRole::cases()))],
+            'publish_mode' => ['required', Rule::enum(ContentPublishMode::class)],
         ];
     }
 
@@ -81,6 +83,7 @@ class DixlasePagesUpdatePagesSettingsRequest extends FormRequest
             'default_status' => __('dixlase-pages::admin/pages/settings.basic.default_status'),
             'default_editor_type' => __('dixlase-pages::admin/pages/settings.basic.default_editor_type'),
             'default_storage_type' => __('dixlase-pages::admin/pages/settings.basic.default_storage_type'),
+            'publish_mode' => __('common.content_publish_mode.label'),
         ];
     }
 

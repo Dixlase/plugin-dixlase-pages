@@ -35,4 +35,5 @@ return [
     'description' => 'ページの内容を編集します。タイトル、コンテンツ、SEO設定、公開ステータスなどを変更できます。',
     'confirmation_message' => 'この内容でページを更新しますか？',
     'success' => 'ページが正常に更新されました。',
+    'publish_file_success' => 'ファイルの変更を公開しました。',
 ];

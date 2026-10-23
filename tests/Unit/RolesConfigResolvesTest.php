@@ -83,6 +83,7 @@ class RolesConfigResolvesTest extends TestCase
             'show' => ['pages.show', $editor],
             'edit form' => ['pages.edit', $editor],
             'update' => ['pages.update', $editor],
+            'publish file changes' => ['pages.publish-file', $editor],
 
             // Preview no longer executes Blade (see the Blade execution path
             // removal), so it is ordinary authoring.
