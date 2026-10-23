@@ -5,12 +5,12 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
-## [Unreleased]
+## [0.2.5] — 2026-10-24
 
 ### Changed
 
 - A page stored as a file is published through core's shared layer for file-stored content
-  (#57). By default the site shows the copy last saved or published from the admin: a change made
+  (#88, fixes #57). By default the site shows the copy last saved or published from the admin: a change made
   to the page's files outside the admin is recorded once in the audit log as a warning, and the
   edit screen shows what changed with a Publish button. Publishing is audited and recorded as a
   revision. The new "File-stored pages" setting can instead take each file change in at once,
@@ -20,6 +20,19 @@ and this plugin follows Semantic Versioning.
 - The daily integrity scan also checks the pages' files, and the dashboard counts the changes
   waiting to be published.
 - Requires Dixlase 0.1.19.
+- Comments describe the translation integration through core (the `TranslationResolver` contract
+  and the `localized-url.providers` tag) instead of naming the extension that provides it (#86,
+  fixes #85). No behaviour changed.
+
+### Development
+
+- Bump `vite` from 8.3.1 to 8.3.3, a build-time dependency that is not shipped to sites (#87).
+
+### Upgrade notes
+
+This release adds a database migration (the hash columns on the pages table). Plugin migrations
+are not run by `php artisan migrate`. Updating with `dls:plugin:update` runs it; a site that
+receives the files another way runs `php artisan dls:plugin:migrate DixlasePages --force` once.
 
 ## [0.2.4] — 2026-10-18
 
