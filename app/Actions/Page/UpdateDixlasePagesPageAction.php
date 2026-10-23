@@ -38,6 +38,7 @@ use App\Contracts\Action\Actor;
 use App\Contracts\TranslationResolver;
 use App\DTO\Action\ActionResult;
 use App\Enums\ContentStorageType;
+use App\Services\Content\FileContentPublisher;
 use App\Services\RevisionService;
 use Illuminate\Support\Facades\App;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
@@ -150,6 +151,9 @@ class UpdateDixlasePagesPageAction extends AbstractDixlasePagesPageAction
             'custom_css' => $customCss,
             'custom_js' => $customJs,
         ]);
+
+        // The admin wrote the files and the published copy together.
+        app(FileContentPublisher::class)->markSaved($page);
 
         $this->changed = array_values(array_intersect(
             self::AUDITED_ATTRIBUTES,

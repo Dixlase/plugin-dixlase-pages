@@ -35,4 +35,5 @@ return [
     'description' => 'Edit page content. You can change title, content, SEO settings, publish status, and more.',
     'confirmation_message' => 'Do you want to update the page with this content?',
     'success' => 'The page has been updated successfully.',
+    'publish_file_success' => 'The file changes have been published.',
 ];

@@ -32,6 +32,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 @section('content')
 
+{{-- Changes made to the page's files outside the admin, waiting to be
+     published (#57). Outside the edit form: it posts its own form. --}}
+<x-content.file-changes
+    id="page-file-changes"
+    :changes="$fileChanges"
+    :publishUrl="route('dixlase-pages::admin.pages.publish-file', ['page' => $page->id])"
+    :canPublish="$canPublishFile"
+/>
+
 <form id="pageUpdateForm" action="{{ route('dixlase-pages::admin.pages.update', ['page' => $page->id] ) }}" method="POST" class="min-w-0 overflow-hidden">
     @csrf
     @method('PATCH')

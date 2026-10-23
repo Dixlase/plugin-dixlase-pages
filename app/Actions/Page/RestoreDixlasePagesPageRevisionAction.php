@@ -40,6 +40,7 @@ use App\DTO\Action\ActionResult;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStorageType;
 use App\Enums\Permission;
+use App\Services\Content\FileContentPublisher;
 use App\Services\RevisionService;
 use Illuminate\Validation\ValidationException;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
@@ -114,6 +115,10 @@ class RestoreDixlasePagesPageRevisionAction extends AbstractAction
         $page = $this->revisionService->restore($this->revision, $actor->getActorId());
 
         $this->syncFiles($before, $page);
+
+        // The files now match the restored copy; any change waiting to be
+        // published was replaced by the restore.
+        app(FileContentPublisher::class)->markSaved($page);
 
         return ActionResult::success(
             model: $page,

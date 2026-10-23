@@ -32,12 +32,15 @@
 
 namespace Plugins\DixlasePages\App\Models;
 
+use App\Contracts\Content\PublishesFileContent;
 use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
 use App\Contracts\Revisionable;
 use App\Contracts\TranslationResolver;
 use App\Enums\ContentEditorType;
+use App\Enums\ContentPublishMode;
 use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
+use App\Services\Content\FileContentPublisher;
 use App\Traits\HasRevisions;
 use App\Traits\TranslatableTrait;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,11 +51,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
 
 /**
  * @property string $lang Source locale of the row's column values.
  */
-class DixlasePagesPage extends Model implements Revisionable
+class DixlasePagesPage extends Model implements PublishesFileContent, Revisionable
 {
     use HasFactory, HasRevisions, SoftDeletes, TranslatableTrait;
 
@@ -106,6 +110,12 @@ class DixlasePagesPage extends Model implements Revisionable
      * push the resulting page beyond the limit.
      */
     public const MAX_DEPTH = 2;
+
+    /**
+     * The plugin setting that holds how file-stored pages are published
+     * (a {@see ContentPublishMode} value)
+     */
+    public const PUBLISH_MODE_SETTING = 'publish_mode';
 
     /**
      * Attributes to cast
@@ -405,7 +415,10 @@ class DixlasePagesPage extends Model implements Revisionable
      *
      * - FILE storage: prefer a multilingual translation overlay for the
      *   current locale when one is published; only fall back to the
-     *   per-locale file on disk when no overlay exists. The overlay
+     *   page's published copy when no overlay exists. Core's
+     *   FileContentPublisher decides what that copy is: the content saved
+     *   from the admin, or the file on disk under the file save publish
+     *   mode. The overlay
      *   takes priority because the central translation editor is the
      *   discoverable place to manage non-source locales, and a stale
      *   per-locale file (e.g. an `en/html.html` that was created with
@@ -427,13 +440,9 @@ class DixlasePagesPage extends Model implements Revisionable
                 return $overlay;
             }
 
-            $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
-
-            return $contentService->loadFromFile(
-                $this->slug,
-                $locale,
-                $this->editor_type?->slug() ?? 'html'
-            );
+            // The published copy: the file itself only under the file save
+            // publish mode, which takes each change in as it is seen.
+            return app(FileContentPublisher::class)->resolve($this, 'content');
         }
 
         return $this->getTranslation('content');
@@ -553,6 +562,73 @@ class DixlasePagesPage extends Model implements Revisionable
     protected static function newFactory()
     {
         return \Plugins\DixlasePages\Database\Factories\DixlasePagesPageFactory::new();
+    }
+
+    public function usesFileStorage(): bool
+    {
+        return $this->storage_type === ContentStorageType::FILE;
+    }
+
+    public function fileContentPublishMode(): ContentPublishMode
+    {
+        return ContentPublishMode::fromSetting(DixlasePagesPageSetting::getValue(self::PUBLISH_MODE_SETTING));
+    }
+
+    /**
+     * The body, plus the custom CSS and JS that only the HTML editor keeps
+     *
+     * @return array<string, string>
+     */
+    public function fileContentParts(): array
+    {
+        $parts = ['content' => 'content'];
+
+        if ($this->editorType() === ContentEditorType::HTML) {
+            $parts['custom_css'] = 'custom_css';
+            $parts['custom_js'] = 'custom_js';
+        }
+
+        return $parts;
+    }
+
+    public function fileContentPath(string $part): string
+    {
+        $files = app(DixlasePagesPageContentService::class);
+        $locale = (string) $this->lang;
+
+        return match ($part) {
+            'custom_css' => $files->getCssFilePath($this->slug, $locale),
+            'custom_js' => $files->getJsFilePath($this->slug, $locale),
+            default => $files->getFilePath($this->slug, $locale, $this->editorType()->slug()),
+        };
+    }
+
+    public function fileContentDisk(): string
+    {
+        return app(DixlasePagesPageContentService::class)->getDisk();
+    }
+
+    public function fileContentAuditPrefix(): string
+    {
+        return 'dixlase_pages.page';
+    }
+
+    /**
+     * @return Builder<static>
+     */
+    public static function fileStoredQuery(): Builder
+    {
+        return static::query()->where('storage_type', ContentStorageType::FILE->value);
+    }
+
+    /**
+     * The editor type as the enum the cast gives
+     */
+    private function editorType(): ContentEditorType
+    {
+        $editorType = $this->editor_type;
+
+        return $editorType instanceof ContentEditorType ? $editorType : ContentEditorType::from((int) $editorType);
     }
 
     public function revisionModel(): string

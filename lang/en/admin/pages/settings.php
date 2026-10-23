@@ -44,6 +44,10 @@ return [
         'default_storage_type_help' => 'Default content storage method when creating new pages.',
     ],
     'simple_mode_notice' => 'Some settings are automatically configured in Simple mode. Switch to Advanced mode to customize all settings.',
+    'publish_mode' => [
+        'title' => 'File-stored pages',
+        'help' => 'Applies to pages stored as files. Changing it is recorded in the audit log.',
+    ],
     'publish_permission' => [
         'title' => 'Publish Permission',
         'description' => 'Set the minimum role required to publish pages. Members below this role can only save pages as drafts.',

@@ -93,6 +93,14 @@ return [
                     'access_roles' => MemberRole::EDITOR->value,
                     'view_roles' => MemberRole::EDITOR->value,
                 ],
+                // Publishing changes made to a file-stored page's files
+                // outside the admin is the same authoring as saving the page;
+                // the controller applies the script and publish_min_role
+                // checks the save applies.
+                'publish-file' => [
+                    'access_roles' => MemberRole::EDITOR->value,
+                    'view_roles' => MemberRole::EDITOR->value,
+                ],
                 // Preview renders the draft the author is working on. It no
                 // longer executes Blade (see pages#19), so it is ordinary
                 // authoring.

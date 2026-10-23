@@ -8,7 +8,7 @@ Static-page management for Dixlase: a hierarchical page tree under a configurabl
 
 - **Hierarchical pages** — Up to three levels (`/page/parent/child`). Children are promoted to top-level when a parent is deleted.
 - **Editors** — GUI / Markdown / HTML, switchable per page.
-- **Storage** — Choose database or file storage per page.
+- **Storage** — Choose database or file storage per page. A change made to a page's files outside the admin is shown on the edit screen and reaches the site when it is published there, or at once if the settings say so; either way it is recorded in the audit log.
 - **Per-page custom CSS / JS** — Each page ships its own stylesheet and script.
 - **Revisions** — Snapshots on every save, restorable anytime.
 - **Publish workflow** — Draft / Published / Scheduled.
