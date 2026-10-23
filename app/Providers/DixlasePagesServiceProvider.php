@@ -34,8 +34,10 @@ namespace Plugins\DixlasePages\App\Providers;
 
 use App\Contracts\RouteSlugProvider;
 use App\DTO\RouteSlug\RegisteredSlug;
+use App\Services\Content\FileContentRegistry;
 use App\Traits\PluginLoaderTrait;
 use Illuminate\Support\ServiceProvider;
+use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 use Plugins\DixlasePages\App\Services\DixlasePagesLocalizedUrlProvider;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageLinkableProvider;
@@ -70,6 +72,11 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
 
         // Register translation files
         $this->loadTranslationsFrom(__DIR__.'/../../lang', 'dixlase-pages');
+
+        // File-stored pages are published through core's shared layer, so
+        // the scheduled integrity scan checks their files and the dashboard
+        // counts the changes waiting to be published (#57).
+        $this->app->make(FileContentRegistry::class)->register(DixlasePagesPage::class);
 
         // Migrations are deliberately NOT registered here. They are applied by
         // PluginMigrator (dls:plugin:install / dls:plugin:update) and recorded in

@@ -71,6 +71,7 @@ Route::prefix('pages')
         Route::get('/{page}/edit', [DixlasePagesAdminPagesController::class, 'edit'])->name('edit');
         Route::get('/{page}/preview-frame', [DixlasePagesAdminPagesController::class, 'previewFrame'])->name('preview-frame');
         Route::patch('/{page}', [DixlasePagesAdminPagesController::class, 'update'])->name('update');
+        Route::post('/{page}/publish-file', [DixlasePagesAdminPagesController::class, 'publishFile'])->name('publish-file');
         Route::delete('/{page}', [DixlasePagesAdminPagesController::class, 'destroy'])->name('destroy');
 
         // Revisions (view, diff, restore)

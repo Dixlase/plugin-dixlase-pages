@@ -38,6 +38,7 @@ use App\Contracts\Action\Actor;
 use App\DTO\Action\ActionResult;
 use App\Enums\ContentEditorType;
 use App\Enums\ContentStorageType;
+use App\Services\Content\FileContentPublisher;
 use App\Services\RevisionService;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
@@ -110,6 +111,9 @@ class CreateDixlasePagesPageAction extends AbstractDixlasePagesPageAction
             'custom_css' => $customCss,
             'custom_js' => $customJs,
         ]);
+
+        // The admin wrote the files and the published copy together.
+        app(FileContentPublisher::class)->markSaved($page);
 
         // Record revision (manual because it's an explicit save by user)
         $this->revisionService->record(

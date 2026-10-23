@@ -33,6 +33,7 @@
 namespace Plugins\DixlasePages\App\Services;
 
 use App\Enums\ContentStorageType;
+use App\Services\Content\FileContentPublisher;
 use App\Traits\ManagesContentFiles;
 use Illuminate\Support\Facades\Storage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
@@ -158,44 +159,44 @@ class DixlasePagesPageContentService
     }
 
     /**
-     * Retrieve JS content (DB or file)
+     * Retrieve the published JS content
+     *
+     * A file-stored page's published copy comes from core's
+     * FileContentPublisher: the value saved from the admin, or the file on
+     * disk under the file save publish mode. The edit screen reads the file
+     * itself through the publisher instead.
      *
      * @param  DixlasePagesPage  $page  Page model
-     * @param  string|null  $locale  Language code (current language if null)
+     * @param  string|null  $locale  Language code (kept for signature compatibility, unused)
      * @return string|null Content
      */
     public function getJsContent(DixlasePagesPage $page, ?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
-
-        if ($page->storage_type === ContentStorageType::FILE) {
-            $filePath = $this->getJsFilePath($page->slug, $locale);
-
-            if (Storage::disk($this->disk)->exists($filePath)) {
-                return Storage::disk($this->disk)->get($filePath);
-            }
+        if ($page->storage_type === ContentStorageType::FILE
+            && array_key_exists('custom_js', $page->fileContentParts())) {
+            return app(FileContentPublisher::class)->resolve($page, 'custom_js');
         }
 
         return $page->custom_js ?? null;
     }
 
     /**
-     * Retrieve CSS content (DB or file)
+     * Retrieve the published CSS content
+     *
+     * A file-stored page's published copy comes from core's
+     * FileContentPublisher: the value saved from the admin, or the file on
+     * disk under the file save publish mode. The edit screen reads the file
+     * itself through the publisher instead.
      *
      * @param  DixlasePagesPage  $page  Page model
-     * @param  string|null  $locale  Language code (current language if null)
+     * @param  string|null  $locale  Language code (kept for signature compatibility, unused)
      * @return string|null Content
      */
     public function getCssContent(DixlasePagesPage $page, ?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
-
-        if ($page->storage_type === ContentStorageType::FILE) {
-            $filePath = $this->getCssFilePath($page->slug, $locale);
-
-            if (Storage::disk($this->disk)->exists($filePath)) {
-                return Storage::disk($this->disk)->get($filePath);
-            }
+        if ($page->storage_type === ContentStorageType::FILE
+            && array_key_exists('custom_css', $page->fileContentParts())) {
+            return app(FileContentPublisher::class)->resolve($page, 'custom_css');
         }
 
         return $page->custom_css ?? null;

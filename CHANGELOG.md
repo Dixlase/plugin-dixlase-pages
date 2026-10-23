@@ -5,6 +5,22 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [Unreleased]
+
+### Changed
+
+- A page stored as a file is published through core's shared layer for file-stored content
+  (#57). By default the site shows the copy last saved or published from the admin: a change made
+  to the page's files outside the admin is recorded once in the audit log as a warning, and the
+  edit screen shows what changed with a Publish button. Publishing is audited and recorded as a
+  revision. The new "File-stored pages" setting can instead take each file change in at once,
+  recorded in the audit log and as a revision. **Behaviour change:** on a site that edits page
+  files outside the admin, those edits stop reaching the site after the update until they are
+  published from the edit screen.
+- The daily integrity scan also checks the pages' files, and the dashboard counts the changes
+  waiting to be published.
+- Requires Dixlase 0.1.19.
+
 ## [0.2.4] — 2026-10-18
 
 ### Fixed

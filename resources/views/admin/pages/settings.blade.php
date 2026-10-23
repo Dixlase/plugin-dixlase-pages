@@ -126,6 +126,27 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             </div>
         </section>
 
+        {{-- How a file-stored page is published (#57). File storage is not
+             offered in simple mode, so neither is this; the value is kept. --}}
+        @if($isSimpleMode)
+            <input type="hidden" name="publish_mode" value="{{ $publishMode }}">
+        @else
+            <section class="mb-8">
+                <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.publish_mode.title') }}</h2>
+                <div>
+                    <x-form-label :text="__('common.content_publish_mode.label')" class="mb-2" />
+                    <x-form-radio-card-group
+                        name="publish_mode"
+                        :options="$publishModeOptions"
+                        :value="old('publish_mode', $publishMode)"
+                        :columns="2"
+                    />
+                    <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.publish_mode.help')" />
+                    <x-form-error name="publish_mode" />
+                </div>
+            </section>
+        @endif
+
         {{-- Public permission settings --}}
         <section class="mb-8">
             <h2 class="text-xl font-semibold mb-4">{{ __('dixlase-pages::admin/pages/settings.publish_permission.title') }}</h2>
