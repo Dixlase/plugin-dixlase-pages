@@ -289,6 +289,32 @@ class DixlasePagesFrontPageTest extends TestCase
     }
 
     /**
+     * A Markdown page serves its own CSS, never JavaScript.
+     */
+    public function test_a_markdown_page_serves_its_css_but_never_a_script(): void
+    {
+        DixlasePagesPage::factory()->published()->create([
+            'slug' => 'md-styled',
+            'storage_type' => ContentStorageType::DATABASE,
+            'editor_type' => ContentEditorType::MARKDOWN,
+            'content' => 'Note {.note}',
+            'custom_css' => '.note { color: red; }',
+            // Stored before Markdown kept CSS only; never served.
+            'custom_js' => 'console.log(1);',
+            'lang' => app()->getLocale(),
+        ]);
+
+        $this->get('/'.$this->pagesDirectory.'/md-styled')
+            ->assertOk()
+            ->assertSee('md-styled/custom-style.css', false)
+            ->assertDontSee('custom-script.js', false);
+        $this->get('/'.$this->pagesDirectory.'/md-styled/custom-style.css')
+            ->assertOk()
+            ->assertSee('.note { color: red; }');
+        $this->get('/'.$this->pagesDirectory.'/md-styled/custom-script.js')->assertNotFound();
+    }
+
+    /**
      * カスタムCSS/JSが空の場合は404を返すことを確認
      */
     public function test_empty_custom_css_returns_404(): void

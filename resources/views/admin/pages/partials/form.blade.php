@@ -58,6 +58,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     :multilingualEnabled="$multilingualEnabled"
     :isSimpleMode="$isSimpleMode"
     :isAdvancedEditor="$isAdvancedEditor"
+    :markdownCss="$markdownCss"
     :canPublish="$canPublish"
     :seoMetaEnabled="$seoMetaEnabled ?? false"
     :seoMeta="$seoMeta ?? null"

@@ -158,7 +158,7 @@ class ScriptAuthoringPolicyTest extends TestCase
         $this->assertSame('database', $request->input('storage_type'));
     }
 
-    public function test_custom_css_and_js_are_dropped_for_non_html_pages(): void
+    public function test_an_editor_creating_a_markdown_page_sets_neither_css_nor_js(): void
     {
         $this->actingAs($this->member(MemberRole::EDITOR), 'member');
 
@@ -171,6 +171,47 @@ class ScriptAuthoringPolicyTest extends TestCase
         $this->assertFalse($validator->fails(), (string) json_encode($validator->errors()->toArray()));
         $this->assertNull($request->input('custom_js'));
         $this->assertNull($request->input('custom_css'));
+    }
+
+    public function test_an_admin_keeps_the_css_of_a_markdown_page_but_never_its_js(): void
+    {
+        $this->actingAs($this->member(MemberRole::ADMIN), 'member');
+
+        [$request] = $this->validateStore([
+            'editor_type' => 'markdown',
+            'custom_js' => 'alert(1)',
+            'custom_css' => 'body{}',
+        ]);
+        $this->assertSame('body{}', $request->input('custom_css'));
+        $this->assertNull($request->input('custom_js'));
+
+        $page = DixlasePagesPage::factory()->create([
+            'slug' => 'styled',
+            'editor_type' => ContentEditorType::MARKDOWN,
+            'storage_type' => ContentStorageType::DATABASE,
+        ]);
+        $request = $this->updateRequestFor($page);
+        (new ReflectionMethod($request, 'prepareForValidation'))->invoke($request);
+        $this->assertSame('body{}', $request->input('custom_css'));
+        $this->assertNull($request->input('custom_js'));
+    }
+
+    public function test_an_editor_saving_a_markdown_page_keeps_the_css_an_admin_wrote(): void
+    {
+        $page = DixlasePagesPage::factory()->create([
+            'slug' => 'styled',
+            'editor_type' => ContentEditorType::MARKDOWN,
+            'storage_type' => ContentStorageType::DATABASE,
+            'custom_css' => 'h1{color:red}',
+        ]);
+
+        $this->actingAs($this->member(MemberRole::EDITOR), 'member');
+        $request = $this->updateRequestFor($page);
+        (new ReflectionMethod($request, 'prepareForValidation'))->invoke($request);
+
+        // The editor's CSS is ignored; the stored one is carried over.
+        $this->assertSame('h1{color:red}', $request->input('custom_css'));
+        $this->assertNull($request->input('custom_js'));
     }
 
     public function test_an_editor_may_not_update_an_html_page(): void

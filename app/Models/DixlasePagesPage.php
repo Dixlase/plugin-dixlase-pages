@@ -52,6 +52,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageContentService;
+use Plugins\DixlasePages\App\Services\ScriptAuthoringPolicy;
 
 /**
  * @property string $lang Source locale of the row's column values.
@@ -575,7 +576,7 @@ class DixlasePagesPage extends Model implements PublishesFileContent, Revisionab
     }
 
     /**
-     * The body, plus the custom CSS and JS that only the HTML editor keeps
+     * The body, plus the custom CSS (HTML and Markdown) and JS (HTML alone)
      *
      * @return array<string, string>
      */
@@ -583,8 +584,10 @@ class DixlasePagesPage extends Model implements PublishesFileContent, Revisionab
     {
         $parts = ['content' => 'content'];
 
-        if ($this->editorType() === ContentEditorType::HTML) {
+        if (ScriptAuthoringPolicy::carriesCustomCss($this->editorType())) {
             $parts['custom_css'] = 'custom_css';
+        }
+        if (ScriptAuthoringPolicy::carriesCustomJs($this->editorType())) {
             $parts['custom_js'] = 'custom_js';
         }
 

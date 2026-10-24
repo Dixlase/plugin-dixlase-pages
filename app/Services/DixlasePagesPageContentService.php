@@ -161,6 +161,8 @@ class DixlasePagesPageContentService
     /**
      * Retrieve the published JS content
      *
+     * Null for an editor type that does not keep it (HTML alone).
+     *
      * A file-stored page's published copy comes from core's
      * FileContentPublisher: the value saved from the admin, or the file on
      * disk under the file save publish mode. The edit screen reads the file
@@ -172,6 +174,10 @@ class DixlasePagesPageContentService
      */
     public function getJsContent(DixlasePagesPage $page, ?string $locale = null): ?string
     {
+        if (! ScriptAuthoringPolicy::carriesCustomJs($page->editor_type)) {
+            return null;
+        }
+
         if ($page->storage_type === ContentStorageType::FILE
             && array_key_exists('custom_js', $page->fileContentParts())) {
             return app(FileContentPublisher::class)->resolve($page, 'custom_js');
@@ -182,6 +188,8 @@ class DixlasePagesPageContentService
 
     /**
      * Retrieve the published CSS content
+     *
+     * Null for an editor type that does not keep it (HTML and Markdown keep CSS).
      *
      * A file-stored page's published copy comes from core's
      * FileContentPublisher: the value saved from the admin, or the file on
@@ -194,6 +202,10 @@ class DixlasePagesPageContentService
      */
     public function getCssContent(DixlasePagesPage $page, ?string $locale = null): ?string
     {
+        if (! ScriptAuthoringPolicy::carriesCustomCss($page->editor_type)) {
+            return null;
+        }
+
         if ($page->storage_type === ContentStorageType::FILE
             && array_key_exists('custom_css', $page->fileContentParts())) {
             return app(FileContentPublisher::class)->resolve($page, 'custom_css');
