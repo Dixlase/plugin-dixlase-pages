@@ -76,6 +76,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     // 簡単モード
     'isSimpleMode' => false,
     'isAdvancedEditor' => false,
+    // The CSS tab for Markdown too (members who may author scripts)
+    'markdownCss' => false,
     // GUI editor plugin info
     'guiEditorInfo' => null,
     'guiEditorAssetHtml' => '',
@@ -145,6 +147,7 @@ Layout:
             :previewUrl="$previewRenderUrl"
             previewRender="server"
             :assetTabs="! $isSimpleMode"
+            :markdownCss="$markdownCss"
             :customCss="old('custom_css', $customCss)"
             :customJs="old('custom_js', $customJs)"
             :cssPlaceholder="__('dixlase-pages::components/page-content-editor.css_placeholder')"

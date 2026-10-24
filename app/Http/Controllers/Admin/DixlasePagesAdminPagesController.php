@@ -374,6 +374,8 @@ class DixlasePagesAdminPagesController extends Controller
         // Public permission check: whether the current member's role is equal to or higher than publish_min_role
         $publishMinRole = (int) DixlasePagesPageSetting::getValue('publish_min_role', MemberRole::EDITOR->value);
         $canPublish = $this->member && $this->member->role->value >= $publishMinRole;
+        // The CSS tab for Markdown, for members who may write it.
+        $markdownCss = ScriptAuthoringPolicy::canAuthorScripts($this->member);
 
         // Status options (for form-select)
         // Members without public permission can only use draft
@@ -522,6 +524,7 @@ class DixlasePagesAdminPagesController extends Controller
             'isSimpleMode',
             'isAdvancedEditor',
             'canPublish',
+            'markdownCss',
             'guiEditorInfo',
             'guiEditorAssetHtml',
             'hasGuiEditor',

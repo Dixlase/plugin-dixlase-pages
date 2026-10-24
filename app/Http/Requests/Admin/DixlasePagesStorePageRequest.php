@@ -170,12 +170,16 @@ class DixlasePagesStorePageRequest extends FormRequest
             $this->merge(['slug' => $this->convertToSlug($this->title)]);
         }
 
-        // Custom CSS / JS are only served for HTML-editor pages, and only
-        // members who may author scripts can create those. Drop them for
-        // every other editor type so nothing script-capable is stored.
-        if ($this->input('editor_type') !== ContentEditorType::HTML->slug()) {
-            $this->merge(['custom_css' => null, 'custom_js' => null]);
-        }
+        // A page's own CSS and JavaScript: only members who may author
+        // scripts set them, and only an editor type that serves them keeps
+        // them (CSS for HTML and Markdown, JavaScript for HTML alone), so
+        // nothing that would not be served is stored.
+        $editorType = ContentEditorType::tryFromSlug((string) $this->input('editor_type'));
+        $canAuthorScripts = ScriptAuthoringPolicy::canAuthorScripts(Auth::guard('member')->user());
+        $this->merge([
+            'custom_css' => $canAuthorScripts && ScriptAuthoringPolicy::carriesCustomCss($editorType) ? $this->input('custom_css') : null,
+            'custom_js' => $canAuthorScripts && ScriptAuthoringPolicy::carriesCustomJs($editorType) ? $this->input('custom_js') : null,
+        ]);
 
         // Simple mode stores pages in the database only (the form hides the
         // file option); enforce it rather than trusting the hidden input.

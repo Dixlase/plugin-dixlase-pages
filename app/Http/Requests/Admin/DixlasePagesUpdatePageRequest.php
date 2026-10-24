@@ -37,6 +37,7 @@ use App\Enums\ContentStatus;
 use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Rules\UniqueContentSlug;
+use App\Services\Content\FileContentPublisher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -172,18 +173,46 @@ class DixlasePagesUpdatePageRequest extends FormRequest
     }
 
     /**
+     * A page's own CSS and JavaScript (the editor type cannot change on
+     * update). An editor type keeps only what it serves: CSS for HTML and
+     * Markdown, JavaScript for HTML alone. Only members who may author
+     * scripts set them; from anyone else, and from a form without the
+     * field (Simple mode hides the tabs), the stored one is carried over,
+     * since the update action writes whatever arrives. A file-stored page
+     * carries over its working copy, as the edit screen shows it.
+     */
+    private function keepCustomAssetsToTheirAuthors(DixlasePagesPage $page): void
+    {
+        $canAuthorScripts = ScriptAuthoringPolicy::canAuthorScripts(Auth::guard('member')->user());
+        $stored = $page->storage_type === ContentStorageType::FILE
+            ? app(FileContentPublisher::class)->readFiles($page)
+            : [];
+
+        $carries = [
+            'custom_css' => ScriptAuthoringPolicy::carriesCustomCss($page->editor_type),
+            'custom_js' => ScriptAuthoringPolicy::carriesCustomJs($page->editor_type),
+        ];
+
+        $merge = [];
+        foreach ($carries as $field => $carried) {
+            $merge[$field] = match (true) {
+                ! $carried => null,
+                $canAuthorScripts && $this->has($field) => $this->input($field),
+                default => $stored[$field] ?? $page->getAttribute($field),
+            };
+        }
+
+        $this->merge($merge);
+    }
+
+    /**
      * Processing before validation
      */
     protected function prepareForValidation(): void
     {
         $page = $this->route('page');
         if ($page instanceof DixlasePagesPage) {
-            // Custom CSS / JS are only served for HTML-editor pages (the
-            // editor type cannot change on update), so never store them on
-            // any other page.
-            if ($page->editor_type !== ContentEditorType::HTML) {
-                $this->merge(['custom_css' => null, 'custom_js' => null]);
-            }
+            $this->keepCustomAssetsToTheirAuthors($page);
 
             // Simple mode hides the file option: a database page stays in the
             // database. (An existing file page keeps its choice.)

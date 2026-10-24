@@ -32,7 +32,6 @@
 
 namespace Plugins\DixlasePages\App\Http\Controllers\Front;
 
-use App\Enums\ContentEditorType;
 use App\Services\Auth\SignedInMemberResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -116,10 +115,8 @@ class DixlasePagesCustomAssetController extends Controller
             return null;
         }
 
-        if ($page->editor_type !== ContentEditorType::HTML) {
-            return null;
-        }
-
+        // The content service answers only for an editor type that keeps
+        // the file: CSS for HTML and Markdown, JavaScript for HTML alone.
         $content = $type === 'js'
             ? $this->contentService->getJsContent($page, $locale)
             : $this->contentService->getCssContent($page, $locale);
