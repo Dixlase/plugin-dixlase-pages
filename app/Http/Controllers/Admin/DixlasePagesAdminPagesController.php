@@ -108,11 +108,14 @@ class DixlasePagesAdminPagesController extends Controller
     public function preview(Request $request)
     {
         $page = new DixlasePagesPage();
-        $page->title = $request->input('title', '');
-        $page->slug = $request->input('slug', '');
-        $page->content = $request->input('content', '');
-        $page->custom_css = $request->input('custom_css', '');
-        $page->custom_js = $request->input('custom_js', '');
+        // An empty field may arrive as null rather than '' (core's
+        // ConvertEmptyStringsToNull), and an input() default covers only a
+        // missing key, so cast instead.
+        $page->title = (string) $request->input('title');
+        $page->slug = (string) $request->input('slug');
+        $page->content = (string) $request->input('content');
+        $page->custom_css = (string) $request->input('custom_css');
+        $page->custom_js = (string) $request->input('custom_js');
         // Preview builds an unsaved page straight from request input, so
         // editor_type is attacker-controlled here in a way it never is for a
         // stored page. BLADE is downgraded rather than trusted: the front view
@@ -121,7 +124,7 @@ class DixlasePagesAdminPagesController extends Controller
         // Mirrors ContentPreviewService::renderFromSlug(), which applies the
         // same downgrade for exactly this reason.
         $requestedEditorType = ContentEditorType::tryFromSlug(
-            $request->input('editor_type', 'html')
+            (string) ($request->input('editor_type') ?: 'html')
         ) ?? ContentEditorType::HTML;
 
         $page->editor_type = $requestedEditorType === ContentEditorType::BLADE
@@ -129,7 +132,7 @@ class DixlasePagesAdminPagesController extends Controller
             : $requestedEditorType;
         // In preview, always treat as database and directly display the POSTed content
         $page->storage_type = ContentStorageType::DATABASE;
-        $page->status = $request->input('status', 'draft');
+        $page->status = $request->input('status') ?: 'draft';
         $page->published_at = $request->input('published_at') ?: null;
 
         // Prepare view variables (because @php blocks are prohibited)
@@ -246,8 +249,9 @@ class DixlasePagesAdminPagesController extends Controller
      */
     public function previewRender(Request $request): JsonResponse
     {
-        $content = $request->input('content', '');
-        $editorTypeSlug = $request->input('editor_type', 'html');
+        // An empty body may arrive as null; renderFromSlug() takes a string.
+        $content = (string) $request->input('content');
+        $editorTypeSlug = (string) ($request->input('editor_type') ?: 'html');
 
         $previewService = app(ContentPreviewService::class);
         $html = $previewService->renderFromSlug($content, $editorTypeSlug, false, false);
