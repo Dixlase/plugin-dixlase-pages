@@ -5,6 +5,39 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.3.0] — 2026-10-30
+
+### Added
+
+- A Markdown page carries its own CSS, as an HTML page does, so the classes it gives elements
+  (`{.class}`) have something to style them (#92, fixes #91). The page links and serves
+  `custom-style.css`; JavaScript stays HTML-only. Only members who may author scripts (ADMIN and
+  above) set the CSS, and an editor who saves the page keeps the CSS an admin wrote. The editor
+  shows the CSS tab for Markdown with core 0.1.20 or later; on an earlier core the tab stays
+  HTML-only and nothing else changes.
+
+### Fixed
+
+- The live preview and the preview of an unsaved page keep working when an empty field arrives as
+  `null` rather than `''` (#96, fixes #94). They returned an error before.
+
+### Changed
+
+- `requires.dixlase` states the oldest core this works on as a floor (`>=0.1.19`) rather than a
+  caret, so a core 0.2 release does not refuse to install or update it (#101;
+  Dixlase/dixlase-core#790).
+- The plugin thumbnail is replaced with a version with an adjusted layout and colours (#98, fixes
+  #97).
+
+### Development
+
+- Pull requests against `next`, the development branch, run the checks (#90, fixes #89).
+- The release build compares the files with the signature manifest at the tag and stops before
+  building the ZIP on a mismatch (#93; part of Dixlase/dixlase-core#520).
+- The deploy workflow recognises a checkout of this repository by its identity rather than by the
+  text of its URL, and a site it refuses no longer holds the update back from the others (#95; fixes
+  Dixlase/dixlase-core#518 and #519).
+
 ## [0.2.5] — 2026-10-24
 
 ### Changed
