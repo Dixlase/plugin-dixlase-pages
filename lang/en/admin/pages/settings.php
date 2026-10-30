@@ -47,6 +47,8 @@ return [
     'publish_mode' => [
         'title' => 'File-stored pages',
         'help' => 'Applies to pages stored as files. Changing it is recorded in the audit log.',
+        'local' => 'This is a development environment (APP_ENV is "local"). Under publishing on file save, every part of a page goes live at once, including the HTML body and the custom CSS and JS. In any other environment, changes to the files wait to be published.',
+        'not_local' => 'This is not a development environment (APP_ENV is not "local"), so changes to the files wait to be published whatever this setting says. Publishing on file save takes effect only in a development environment.',
     ],
     'publish_permission' => [
         'title' => 'Publish Permission',

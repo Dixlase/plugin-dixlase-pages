@@ -143,6 +143,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     />
                     <x-form-help-text :text="__('dixlase-pages::admin/pages/settings.publish_mode.help')" />
                     <x-form-error name="publish_mode" />
+                    {{-- The file save mode applies only in a local environment,
+                         and there it takes every part in, scripts included (#102) --}}
+                    <div class="mt-4">
+                        @if($fileSaveModeAvailable)
+                            <x-ui-message type="info" :message="__('dixlase-pages::admin/pages/settings.publish_mode.local')" />
+                        @else
+                            <x-ui-message type="warning" :message="__('dixlase-pages::admin/pages/settings.publish_mode.not_local')" />
+                        @endif
+                    </div>
                 </div>
             </section>
         @endif

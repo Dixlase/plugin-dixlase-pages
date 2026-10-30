@@ -41,6 +41,7 @@ use App\Services\Content\FileContentRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageRevision;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
@@ -53,7 +54,7 @@ use Tests\TestCase;
  * Under the default admin publish mode a change made to the files outside
  * the admin is recorded once and waits on the edit screen until someone
  * publishes it; under the file save mode it is taken in at once and recorded
- * as a revision.
+ * as a revision -- in a local environment only (#102).
  */
 class FileContentPublishTest extends TestCase
 {
@@ -218,6 +219,7 @@ class FileContentPublishTest extends TestCase
         DixlasePagesPageSetting::setValue(DixlasePagesPage::PUBLISH_MODE_SETTING, ContentPublishMode::FILE_SAVE->value);
         $page = $this->createPage('about', 'Saved body');
         $revisions = DixlasePagesPageRevision::where('page_id', $page->id)->count();
+        $this->useLocalEnvironment();
 
         Storage::disk('local')->put('dixlase-pages/about.md', 'Edited on disk');
 
@@ -229,6 +231,93 @@ class FileContentPublishTest extends TestCase
         $this->assertCount(1, $logs);
         $this->assertTrue($logs->first()->context['published'] ?? null);
         $this->assertSame(0, app(FileContentRegistry::class)->pendingCount());
+    }
+
+    public function test_the_file_save_mode_takes_every_part_of_an_html_page_in_locally(): void
+    {
+        DixlasePagesPageSetting::setValue(DixlasePagesPage::PUBLISH_MODE_SETTING, ContentPublishMode::FILE_SAVE->value);
+        $page = $this->createPage('about', '<p>Body</p>', 'draft', 'html', [
+            'custom_css' => 'p { color: red; }',
+            'custom_js' => 'console.log(1);',
+        ]);
+        $this->useLocalEnvironment();
+
+        Storage::disk('local')->put('dixlase-pages/about.html', '<p>Edited</p><script>console.log(2);</script>');
+        Storage::disk('local')->put('dixlase-pages/about.css', 'p { color: blue; }');
+        Storage::disk('local')->put('dixlase-pages/about.js', 'console.log(3);');
+
+        $page->refresh()->getContentByEditorType();
+        $attributes = $page->refresh()->getAttributes();
+
+        $this->assertSame('<p>Edited</p><script>console.log(2);</script>', $attributes['content']);
+        $this->assertSame('p { color: blue; }', $attributes['custom_css']);
+        $this->assertSame('console.log(3);', $attributes['custom_js']);
+
+        $log = $this->logs('dixlase_pages.page.file_changed')->first();
+        $this->assertNotNull($log);
+        $this->assertEqualsCanonicalizing(['content', 'custom_css', 'custom_js'], $log->context['parts'] ?? null);
+        $this->assertSame(0, app(FileContentRegistry::class)->pendingCount());
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function nonLocalEnvironments(): array
+    {
+        return [
+            'testing' => ['testing'],
+            'staging' => ['staging'],
+            'production' => ['production'],
+            'a mistyped value' => ['locale'],
+        ];
+    }
+
+    #[DataProvider('nonLocalEnvironments')]
+    public function test_the_file_save_mode_waits_outside_a_local_environment(string $environment): void
+    {
+        DixlasePagesPageSetting::setValue(DixlasePagesPage::PUBLISH_MODE_SETTING, ContentPublishMode::FILE_SAVE->value);
+        $page = $this->createPage('about', 'Saved body');
+        $this->app['env'] = $environment;
+
+        Storage::disk('local')->put('dixlase-pages/about.md', 'Edited on disk');
+
+        $this->assertSame('Saved body', $page->refresh()->getContentByEditorType());
+        $this->assertSame(ContentPublishMode::ADMIN, $page->fileContentPublishMode());
+        // The setting is kept as chosen.
+        $this->assertSame('file_save', DixlasePagesPageSetting::getValue(DixlasePagesPage::PUBLISH_MODE_SETTING));
+
+        $logs = $this->logs('dixlase_pages.page.file_changed');
+        $this->assertCount(1, $logs);
+        $this->assertFalse($logs->first()->context['published'] ?? null);
+        // Counted for core's banner of changes waiting to be published.
+        $this->assertSame(1, app(FileContentRegistry::class)->pendingCount());
+        $this->assertFalse(app(FileContentRegistry::class)->usesFileSaveMode());
+    }
+
+    public function test_an_html_body_is_declared_script_capable_outside_a_local_environment(): void
+    {
+        $page = $this->createPage('about', '<p>Body</p>', 'draft', 'html');
+
+        $this->assertEqualsCanonicalizing(['custom_css', 'custom_js', 'content'], $page->scriptCapableFileContentParts());
+
+        $this->useLocalEnvironment();
+        $this->assertSame([], $page->scriptCapableFileContentParts());
+    }
+
+    public function test_the_settings_screen_says_where_the_file_save_mode_applies(): void
+    {
+        $this->actingAs($this->admin, 'member')
+            ->get(route('dixlase-pages::admin.pages.settings'))
+            ->assertOk()
+            ->assertSee(__('dixlase-pages::admin/pages/settings.publish_mode.not_local'), false)
+            ->assertDontSee(__('dixlase-pages::admin/pages/settings.publish_mode.local'), false);
+
+        $this->useLocalEnvironment();
+
+        $this->actingAs($this->admin, 'member')
+            ->get(route('dixlase-pages::admin.pages.settings'))
+            ->assertOk()
+            ->assertSee(__('dixlase-pages::admin/pages/settings.publish_mode.local'), false);
     }
 
     public function test_the_custom_css_of_an_html_page_waits_as_well(): void
@@ -265,6 +354,17 @@ class FileContentPublishTest extends TestCase
 
         $this->assertSame('Saved body', $page->refresh()->getContentByEditorType());
         $this->assertSame(['checked' => 0, 'pending' => 0], app(FileContentRegistry::class)->checkAll(app(\App\Services\Content\FileContentPublisher::class)));
+    }
+
+    /**
+     * Run the rest of the test as a local environment
+     *
+     * Only after the pages are created: the test-only CSRF exemption holds
+     * while the environment is `testing`, so a POST made after this is refused.
+     */
+    private function useLocalEnvironment(): void
+    {
+        $this->app['env'] = 'local';
     }
 
     /**

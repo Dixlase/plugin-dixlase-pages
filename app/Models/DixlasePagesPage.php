@@ -32,6 +32,7 @@
 
 namespace Plugins\DixlasePages\App\Models;
 
+use App\Contracts\Content\DeclaresScriptCapableParts;
 use App\Contracts\Content\PublishesFileContent;
 use App\Contracts\PluginIntegration\SeoMetaProviderInterface;
 use App\Contracts\Revisionable;
@@ -57,7 +58,7 @@ use Plugins\DixlasePages\App\Services\ScriptAuthoringPolicy;
 /**
  * @property string $lang Source locale of the row's column values.
  */
-class DixlasePagesPage extends Model implements PublishesFileContent, Revisionable
+class DixlasePagesPage extends Model implements DeclaresScriptCapableParts, PublishesFileContent, Revisionable
 {
     use HasFactory, HasRevisions, SoftDeletes, TranslatableTrait;
 
@@ -570,9 +571,54 @@ class DixlasePagesPage extends Model implements PublishesFileContent, Revisionab
         return $this->storage_type === ContentStorageType::FILE;
     }
 
+    /**
+     * Whether the file save mode takes effect in this environment
+     *
+     * Taking file changes in without anyone publishing them is a development
+     * convenience, so it applies only in a local environment (#102). Anywhere
+     * else -- staging, production, a mistyped APP_ENV -- every change to the
+     * files waits to be published, whatever the setting says. The setting is
+     * kept as chosen, so a copy of the site in a local environment picks it
+     * up again.
+     */
+    public static function fileSaveModeAvailable(): bool
+    {
+        return App::environment('local');
+    }
+
     public function fileContentPublishMode(): ContentPublishMode
     {
+        if (! self::fileSaveModeAvailable()) {
+            return ContentPublishMode::ADMIN;
+        }
+
         return ContentPublishMode::fromSetting(DixlasePagesPageSetting::getValue(self::PUBLISH_MODE_SETTING));
+    }
+
+    /**
+     * The parts of a page that may carry a script
+     *
+     * In a local environment none are held back: whoever can write the files
+     * there runs the code as well, so the file save mode takes every part in
+     * at once (#102). Elsewhere the file save mode never takes effect, and
+     * the answer is the true one -- the custom CSS and JS, and the body under
+     * the HTML editor, where `<script>` is part of what the author writes.
+     *
+     * @return list<string>
+     */
+    public function scriptCapableFileContentParts(): array
+    {
+        if (self::fileSaveModeAvailable()) {
+            return [];
+        }
+
+        $parts = FileContentPublisher::DEFAULT_SCRIPT_CAPABLE_PARTS;
+
+        if ($this->editorType() === ContentEditorType::HTML) {
+            $parts[] = 'content';
+        }
+
+        return $parts;
     }
 
     /**
