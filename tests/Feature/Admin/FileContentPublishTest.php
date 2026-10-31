@@ -215,26 +215,29 @@ class FileContentPublishTest extends TestCase
         $this->assertSame('Saved body', $page->refresh()->getAttributes()['content']);
     }
 
-    public function test_the_file_save_mode_takes_a_change_in_at_once(): void
+    public function test_the_file_save_mode_shows_a_change_at_once(): void
     {
         DixlasePagesPageSetting::setValue(DixlasePagesPage::PUBLISH_MODE_SETTING, ContentPublishMode::FILE_SAVE->value);
         $page = $this->createPage('about', 'Saved body');
-        $revisions = DixlasePagesPageRevision::where('page_id', $page->id)->count();
         $this->useLocalEnvironment();
 
         Storage::disk('local')->put('dixlase-pages/about.md', 'Edited on disk');
 
+        // What this plugin owes: the page shows the edit at once, and the
+        // change is recorded. Whether core also takes the file in as the
+        // published copy is core's policy, and it differs between
+        // releases -- core took it in up to 0.1.20 and holds it from
+        // dixlase-core#808 on. Asserting it here pinned this plugin to one
+        // core, so those assertions live in core's own test now.
         $this->assertSame('Edited on disk', $page->refresh()->getContentByEditorType());
-        $this->assertSame('Edited on disk', $page->refresh()->getAttributes()['content']);
-        $this->assertSame($revisions + 1, DixlasePagesPageRevision::where('page_id', $page->id)->count());
+        $this->assertSame('Edited on disk', app(FileContentPublisher::class)->resolve($page->refresh(), 'content'));
 
         $logs = $this->logs('dixlase_pages.page.file_changed');
         $this->assertCount(1, $logs);
-        $this->assertTrue($logs->first()->context['published'] ?? null);
-        $this->assertSame(0, app(FileContentRegistry::class)->pendingCount());
+        $this->assertEqualsCanonicalizing(['content'], $logs->first()->context['parts'] ?? null);
     }
 
-    public function test_the_file_save_mode_takes_every_part_of_an_html_page_in_locally(): void
+    public function test_the_file_save_mode_shows_every_part_of_an_html_page_locally(): void
     {
         DixlasePagesPageSetting::setValue(DixlasePagesPage::PUBLISH_MODE_SETTING, ContentPublishMode::FILE_SAVE->value);
         $page = $this->createPage('about', '<p>Body</p>', 'draft', 'html', [
@@ -247,17 +250,19 @@ class FileContentPublishTest extends TestCase
         Storage::disk('local')->put('dixlase-pages/about.css', 'p { color: blue; }');
         Storage::disk('local')->put('dixlase-pages/about.js', 'console.log(3);');
 
-        $page->refresh()->getContentByEditorType();
-        $attributes = $page->refresh()->getAttributes();
+        $page = $page->refresh();
+        $publisher = app(FileContentPublisher::class);
 
-        $this->assertSame('<p>Edited</p><script>console.log(2);</script>', $attributes['content']);
-        $this->assertSame('p { color: blue; }', $attributes['custom_css']);
-        $this->assertSame('console.log(3);', $attributes['custom_js']);
+        // Read through core's resolver, not the stored columns: the
+        // resolver answers the same on every core, while the columns
+        // depend on whether core takes the file in (see the test above).
+        $this->assertSame('<p>Edited</p><script>console.log(2);</script>', $publisher->resolve($page, 'content'));
+        $this->assertSame('p { color: blue; }', $publisher->resolve($page, 'custom_css'));
+        $this->assertSame('console.log(3);', $publisher->resolve($page, 'custom_js'));
 
         $log = $this->logs('dixlase_pages.page.file_changed')->first();
         $this->assertNotNull($log);
         $this->assertEqualsCanonicalizing(['content', 'custom_css', 'custom_js'], $log->context['parts'] ?? null);
-        $this->assertSame(0, app(FileContentRegistry::class)->pendingCount());
     }
 
     /**
