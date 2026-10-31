@@ -35,4 +35,5 @@ return [
     'preview_description' => 'This page is currently in ":status" status and is not visible to the public.',
     'published_at' => 'Published on :date',
     'date_format' => 'F j, Y',
+    'admin_bar_edit' => 'Edit this page',
 ];

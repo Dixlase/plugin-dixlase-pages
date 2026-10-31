@@ -88,6 +88,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     @endif
 @endif
 
+{{-- An edit link in core's admin bar, for a member who may edit pages
+     (the front route decides; #109). --}}
+@if ($adminEditUrl ?? null)
+    @section('admin_bar_edit_url', $adminEditUrl)
+    @section('admin_bar_edit_label', __('dixlase-pages::front/page.admin_bar_edit'))
+@endif
+
 @section('content')
     <div class="dixlase-page">
         @php
