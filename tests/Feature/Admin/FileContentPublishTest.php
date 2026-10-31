@@ -37,6 +37,7 @@ use App\Enums\MemberRole;
 use App\Models\AuditLog;
 use App\Models\Member;
 use App\Models\SiteSetting;
+use App\Services\Content\FileContentPublisher;
 use App\Services\Content\FileContentRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -282,8 +283,9 @@ class FileContentPublishTest extends TestCase
         Storage::disk('local')->put('dixlase-pages/about.md', 'Edited on disk');
 
         $this->assertSame('Saved body', $page->refresh()->getContentByEditorType());
-        $this->assertSame(ContentPublishMode::ADMIN, $page->fileContentPublishMode());
-        // The setting is kept as chosen.
+        // Core decides the mode in effect; the setting is kept as chosen.
+        $this->assertSame(ContentPublishMode::ADMIN, app(FileContentPublisher::class)->effectivePublishMode($page));
+        $this->assertSame(ContentPublishMode::FILE_SAVE, $page->fileContentPublishMode());
         $this->assertSame('file_save', DixlasePagesPageSetting::getValue(DixlasePagesPage::PUBLISH_MODE_SETTING));
 
         $logs = $this->logs('dixlase_pages.page.file_changed');
@@ -294,14 +296,14 @@ class FileContentPublishTest extends TestCase
         $this->assertFalse(app(FileContentRegistry::class)->usesFileSaveMode());
     }
 
-    public function test_an_html_body_is_declared_script_capable_outside_a_local_environment(): void
+    public function test_an_html_body_is_declared_script_capable_in_every_environment(): void
     {
         $page = $this->createPage('about', '<p>Body</p>', 'draft', 'html');
 
         $this->assertEqualsCanonicalizing(['custom_css', 'custom_js', 'content'], $page->scriptCapableFileContentParts());
 
         $this->useLocalEnvironment();
-        $this->assertSame([], $page->scriptCapableFileContentParts());
+        $this->assertEqualsCanonicalizing(['custom_css', 'custom_js', 'content'], $page->scriptCapableFileContentParts());
     }
 
     public function test_the_settings_screen_says_where_the_file_save_mode_applies(): void
@@ -309,15 +311,15 @@ class FileContentPublishTest extends TestCase
         $this->actingAs($this->admin, 'member')
             ->get(route('dixlase-pages::admin.pages.settings'))
             ->assertOk()
-            ->assertSee(__('dixlase-pages::admin/pages/settings.publish_mode.not_local'), false)
-            ->assertDontSee(__('dixlase-pages::admin/pages/settings.publish_mode.local'), false);
+            ->assertSee(__('common.content_publish_mode.not_in_effect'), false)
+            ->assertDontSee(__('common.content_publish_mode.in_effect_local'), false);
 
         $this->useLocalEnvironment();
 
         $this->actingAs($this->admin, 'member')
             ->get(route('dixlase-pages::admin.pages.settings'))
             ->assertOk()
-            ->assertSee(__('dixlase-pages::admin/pages/settings.publish_mode.local'), false);
+            ->assertSee(__('common.content_publish_mode.in_effect_local'), false);
     }
 
     public function test_the_custom_css_of_an_html_page_waits_as_well(): void
