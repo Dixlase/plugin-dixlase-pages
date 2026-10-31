@@ -84,10 +84,11 @@ Route::middleware(['front.ip'])->group(
             //      locale when forLang($locale) misses, and the
             //      TranslatableTrait inside getContentByEditorType()
             //      surfaces the right translation at render time.
+            $member = app(\App\Services\Auth\SignedInMemberResolver::class)->resolve();
             $page = DixlasePagesPage::resolvePath(
                 $path,
                 $locale,
-                publishedOnly: ! app(\App\Services\Auth\SignedInMemberResolver::class)->check()
+                publishedOnly: $member === null
             );
 
             if ($page === null) {
@@ -113,6 +114,18 @@ Route::middleware(['front.ip'])->group(
             $hasCustomJs = ! empty($contentService->getJsContent($page, $locale));
             $customAssetVersion = $page->updated_at?->timestamp ?? time();
 
+            // The page's edit screen, for core's admin bar, when the member
+            // signed in to the admin may open it (#109). The plugin's role
+            // settings, with a site's overrides, decide, as they do for the
+            // edit route itself. No link when the admin routes are not
+            // loaded.
+            $role = $member?->getMemberRole();
+            $adminEditUrl = $role !== null
+                && Route::has('dixlase-pages::admin.pages.edit')
+                && \App\Services\PermissionRegistry::canAccessPlugin('DixlasePages', 'pages.edit', $role)
+                ? route('dixlase-pages::admin.pages.edit', ['page' => $page->id])
+                : null;
+
             $response = response()->view('dixlase-pages::front.page', compact(
                 'page',
                 'editorType',
@@ -120,6 +133,7 @@ Route::middleware(['front.ip'])->group(
                 'hasCustomCss',
                 'hasCustomJs',
                 'customAssetVersion',
+                'adminEditUrl',
             ));
 
             // An unpublished page is served only to a signed-in member; a

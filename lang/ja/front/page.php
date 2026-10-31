@@ -35,4 +35,5 @@ return [
     'preview_description' => 'このページは現在「:status」ステータスであり、一般には公開されていません。',
     'published_at' => ':date に公開',
     'date_format' => 'Y年n月j日',
+    'admin_bar_edit' => 'このページを編集',
 ];
