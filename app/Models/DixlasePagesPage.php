@@ -572,46 +572,27 @@ class DixlasePagesPage extends Model implements DeclaresScriptCapableParts, Publ
     }
 
     /**
-     * Whether the file save mode takes effect in this environment
+     * The mode chosen in the settings
      *
-     * Taking file changes in without anyone publishing them is a development
-     * convenience, so it applies only in a local environment (#102). Anywhere
-     * else -- staging, production, a mistyped APP_ENV -- every change to the
-     * files waits to be published, whatever the setting says. The setting is
-     * kept as chosen, so a copy of the site in a local environment picks it
-     * up again.
+     * Core decides where it takes effect: the file save mode applies only in
+     * a local environment, and anywhere else every change to the files waits
+     * to be published (FileContentPublisher::effectivePublishMode()).
      */
-    public static function fileSaveModeAvailable(): bool
-    {
-        return App::environment('local');
-    }
-
     public function fileContentPublishMode(): ContentPublishMode
     {
-        if (! self::fileSaveModeAvailable()) {
-            return ContentPublishMode::ADMIN;
-        }
-
         return ContentPublishMode::fromSetting(DixlasePagesPageSetting::getValue(self::PUBLISH_MODE_SETTING));
     }
 
     /**
      * The parts of a page that may carry a script
      *
-     * In a local environment none are held back: whoever can write the files
-     * there runs the code as well, so the file save mode takes every part in
-     * at once (#102). Elsewhere the file save mode never takes effect, and
-     * the answer is the true one -- the custom CSS and JS, and the body under
-     * the HTML editor, where `<script>` is part of what the author writes.
+     * The custom CSS and JS, and the body under the HTML editor, where
+     * `<script>` is part of what the author writes.
      *
      * @return list<string>
      */
     public function scriptCapableFileContentParts(): array
     {
-        if (self::fileSaveModeAvailable()) {
-            return [];
-        }
-
         $parts = FileContentPublisher::DEFAULT_SCRIPT_CAPABLE_PARTS;
 
         if ($this->editorType() === ContentEditorType::HTML) {

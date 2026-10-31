@@ -962,7 +962,7 @@ class DixlasePagesAdminPagesController extends Controller
 
         $this->viewParams['publishMode'] = ContentPublishMode::fromSetting($settings[DixlasePagesPage::PUBLISH_MODE_SETTING] ?? null)->value;
         $this->viewParams['publishModeOptions'] = ContentPublishMode::options();
-        $this->viewParams['fileSaveModeAvailable'] = DixlasePagesPage::fileSaveModeAvailable();
+        $this->viewParams['fileSaveModeAvailable'] = FileContentPublisher::fileSaveModeAvailable();
         $this->viewParams['settings'] = $settings;
         $this->viewParams['statusCardOptions'] = $statusCardOptions;
         $this->viewParams['editorTypeCardOptions'] = $editorTypeCardOptions;
