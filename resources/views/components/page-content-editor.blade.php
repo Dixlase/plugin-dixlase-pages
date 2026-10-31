@@ -205,19 +205,15 @@ Layout:
                         {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
                     </p>
 
-                    {{-- Translate button, when a plugin provides it. The view check stays:
-                         <x-dynamic-component> throws when the component is missing, so
-                         a site without the button would get a 500 on this screen. --}}
-                    @if (view()->exists('dixlase-multilingual::components.translate-button'))
-                        <div class="mt-3">
-                            <x-dynamic-component
-                                component="dixlase-multilingual::translate-button"
-                                type="dixlase-pages:page"
-                                :id="$pageId"
-                                :sourceLocale="$langValue"
-                            />
-                        </div>
-                    @endif
+                    {{-- Translate button, through core's seam: it renders nothing unless
+                         an extension translates pages (#83) --}}
+                    <div class="mt-3">
+                        <x-admin.translate-button
+                            type="dixlase-pages:page"
+                            :id="$pageId"
+                            :source-locale="$langValue"
+                        />
+                    </div>
 
                     {{-- In edit mode, send meta info via hidden input --}}
                     <input type="hidden" name="storage_type" value="{{ $storageType }}">
