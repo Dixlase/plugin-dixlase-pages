@@ -32,20 +32,22 @@
 
 namespace Plugins\DixlasePages\Tests\Feature\Admin;
 
+use App\Contracts\PluginIntegration\TranslationUiProviderInterface;
+use App\Services\Plugin\PluginServiceResolver;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
- * The page editor embeds the translate button on a saved page, and still
- * renders when no plugin provides the button.
+ * The page editor embeds core's translate button on a saved page, and still
+ * renders when no extension translates pages (#83).
  *
- * The button's view namespace is pointed at a stand-in that
- * prints its props, or at an empty directory, so each test controls
- * whether the component exists.
+ * A stand-in provider is registered under core's capability tag, the way an
+ * extension's ServiceProvider does it, so each test controls whether pages
+ * can be translated.
  */
 class TranslateButtonEmbedTest extends TestCase
 {
-    private const BUTTON = 'data-test="translate-button"';
+    private const URL = 'https://example.test/translations/dixlase-pages:page/7';
 
     protected function setUp(): void
     {
@@ -57,6 +59,7 @@ class TranslateButtonEmbedTest extends TestCase
         $this->app['view']->addNamespace('dixlase-pages', base_path('plugins/DixlasePages/resources/views'));
         $this->app['translator']->addNamespace('dixlase-pages', base_path('plugins/DixlasePages/lang'));
         $this->withViewErrors([]);
+        app()->setLocale('en');
 
         // The edit screen links to the page's revisions.
         Route::get('/pages/{page}/revisions', fn () => '')->name('dixlase-pages::admin.pages.revisions.index');
@@ -65,35 +68,69 @@ class TranslateButtonEmbedTest extends TestCase
 
     public function test_edit_screen_of_a_saved_page_shows_the_button(): void
     {
-        $this->useMultilingualViews(__DIR__.'/../../Fixtures/views/multilingual');
+        $this->registerProvider(['dixlase-pages:page' => self::URL]);
 
         $html = (string) $this->renderEditor(isEditMode: true, pageId: 7, langValue: 'ja');
 
-        $this->assertStringContainsString(self::BUTTON.'>dixlase-pages:page|7|ja<', $html);
+        $this->assertStringContainsString('href="'.self::URL.'"', $html);
+        $this->assertStringContainsString(__('common.languages.ja'), $html);
     }
 
     public function test_create_screen_shows_no_button(): void
     {
-        $this->useMultilingualViews(__DIR__.'/../../Fixtures/views/multilingual');
+        $this->registerProvider(['dixlase-pages:page' => self::URL]);
 
         $html = (string) $this->renderEditor(isEditMode: false, pageId: null, langValue: 'ja');
 
-        $this->assertStringNotContainsString(self::BUTTON, $html);
+        $this->assertStringNotContainsString(self::URL, $html);
     }
 
-    public function test_edit_screen_renders_without_the_multilingual_views(): void
+    public function test_edit_screen_renders_when_nothing_translates_pages(): void
     {
-        $this->useMultilingualViews(__DIR__.'/../../Fixtures/views/none');
+        $this->registerProvider(['another-plugin:item' => self::URL]);
 
         $html = (string) $this->renderEditor(isEditMode: true, pageId: 7, langValue: 'ja');
 
         $this->assertStringContainsString('name="lang" value="ja"', $html);
-        $this->assertStringNotContainsString(self::BUTTON, $html);
+        $this->assertStringNotContainsString(self::URL, $html);
     }
 
-    private function useMultilingualViews(string $path): void
+    public function test_edit_screen_renders_without_any_provider(): void
     {
-        $this->app['view']->getFinder()->replaceNamespace('dixlase-multilingual', [$path]);
+        $html = (string) $this->renderEditor(isEditMode: true, pageId: 7, langValue: 'ja');
+
+        $this->assertStringContainsString('name="lang" value="ja"', $html);
+        $this->assertStringNotContainsString(self::URL, $html);
+    }
+
+    /**
+     * @param  array<string, string>  $urls
+     */
+    private function registerProvider(array $urls): void
+    {
+        $this->app->instance('test.translation-ui', new class($urls) implements TranslationUiProviderInterface
+        {
+            /**
+             * @param  array<string, string>  $urls
+             */
+            public function __construct(private array $urls) {}
+
+            public function getPluginSlug(): string
+            {
+                return 'translation-stand-in';
+            }
+
+            public function isCapabilityAvailable(): bool
+            {
+                return true;
+            }
+
+            public function getTranslationEditUrl(string $type, int|string $id): ?string
+            {
+                return $this->urls[$type] ?? null;
+            }
+        });
+        $this->app->tag(['test.translation-ui'], PluginServiceResolver::CAPABILITY_TAG);
     }
 
     private function renderEditor(bool $isEditMode, ?int $pageId, string $langValue): \Illuminate\Testing\TestView

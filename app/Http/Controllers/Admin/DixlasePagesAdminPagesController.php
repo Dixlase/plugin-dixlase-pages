@@ -44,6 +44,7 @@ use App\Enums\ContentStorageType;
 use App\Enums\MemberRole;
 use App\Facades\SiteSettings;
 use App\Helpers\AdminHelper;
+use App\Helpers\LocaleHelper;
 use App\Presenters\Admin\RevisionDiffPresenter;
 use App\Services\Content\FileContentPublisher;
 use App\Services\ContentPreviewService;
@@ -442,12 +443,11 @@ class DixlasePagesAdminPagesController extends Controller
             : '';
 
         // Whether locale-prefixed URL routing is on. Drives the language
-        // picker visibility on the create/edit form. We read the config
-        // flag the translation provider gates its runtime locale wiring on;
-        // a bound TranslationResolver alone is not a reliable signal, since
-        // the provider binds it even when the operator has the master
-        // toggle off. Reading it through core instead is tracked in #83.
-        $multilingualEnabled = (bool) config('dixlase_multilingual.locale_url_routing_enabled', false);
+        // picker visibility on the create/edit form. Core answers it through
+        // the LocaleUrlRouting contract, false when no extension binds it
+        // (#83). A bound TranslationResolver alone is not a reliable signal,
+        // since a provider may bind it with locale URLs turned off.
+        $multilingualEnabled = LocaleHelper::localeUrlRoutingEnabled();
 
         // Language options (get labels according to locale from translation keys)
         $languageOptions = __('common.languages');
