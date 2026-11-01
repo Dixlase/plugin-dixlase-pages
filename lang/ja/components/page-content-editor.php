@@ -60,6 +60,9 @@ return [
     'meta_section' => 'メタ情報',
     'meta_locked_help' => 'エディタ形式・言語・保存形式は初回作成時のみ選択できます。変更するには新規ページを作り直してください。',
     'revisions_section' => 'リビジョン',
+    'title_slug_section' => 'タイトル・スラッグ',
+    'publish_section_status' => '公開設定（:status）',
+    'seo_section' => 'SEO 設定',
     'revisions_button' => 'リビジョン履歴',
     'revisions_help' => '保存履歴を確認し、過去のバージョンへ復元できます。',
 ];
