@@ -90,13 +90,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 {{--
 Layout:
-+----------------------------------+---+----------------+
-| Main Content                     |[>]| Right Sidebar  |
-|  Title                           |   | Slug           |
-|  Editor Type (radio cards)       |   | Storage Type   |
-|  Content Editor                  |   | Publish        |
-|                                  |   |                |
-+----------------------------------+---+----------------+
++----------------------------------+---+----------------------+
+| Main Content                     |[>]| Right Sidebar        |
+|  Editor Type (radio cards)       |   | Preview              |
+|  Content Editor                  |   | v Title and slug     |
+|                                  |   | > SEO                |
+|                                  |   | > Page information   |
+|                                  |   | > Revisions          |
+|                                  |   | > Publish settings   |
++----------------------------------+---+----------------------+
 --}}
 
 @php
@@ -176,294 +178,350 @@ Layout:
             {{-- Preview in new tab --}}
             <x-content-editor.new-tab-preview :url="$previewUrl" />
 
-            {{-- Meta info (edit mode: placed directly below preview, above title) --}}
-            @if($isEditMode)
-                @php
-                    $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
-                @endphp
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                        {{ __('dixlase-pages::components/page-content-editor.meta_section') }}
-                    </h3>
-                    <div class="flex flex-wrap items-center gap-2 text-xs">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                            <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
-                            {{ $currentCard['label'] ?? $editorType }}
-                        </span>
-                        @if($multilingualEnabled)
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                                <i class="fas fa-globe"></i>
-                                {{ $languageOptions[$langValue] ?? $langValue }}
-                            </span>
-                        @endif
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                            <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-gray-500 dark:text-gray-400"></i>
-                            {{ $storageOptions[$storageType] ?? $storageType }}
-                        </span>
+            {{-- The rest opens and closes in core's content editor sections
+                 (#113), as the blog's editor does. Only "Title and slug"
+                 starts open; a section holding a validation error opens, and
+                 each viewer's choice is remembered. A closed section shows a
+                 summary next to its title. --}}
+            @php
+                $publishSummary = $statusOptions[$statusValue] ?? $statusValue;
+                if ($statusValue === 'scheduled' && filled($publishedAtValue)) {
+                    $publishSummary = __('dixlase-pages::components/page-content-editor.summary_scheduled', [
+                        'date' => str_replace('T', ' ', (string) $publishedAtValue),
+                    ]);
+                }
+                $seoSummary = filled(old('seo_meta.description', $seoMeta?->description ?? null))
+                    ? __('dixlase-pages::components/page-content-editor.summary_set')
+                    : __('dixlase-pages::components/page-content-editor.summary_none');
+                $pageInfoCard = collect($editorCardOptions)->firstWhere('value', $editorType);
+                $pageInfoSummary = collect([
+                    $isEditMode ? ($pageInfoCard['label'] ?? null) : null,
+                    $multilingualEnabled ? ($languageOptions[$langValue] ?? null) : null,
+                    $isSimpleMode ? null : ($storageOptions[$storageType] ?? null),
+                ])->filter()->implode(' · ');
+            @endphp
+
+            {{-- Title, slug and parent page --}}
+            <x-content-editor.sidebar-section
+                :title="__('dixlase-pages::components/page-content-editor.title_slug_section')"
+                icon="fas fa-heading"
+                :open="true"
+                :summary="\Illuminate\Support\Str::limit((string) old('title', $title), 40)"
+                :errorFields="['title', 'slug', 'parent_id']"
+                rememberKey="dixlase-pages.page.title"
+            >
+                <div class="space-y-5">
+                    {{-- Title --}}
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            {{ __('dixlase-pages::components/page-content-editor.title') }}<x-form-required-badge />
+                        </label>
+                        @include('components::form-text', [
+                            'name' => 'title',
+                            'value' => $title,
+                            'placeholder' => __('dixlase-pages::components/page-content-editor.title_placeholder'),
+                        ])
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            {{ __('dixlase-pages::components/page-content-editor.title_required_help') }}
+                        </p>
+                        @include('components::form-error', ['name' => 'title'])
                     </div>
-                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                        {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
-                    </p>
 
-                    {{-- Translate button, through core's seam: it renders nothing unless
-                         an extension translates pages (#83) --}}
-                    <div class="mt-3">
-                        <x-admin.translate-button
-                            type="dixlase-pages:page"
-                            :id="$pageId"
-                            :source-locale="$langValue"
-                        />
-                    </div>
-
-                    {{-- In edit mode, send meta info via hidden input --}}
-                    <input type="hidden" name="storage_type" value="{{ $storageType }}">
-                    <input type="hidden" name="lang" value="{{ $langValue }}">
-
-                    {{-- Display info for file storage --}}
-                    @if($storageType === 'file')
-                        <div class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                            <div class="flex items-start">
-                                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
-                                <div class="flex-1">
-                                    <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                                        {{ __('common.content_storage.file_info_title') }}
-                                    </div>
-                                    <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                                        <p>{{ __('common.content_storage.file_info_description') }}</p>
-                                        <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
-                                    </div>
-                                </div>
+                    {{-- Slug --}}
+                    @if($isSimpleMode && !$isEditMode)
+                        {{-- Simple mode (new page): slug auto-generated from title --}}
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                {{ __('dixlase-pages::components/page-content-editor.slug_auto_generated') }}
+                            </p>
+                            @include('components::form-error', ['name' => 'slug'])
+                        </div>
+                    @else
+                        <div>
+                            @include('components::form-label', [
+                                'for' => 'slug',
+                                'text' => __('dixlase-pages::components/page-content-editor.slug'),
+                            ])
+                            @include('components::form-text', [
+                                'name' => 'slug',
+                                'value' => $slugValue,
+                                'xModel' => 'slug',
+                            ])
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                {{ __('dixlase-pages::components/page-content-editor.slug_help') }}
+                            </p>
+                            {{-- URL Preview --}}
+                            <div class="mt-2 text-sm" x-show="slug" x-cloak>
+                                <span class="text-gray-500 dark:text-gray-400">{{ __('dixlase-pages::components/page-content-editor.slug_url_preview') }}:</span>
+                                @if ($isEditMode)
+                                    <a :href="pageUrl" target="_blank" rel="noopener noreferrer"
+                                       class="font-mono text-blue-600 dark:text-blue-400 break-all hover:underline"
+                                       x-text="pageUrl"></a>
+                                @else
+                                    <span class="font-mono text-blue-600 dark:text-blue-400 break-all" x-text="pageUrl"></span>
+                                @endif
                             </div>
+                            @include('components::form-error', ['name' => 'slug'])
                         </div>
                     @endif
-                </div>
-            @endif
 
-            {{-- Title --}}
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {{ __('dixlase-pages::components/page-content-editor.title') }}<x-form-required-badge />
-                </label>
-                @include('components::form-text', [
-                    'name' => 'title',
-                    'value' => $title,
-                    'placeholder' => __('dixlase-pages::components/page-content-editor.title_placeholder'),
-                ])
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    {{ __('dixlase-pages::components/page-content-editor.title_required_help') }}
-                </p>
-                @include('components::form-error', ['name' => 'title'])
-            </div>
-
-            {{-- 4. Slug --}}
-            @if($isSimpleMode && !$isEditMode)
-                {{-- Simple mode (new page): slug auto-generated from title --}}
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        {{ __('dixlase-pages::components/page-content-editor.slug_auto_generated') }}
-                    </p>
-                    @include('components::form-error', ['name' => 'slug'])
-                </div>
-            @else
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    @include('components::form-label', [
-                        'for' => 'slug',
-                        'text' => __('dixlase-pages::components/page-content-editor.slug'),
-                    ])
-                    @include('components::form-text', [
-                        'name' => 'slug',
-                        'value' => $slugValue,
-                        'xModel' => 'slug',
-                    ])
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ __('dixlase-pages::components/page-content-editor.slug_help') }}
-                    </p>
-                    {{-- URL Preview --}}
-                    <div class="mt-2 text-sm" x-show="slug" x-cloak>
-                        <span class="text-gray-500 dark:text-gray-400">{{ __('dixlase-pages::components/page-content-editor.slug_url_preview') }}:</span>
-                        @if ($isEditMode)
-                            <a :href="pageUrl" target="_blank" rel="noopener noreferrer"
-                               class="font-mono text-blue-600 dark:text-blue-400 break-all hover:underline"
-                               x-text="pageUrl"></a>
-                        @else
-                            <span class="font-mono text-blue-600 dark:text-blue-400 break-all" x-text="pageUrl"></span>
-                        @endif
+                    {{-- Parent page (hierarchy). Kept with the slug because it shapes
+                         the URL preview right above it.
+                         The candidate list is built server-side and already excludes
+                         the current page and its descendants (cycle prevention) plus
+                         anything that would push the subtree past MAX_DEPTH. --}}
+                    <div>
+                        <label for="parent_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            {{ __('dixlase-pages::admin/pages/form.parent_id') }}
+                        </label>
+                        <select
+                            id="parent_id"
+                            name="parent_id"
+                            x-model="parentId"
+                            class="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="">{{ __('dixlase-pages::admin/pages/form.parent_id_top_level') }}</option>
+                            @foreach($parentOptions as $optionId => $optionLabel)
+                                <option value="{{ $optionId }}">{{ $optionLabel }}</option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {{ __('dixlase-pages::admin/pages/form.parent_id_help') }}
+                        </p>
+                        @include('components::form-error', ['name' => 'parent_id'])
                     </div>
-                    @include('components::form-error', ['name' => 'slug'])
                 </div>
-            @endif
+            </x-content-editor.sidebar-section>
 
-            {{-- 4.5 SEO Meta settings (shown only when SEO plugin is enabled and seo-meta capability is declared) --}}
+            {{-- SEO meta settings (shown only when the SEO plugin is enabled and declares seo-meta) --}}
             {{-- <x-dynamic-component> resolves components at runtime, so it's safe even when the SEO plugin is disabled --}}
             @if($seoMetaEnabled)
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <x-dynamic-component
-                        component="dixlase-seo::meta-fields"
-                        :description="$seoMeta?->description"
-                        :ogpMediaId="$seoMeta?->ogpMediaId"
-                        :ogpMedia="$seoOgpMedia"
-                    />
-                </div>
-            @endif
-
-            {{-- 5. Save Method (creation only: when editing, integrated into the meta info section below preview) --}}
-            @if($isSimpleMode)
-                {{-- Simple mode: save format is fixed via hidden input --}}
-                <input type="hidden" name="storage_type" value="database">
-            @elseif(! $isEditMode)
-                {{-- On creation: save format is selectable --}}
-                <div>
-                    @include('components::form-label', [
-                        'for' => 'storage_type',
-                        'text' => __('common.content_storage.label'),
-                    ])
-
-                    <x-form-select
-                        name="storage_type"
-                        :options="$storageOptions"
-                        :value="$storageType"
-                        xModel="storageType"
-                    />
-                    <ul class="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                        @foreach ($storageDescriptions as $value => $description)
-                            <li><span class="font-medium text-gray-700 dark:text-gray-300">{{ $storageOptions[$value] }}</span> — {{ $description }}</li>
-                        @endforeach
-                    </ul>
-
-                    {{-- Display info for file storage --}}
-                    <div x-show="isFileStorage" x-cloak class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <div class="flex items-start">
-                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
-                            <div class="flex-1">
-                                <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                                    {{ __('common.content_storage.file_info_title') }}
-                                </div>
-                                <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                                    <p>{{ __('common.content_storage.file_info_description') }}</p>
-                                    <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @include('components::form-error', ['name' => 'storage_type'])
-                </div>
-            @endif
-
-            {{-- 6.5. Language Selection (creation only: when editing, integrated into meta info) --}}
-            {{-- Hidden when the multilingual plugin is inactive: the site only --}}
-            {{-- has one language so the picker would be misleading. The store --}}
-            {{-- request fills `lang` from the site default in that case. --}}
-            @if($multilingualEnabled)
-                <div>
-                    @include('components::form-label', [
-                        'for' => 'lang',
-                        'text' => __('dixlase-pages::components/page-content-editor.lang'),
-                    ])
-
-                    <x-form-select
-                        name="lang"
-                        :options="$languageOptions"
-                        :value="$langValue"
-                        xModel="lang"
-                    />
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        @if($isEditMode)
-                            {{ __('dixlase-pages::components/page-content-editor.lang_edit_help') }}
-                        @else
-                            {{ __('dixlase-pages::components/page-content-editor.lang_help') }}
-                        @endif
-                    </p>
-                    @include('components::form-error', ['name' => 'lang'])
-                </div>
-            @endif
-
-            {{-- Revision History (edit only) --}}
-            @if($isEditMode && $pageId)
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                        {{ __('dixlase-pages::components/page-content-editor.revisions_section') }}
-                    </h3>
-                    <x-form-button
-                        type="link"
-                        icon="fas fa-clock-rotate-left"
-                        variant="secondary"
-                        size="sm"
-                        :href="route('dixlase-pages::admin.pages.revisions.index', ['page' => $pageId])"
-                        class="w-full"
-                    >
-                        {{ __('dixlase-pages::components/page-content-editor.revisions_button') }}
-                    </x-form-button>
-                    <x-form-help-text :text="__('dixlase-pages::components/page-content-editor.revisions_help')" />
-                </div>
-            @endif
-
-            {{-- Parent page (hierarchy). Placed between revisions and publish
-                 settings so the URL-shaping inputs sit together vertically.
-                 The candidate list is built server-side and already excludes
-                 the current page and its descendants (cycle prevention) plus
-                 anything that would push the subtree past MAX_DEPTH. --}}
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <label for="parent_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {{ __('dixlase-pages::admin/pages/form.parent_id') }}
-                </label>
-                <select
-                    id="parent_id"
-                    name="parent_id"
-                    x-model="parentId"
-                    class="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                <x-content-editor.sidebar-section
+                    :title="__('dixlase-pages::components/page-content-editor.seo_section')"
+                    icon="fas fa-magnifying-glass"
+                    :summary="$seoSummary"
+                    :errorFields="['seo_meta', 'seo_meta.*']"
+                    rememberKey="dixlase-pages.page.seo"
                 >
-                    <option value="">{{ __('dixlase-pages::admin/pages/form.parent_id_top_level') }}</option>
-                    @foreach($parentOptions as $optionId => $optionLabel)
-                        <option value="{{ $optionId }}">{{ $optionLabel }}</option>
-                    @endforeach
-                </select>
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {{ __('dixlase-pages::admin/pages/form.parent_id_help') }}
-                </p>
-                @include('components::form-error', ['name' => 'parent_id'])
-            </div>
+                    <div class="space-y-5">
+                        <x-dynamic-component
+                            component="dixlase-seo::meta-fields"
+                            :description="$seoMeta?->description"
+                            :ogpMediaId="$seoMeta?->ogpMediaId"
+                            :ogpMedia="$seoOgpMedia"
+                        />
+                    </div>
+                </x-content-editor.sidebar-section>
+            @endif
 
-            {{-- 7. Public settings --}}
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                    {{ __('dixlase-pages::components/page-content-editor.publish_section') }}
-                </h3>
+            {{-- Simple mode: save format is fixed via hidden input --}}
+            @if($isSimpleMode)
+                <input type="hidden" name="storage_type" value="database">
+            @endif
 
-                {{-- Status --}}
-                <div class="mb-4">
-                    @include('components::form-label', [
-                        'for' => 'status',
-                        'text' => __('dixlase-pages::components/page-content-editor.status'),
-                    ])
+            {{-- Page information --}}
+            @if($isEditMode || ! $isSimpleMode || $multilingualEnabled)
+                <x-content-editor.sidebar-section
+                    :title="__('dixlase-pages::components/page-content-editor.meta_section')"
+                    icon="fas fa-circle-info"
+                    :summary="$pageInfoSummary"
+                    :errorFields="['storage_type', 'lang']"
+                    rememberKey="dixlase-pages.page.info"
+                >
+                    <div class="space-y-5">
+                        {{-- Edit: what was fixed at creation, and the translate button --}}
+                        @if($isEditMode)
+                            <div class="flex flex-wrap items-center gap-2 text-xs">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                                    <i class="{{ $pageInfoCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
+                                    {{ $pageInfoCard['label'] ?? $editorType }}
+                                </span>
+                                @if($multilingualEnabled)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                                        <i class="fas fa-globe"></i>
+                                        {{ $languageOptions[$langValue] ?? $langValue }}
+                                    </span>
+                                @endif
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                                    <i class="fas {{ $storageType === 'file' ? 'fa-file-code' : 'fa-database' }} text-gray-500 dark:text-gray-400"></i>
+                                    {{ $storageOptions[$storageType] ?? $storageType }}
+                                </span>
+                            </div>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                {{ __('dixlase-pages::components/page-content-editor.meta_locked_help') }}
+                            </p>
 
-                    <x-form-select
-                        name="status"
-                        :options="$statusOptions"
-                        :value="$statusValue"
-                        xModel="status"
-                    />
-                    @include('components::form-error', ['name' => 'status'])
+                            {{-- Translate button, through core's seam: it renders nothing unless
+                                 an extension translates pages (#83) --}}
+                            <div class="mt-3">
+                                <x-admin.translate-button
+                                    type="dixlase-pages:page"
+                                    :id="$pageId"
+                                    :source-locale="$langValue"
+                                />
+                            </div>
+
+                            {{-- In edit mode, send meta info via hidden input --}}
+                            <input type="hidden" name="storage_type" value="{{ $storageType }}">
+                            <input type="hidden" name="lang" value="{{ $langValue }}">
+
+                            {{-- Display info for file storage --}}
+                            @if($storageType === 'file')
+                                <div class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
+                                                {{ __('common.content_storage.file_info_title') }}
+                                            </div>
+                                            <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                                                <p>{{ __('common.content_storage.file_info_description') }}</p>
+                                                <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+
+                        {{-- Create: the save method is selectable (fixed in simple mode) --}}
+                        @if(! $isSimpleMode && ! $isEditMode)
+                            <div>
+                                @include('components::form-label', [
+                                    'for' => 'storage_type',
+                                    'text' => __('common.content_storage.label'),
+                                ])
+
+                                <x-form-select
+                                    name="storage_type"
+                                    :options="$storageOptions"
+                                    :value="$storageType"
+                                    xModel="storageType"
+                                />
+                                <ul class="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
+                                    @foreach ($storageDescriptions as $value => $description)
+                                        <li><span class="font-medium text-gray-700 dark:text-gray-300">{{ $storageOptions[$value] }}</span> — {{ $description }}</li>
+                                    @endforeach
+                                </ul>
+
+                                {{-- Display info for file storage --}}
+                                <div x-show="isFileStorage" x-cloak class="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-blue-900 dark:text-blue-100 mb-2">
+                                                {{ __('common.content_storage.file_info_title') }}
+                                            </div>
+                                            <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                                                <p>{{ __('common.content_storage.file_info_description') }}</p>
+                                                <p class="font-mono text-xs bg-white dark:bg-gray-800 p-2 rounded mt-2 break-all" x-text="filePath"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @include('components::form-error', ['name' => 'storage_type'])
+                            </div>
+                        @endif
+
+                        {{-- Language selection --}}
+                        {{-- Hidden when the multilingual plugin is inactive: the site only --}}
+                        {{-- has one language so the picker would be misleading. The store --}}
+                        {{-- request fills `lang` from the site default in that case. --}}
+                        @if($multilingualEnabled)
+                            <div>
+                                @include('components::form-label', [
+                                    'for' => 'lang',
+                                    'text' => __('dixlase-pages::components/page-content-editor.lang'),
+                                ])
+
+                                <x-form-select
+                                    name="lang"
+                                    :options="$languageOptions"
+                                    :value="$langValue"
+                                    xModel="lang"
+                                />
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                    @if($isEditMode)
+                                        {{ __('dixlase-pages::components/page-content-editor.lang_edit_help') }}
+                                    @else
+                                        {{ __('dixlase-pages::components/page-content-editor.lang_help') }}
+                                    @endif
+                                </p>
+                                @include('components::form-error', ['name' => 'lang'])
+                            </div>
+                        @endif
+                    </div>
+                </x-content-editor.sidebar-section>
+            @endif
+
+            {{-- Revisions (edit only) --}}
+            @if($isEditMode && $pageId)
+                <x-content-editor.sidebar-section
+                    :title="__('dixlase-pages::components/page-content-editor.revisions_section')"
+                    icon="fas fa-clock-rotate-left"
+                    rememberKey="dixlase-pages.page.revisions"
+                >
+                    <div class="space-y-5">
+                        <x-form-button
+                            type="link"
+                            icon="fas fa-clock-rotate-left"
+                            variant="secondary"
+                            size="sm"
+                            :href="route('dixlase-pages::admin.pages.revisions.index', ['page' => $pageId])"
+                            class="w-full"
+                        >
+                            {{ __('dixlase-pages::components/page-content-editor.revisions_button') }}
+                        </x-form-button>
+                        <x-form-help-text :text="__('dixlase-pages::components/page-content-editor.revisions_help')" />
+                    </div>
+                </x-content-editor.sidebar-section>
+            @endif
+
+            {{-- Publish settings, last as in the blog's editor --}}
+            <x-content-editor.sidebar-section
+                :title="__('dixlase-pages::components/page-content-editor.publish_section')"
+                icon="fas fa-calendar-check"
+                :summary="$publishSummary"
+                :errorFields="['status', 'published_at']"
+                rememberKey="dixlase-pages.page.publish"
+            >
+                <div class="space-y-5">
+                    {{-- Status --}}
+                    <div>
+                        @include('components::form-label', [
+                            'for' => 'status',
+                            'text' => __('dixlase-pages::components/page-content-editor.status'),
+                        ])
+
+                        <x-form-select
+                            name="status"
+                            :options="$statusOptions"
+                            :value="$statusValue"
+                            xModel="status"
+                        />
+                        @include('components::form-error', ['name' => 'status'])
+                    </div>
+
+                    {{-- Publication date/time (shown only for scheduled public) --}}
+                    <div x-show="status === 'scheduled'" x-cloak x-transition>
+                        @include('components::form-label', [
+                            'for' => 'published_at',
+                            'text' => __('dixlase-pages::components/page-content-editor.published_at'),
+                        ])
+                        <input type="datetime-local"
+                               id="published_at"
+                               name="published_at"
+                               x-model="publishedAt"
+                               class="input-common input-full my-2">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {{ __('dixlase-pages::components/page-content-editor.published_at_help') }}
+                        </p>
+                        @include('components::form-error', ['name' => 'published_at'])
+                    </div>
                 </div>
-
-                {{-- Publication date/time (shown only for scheduled public) --}}
-                <div x-show="status === 'scheduled'" x-cloak x-transition>
-                    @include('components::form-label', [
-                        'for' => 'published_at',
-                        'text' => __('dixlase-pages::components/page-content-editor.published_at'),
-                    ])
-                    <input type="datetime-local"
-                           id="published_at"
-                           name="published_at"
-                           x-model="publishedAt"
-                           class="input-common input-full my-2">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ __('dixlase-pages::components/page-content-editor.published_at_help') }}
-                    </p>
-                    @include('components::form-error', ['name' => 'published_at'])
-                </div>
-            </div>
+            </x-content-editor.sidebar-section>
 
         </x-admin.right-sidebar>
 
