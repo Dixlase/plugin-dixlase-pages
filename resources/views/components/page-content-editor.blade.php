@@ -94,10 +94,10 @@ Layout:
 | Main Content                     |[>]| Right Sidebar        |
 |  Editor Type (radio cards)       |   | Preview              |
 |  Content Editor                  |   | v Title and slug     |
-|                                  |   | > Publish settings   |
 |                                  |   | > SEO                |
-|                                  |   | > Meta information   |
+|                                  |   | > Page information   |
 |                                  |   | > Revisions          |
+|                                  |   | > Publish settings   |
 +----------------------------------+---+----------------------+
 --}}
 
@@ -178,27 +178,39 @@ Layout:
             {{-- Preview in new tab --}}
             <x-content-editor.new-tab-preview :url="$previewUrl" />
 
-            {{-- The rest opens and closes in sections, as on the theme
-                 settings screen (#113). Only "Title and slug" starts open;
-                 a section holding a validation error starts open too, so an
-                 error is never hidden in a closed section. --}}
+            {{-- The rest opens and closes in core's content editor sections
+                 (#113), as the blog's editor does. Only "Title and slug"
+                 starts open; a section holding a validation error opens, and
+                 each viewer's choice is remembered. A closed section shows a
+                 summary next to its title. --}}
             @php
-                $errorKeys = $errors->keys();
-                $sectionHasError = fn (array $prefixes): bool => collect($errorKeys)
-                    ->contains(fn (string $key): bool => \Illuminate\Support\Str::startsWith($key, $prefixes));
-                $publishSectionTitle = __('dixlase-pages::components/page-content-editor.publish_section_status', [
-                    'status' => $statusOptions[$statusValue] ?? $statusValue,
-                ]);
+                $publishSummary = $statusOptions[$statusValue] ?? $statusValue;
+                if ($statusValue === 'scheduled' && filled($publishedAtValue)) {
+                    $publishSummary = __('dixlase-pages::components/page-content-editor.summary_scheduled', [
+                        'date' => str_replace('T', ' ', (string) $publishedAtValue),
+                    ]);
+                }
+                $seoSummary = filled(old('seo_meta.description', $seoMeta?->description ?? null))
+                    ? __('dixlase-pages::components/page-content-editor.summary_set')
+                    : __('dixlase-pages::components/page-content-editor.summary_none');
+                $pageInfoCard = collect($editorCardOptions)->firstWhere('value', $editorType);
+                $pageInfoSummary = collect([
+                    $isEditMode ? ($pageInfoCard['label'] ?? null) : null,
+                    $multilingualEnabled ? ($languageOptions[$langValue] ?? null) : null,
+                    $isSimpleMode ? null : ($storageOptions[$storageType] ?? null),
+                ])->filter()->implode(' · ');
             @endphp
-            <hr class="border-gray-200 dark:border-gray-700">
 
             {{-- Title, slug and parent page --}}
-            <x-admin.theme-preview-sidebar-section
+            <x-content-editor.sidebar-section
                 :title="__('dixlase-pages::components/page-content-editor.title_slug_section')"
                 icon="fas fa-heading"
                 :open="true"
+                :summary="\Illuminate\Support\Str::limit((string) old('title', $title), 40)"
+                :errorFields="['title', 'slug', 'parent_id']"
+                rememberKey="dixlase-pages.page.title"
             >
-                <div class="space-y-5 pb-4">
+                <div class="space-y-5">
                     {{-- Title --}}
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -281,59 +293,19 @@ Layout:
                         @include('components::form-error', ['name' => 'parent_id'])
                     </div>
                 </div>
-            </x-admin.theme-preview-sidebar-section>
-
-            {{-- Publish settings: the heading carries the saved status --}}
-            <x-admin.theme-preview-sidebar-section
-                :title="$publishSectionTitle"
-                icon="fas fa-eye"
-                :open="$sectionHasError(['status', 'published_at'])"
-            >
-                <div class="space-y-5 pb-4">
-                    {{-- Status --}}
-                    <div>
-                        @include('components::form-label', [
-                            'for' => 'status',
-                            'text' => __('dixlase-pages::components/page-content-editor.status'),
-                        ])
-
-                        <x-form-select
-                            name="status"
-                            :options="$statusOptions"
-                            :value="$statusValue"
-                            xModel="status"
-                        />
-                        @include('components::form-error', ['name' => 'status'])
-                    </div>
-
-                    {{-- Publication date/time (shown only for scheduled public) --}}
-                    <div x-show="status === 'scheduled'" x-cloak x-transition>
-                        @include('components::form-label', [
-                            'for' => 'published_at',
-                            'text' => __('dixlase-pages::components/page-content-editor.published_at'),
-                        ])
-                        <input type="datetime-local"
-                               id="published_at"
-                               name="published_at"
-                               x-model="publishedAt"
-                               class="input-common input-full my-2">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            {{ __('dixlase-pages::components/page-content-editor.published_at_help') }}
-                        </p>
-                        @include('components::form-error', ['name' => 'published_at'])
-                    </div>
-                </div>
-            </x-admin.theme-preview-sidebar-section>
+            </x-content-editor.sidebar-section>
 
             {{-- SEO meta settings (shown only when the SEO plugin is enabled and declares seo-meta) --}}
             {{-- <x-dynamic-component> resolves components at runtime, so it's safe even when the SEO plugin is disabled --}}
             @if($seoMetaEnabled)
-                <x-admin.theme-preview-sidebar-section
+                <x-content-editor.sidebar-section
                     :title="__('dixlase-pages::components/page-content-editor.seo_section')"
                     icon="fas fa-magnifying-glass"
-                    :open="$sectionHasError(['seo_meta'])"
+                    :summary="$seoSummary"
+                    :errorFields="['seo_meta', 'seo_meta.*']"
+                    rememberKey="dixlase-pages.page.seo"
                 >
-                    <div class="space-y-5 pb-4">
+                    <div class="space-y-5">
                         <x-dynamic-component
                             component="dixlase-seo::meta-fields"
                             :description="$seoMeta?->description"
@@ -341,7 +313,7 @@ Layout:
                             :ogpMedia="$seoOgpMedia"
                         />
                     </div>
-                </x-admin.theme-preview-sidebar-section>
+                </x-content-editor.sidebar-section>
             @endif
 
             {{-- Simple mode: save format is fixed via hidden input --}}
@@ -349,23 +321,22 @@ Layout:
                 <input type="hidden" name="storage_type" value="database">
             @endif
 
-            {{-- Meta information --}}
+            {{-- Page information --}}
             @if($isEditMode || ! $isSimpleMode || $multilingualEnabled)
-                <x-admin.theme-preview-sidebar-section
+                <x-content-editor.sidebar-section
                     :title="__('dixlase-pages::components/page-content-editor.meta_section')"
                     icon="fas fa-circle-info"
-                    :open="$sectionHasError(['storage_type', 'lang'])"
+                    :summary="$pageInfoSummary"
+                    :errorFields="['storage_type', 'lang']"
+                    rememberKey="dixlase-pages.page.info"
                 >
-                    <div class="space-y-5 pb-4">
+                    <div class="space-y-5">
                         {{-- Edit: what was fixed at creation, and the translate button --}}
                         @if($isEditMode)
-                            @php
-                                $currentCard = collect($editorCardOptions)->firstWhere('value', $editorType);
-                            @endphp
                             <div class="flex flex-wrap items-center gap-2 text-xs">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                                    <i class="{{ $currentCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
-                                    {{ $currentCard['label'] ?? $editorType }}
+                                    <i class="{{ $pageInfoCard['icon'] ?? 'fas fa-file' }}" style="color: {{ $editorColors[$editorType] ?? 'gray' }}"></i>
+                                    {{ $pageInfoCard['label'] ?? $editorType }}
                                 </span>
                                 @if($multilingualEnabled)
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
@@ -482,17 +453,17 @@ Layout:
                             </div>
                         @endif
                     </div>
-                </x-admin.theme-preview-sidebar-section>
+                </x-content-editor.sidebar-section>
             @endif
 
             {{-- Revisions (edit only) --}}
             @if($isEditMode && $pageId)
-                <x-admin.theme-preview-sidebar-section
+                <x-content-editor.sidebar-section
                     :title="__('dixlase-pages::components/page-content-editor.revisions_section')"
                     icon="fas fa-clock-rotate-left"
-                    :open="false"
+                    rememberKey="dixlase-pages.page.revisions"
                 >
-                    <div class="space-y-5 pb-4">
+                    <div class="space-y-5">
                         <x-form-button
                             type="link"
                             icon="fas fa-clock-rotate-left"
@@ -505,8 +476,52 @@ Layout:
                         </x-form-button>
                         <x-form-help-text :text="__('dixlase-pages::components/page-content-editor.revisions_help')" />
                     </div>
-                </x-admin.theme-preview-sidebar-section>
+                </x-content-editor.sidebar-section>
             @endif
+
+            {{-- Publish settings, last as in the blog's editor --}}
+            <x-content-editor.sidebar-section
+                :title="__('dixlase-pages::components/page-content-editor.publish_section')"
+                icon="fas fa-calendar-check"
+                :summary="$publishSummary"
+                :errorFields="['status', 'published_at']"
+                rememberKey="dixlase-pages.page.publish"
+            >
+                <div class="space-y-5">
+                    {{-- Status --}}
+                    <div>
+                        @include('components::form-label', [
+                            'for' => 'status',
+                            'text' => __('dixlase-pages::components/page-content-editor.status'),
+                        ])
+
+                        <x-form-select
+                            name="status"
+                            :options="$statusOptions"
+                            :value="$statusValue"
+                            xModel="status"
+                        />
+                        @include('components::form-error', ['name' => 'status'])
+                    </div>
+
+                    {{-- Publication date/time (shown only for scheduled public) --}}
+                    <div x-show="status === 'scheduled'" x-cloak x-transition>
+                        @include('components::form-label', [
+                            'for' => 'published_at',
+                            'text' => __('dixlase-pages::components/page-content-editor.published_at'),
+                        ])
+                        <input type="datetime-local"
+                               id="published_at"
+                               name="published_at"
+                               x-model="publishedAt"
+                               class="input-common input-full my-2">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {{ __('dixlase-pages::components/page-content-editor.published_at_help') }}
+                        </p>
+                        @include('components::form-error', ['name' => 'published_at'])
+                    </div>
+                </div>
+            </x-content-editor.sidebar-section>
 
         </x-admin.right-sidebar>
 

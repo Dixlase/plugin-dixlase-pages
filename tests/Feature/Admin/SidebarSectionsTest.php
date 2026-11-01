@@ -36,9 +36,10 @@ use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
- * The editor's right column opens and closes in sections, as on the theme
- * settings screen (#113). Only "Title and slug" starts open, and a section
- * holding a validation error starts open too.
+ * The editor's right column opens and closes in core's content editor
+ * sections, as the blog's editor does (#113). Only "Title and slug" starts
+ * open, publish settings come last, and a section holding a validation
+ * error starts open.
  */
 class SidebarSectionsTest extends TestCase
 {
@@ -66,10 +67,11 @@ class SidebarSectionsTest extends TestCase
 
         $this->assertSame([
             'fas fa-heading' => true,
-            'fas fa-eye' => false,
             'fas fa-circle-info' => false,
             'fas fa-clock-rotate-left' => false,
+            'fas fa-calendar-check' => false,
         ], $this->sections($html));
+        $this->assertStringContainsString('Page Information', $html);
     }
 
     public function test_the_create_screen_has_no_revisions_section(): void
@@ -80,20 +82,20 @@ class SidebarSectionsTest extends TestCase
 
         $this->assertSame([
             'fas fa-heading' => true,
-            'fas fa-eye' => false,
             'fas fa-circle-info' => false,
+            'fas fa-calendar-check' => false,
         ], $this->sections($html));
         // The save method picker lives in the meta section on creation.
         $this->assertStringContainsString('name="storage_type"', $html);
     }
 
-    public function test_the_publish_heading_shows_the_saved_status(): void
+    public function test_the_closed_publish_section_shows_the_saved_status(): void
     {
         $this->withViewErrors([]);
 
         $html = $this->renderEditor(isEditMode: true, statusValue: 'draft');
 
-        $this->assertStringContainsString('Publish Settings (Draft)', $html);
+        $this->assertMatchesRegularExpression('/Publish Settings<\/span>.*?>Draft<\/span>/s', $html);
     }
 
     public function test_a_section_holding_an_error_starts_open(): void
@@ -103,7 +105,7 @@ class SidebarSectionsTest extends TestCase
         $html = $this->renderEditor(isEditMode: true);
 
         $sections = $this->sections($html);
-        $this->assertTrue($sections['fas fa-eye']);
+        $this->assertTrue($sections['fas fa-calendar-check']);
         $this->assertFalse($sections['fas fa-circle-info']);
         $this->assertStringContainsString('The publication date is required.', $html);
     }
@@ -116,7 +118,7 @@ class SidebarSectionsTest extends TestCase
     private function sections(string $html): array
     {
         preg_match_all(
-            '/x-data="\{ open: (true|false) \}">\s*<button[^>]*>\s*<span><i class="([^"]+) mr-1\.5"><\/i>/',
+            '/x-data="contentEditorSidebarSection"\s+data-open="([01])".*?<i class="([^"]+?) w-4 /s',
             $html,
             $matches,
             PREG_SET_ORDER,
@@ -124,7 +126,7 @@ class SidebarSectionsTest extends TestCase
 
         $sections = [];
         foreach ($matches as [, $open, $icon]) {
-            $sections[$icon] = $open === 'true';
+            $sections[$icon] = $open === '1';
         }
 
         return $sections;
