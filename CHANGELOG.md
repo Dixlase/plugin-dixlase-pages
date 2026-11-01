@@ -5,6 +5,35 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.4.0] — 2026-11-01
+
+### Added
+
+- The page editor's right column is grouped into sections that open and close, with the core part
+  the blog's editor uses (#114, fixes #113). Title and slug start open; SEO, page information,
+  revisions and publish settings start closed and show a summary next to their title.
+- On a page, the admin bar offers *Edit this page* to a signed-in member who may edit pages (#110,
+  fixes #109). Visitors, members below the edit role and sites without the admin routes get no link.
+
+### Changed
+
+- **This release needs core 0.2.0.** The "publish on file save" mode takes effect only in a local
+  environment (`APP_ENV=local`) (#103, fixes #102), and the plugin now asks core where it applies
+  instead of checking for itself (#105, fixes #104). Anywhere else a page waits for **Publish**,
+  whatever is selected, and the settings screen says which behaviour applies. `requires.dixlase` is
+  `>=0.2.0`.
+- The Translate button and the language field on the edit screen are reached through core's seams —
+  `<x-admin.translate-button>` and `LocaleHelper::localeUrlRoutingEnabled()` — instead of another
+  extension's names (#112, fixes #83). On a site whose translation extension does not implement
+  those seams yet, the button and the field are not shown; update that extension first.
+- Both READMEs open with the social preview image (#100, fixes #99).
+
+### Development
+
+- The tests can be run by hand against another core ref (#107, fixes #106).
+- The file-content tests check what this plugin owes rather than core's take-in policy, which
+  differs between core releases (#111, fixes #108).
+
 ## [0.3.0] — 2026-10-30
 
 ### Added
