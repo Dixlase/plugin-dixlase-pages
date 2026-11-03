@@ -31,15 +31,22 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @extends('themes::layouts.app')
 
 @php
-    // Hand this page's (locale-aware) SEO meta description to DixlaseSEO so
-    // it renders in the <head> instead of the site-wide default. Guarded:
-    // the helper only exists when the DixlaseSEO plugin is installed.
+    $pageTitle = $page->getTranslation('title');
+
+    // Hand this page's (locale-aware) SEO meta description and title to
+    // DixlaseSEO so they render in the <head> instead of the site-wide
+    // defaults. Guarded: the helper only exists when the DixlaseSEO plugin
+    // is installed.
     if (function_exists('dls_seo_set_page_meta')) {
-        dls_seo_set_page_meta($page, 'dixlase-pages');
+        // Positional, not named: DixlaseSEO 0.1.x declares only the first two
+        // parameters, and PHP ignores extra positional arguments while an
+        // unknown named argument is a fatal Error. Keep this call positional
+        // so the page still renders on a site running 0.1.x.
+        dls_seo_set_page_meta($page, 'dixlase-pages', $pageTitle);
     }
 @endphp
 
-@section('title', $page->getTranslation('title'))
+@section('title', $pageTitle)
 
 @php
     // The route param is the page's full hierarchical path, not just its
