@@ -5,6 +5,13 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.4.1] — 2026-11-05
+
+### Fixed
+
+- A page's share card (`og:title` and `twitter:title`) carries the page's own title instead of the
+  site-wide default, so two pages no longer share one card (#116, fixes #115).
+
 ## [0.4.0] — 2026-11-01
 
 ### Added

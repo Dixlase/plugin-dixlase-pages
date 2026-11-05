@@ -2,7 +2,7 @@
     "name": "Dixlase Pages",
     "package_name": "dixlase/dixlase-pages",
     "slug": "dixlase-pages",
-    "version": "0.4.1-dev",
+    "version": "0.4.1",
     "description": {
         "ja": "固定ページ管理機能を提供するプラグインです。",
         "en": "This plugin provides static page management functionality."
@@ -160,8 +160,8 @@
     "files": {
         ".backlog/SPINOFF-extension-prebuilt-assets-release.ja.md": "sha256:c5b79561e4d94b9909ac2c2d609620b939b632bc65a085ccafbcdb2c278f4ed8",
         ".backlog/SPINOFF-extension-prebuilt-assets-release.md": "sha256:cb389be98e08fc5839d05e147d3cf1fbe921163de078f577ca8fad5ed2974831",
-        "CHANGELOG.ja.md": "sha256:ba6ed4ee19edffa16247d04a716396e012ba4330b66dd98cf154d1504465bc0a",
-        "CHANGELOG.md": "sha256:4fb764dfad259ebe8f11b44856ed058e09a2d3f7d0f63eb85c3481c5e923effb",
+        "CHANGELOG.ja.md": "sha256:aa384d10c7b86d48662eb102037d44c3916f780d3e8573c3214208e02c978128",
+        "CHANGELOG.md": "sha256:008ed0c1cb810b7cd08f6fe61f4b1525d9ebf780539765a9d773d4e635bece21",
         "CONTRIBUTING.ja.md": "sha256:ac820817fcf5ed262e8c2682ba53b83b1c1d7eb5534d5be533e33c4a8d66502b",
         "CONTRIBUTING.md": "sha256:5fbdd10d5e28524543990de605a1b647414eea9d469c68a14683267104304a81",
         "COPYRIGHT-POLICY.ja.md": "sha256:700b70255711f3a34477af8f0b83c262976b0c18d1113e5611f683f9f146c922",
@@ -200,7 +200,7 @@
         "app/Services/DixlasePagesPageContentService.php": "sha256:9c13bb4995dab2da0085037723da27dd378da9bac1aba7949cae1293fb88d44e",
         "app/Services/DixlasePagesPageLinkableProvider.php": "sha256:c57979eac9fb1fc8a77dba39cc2e222d0492b18cd727dc269c4bdafe1ca3d4a3",
         "app/Services/ScriptAuthoringPolicy.php": "sha256:12bf8ae6f487d805fe488cc580766db0acb0e87cb6051f49225fd0c17b9cbb05",
-        "composer.json": "sha256:fb7a8500e642ce9edf56f59b8024d1acdf4088390e012e2cbad116ea209530a8",
+        "composer.json": "sha256:fd6ffe211ef8460d6a68fda2b66f765b254d49e91951f79d7e80c21202d5e3df",
         "config/admin.php": "sha256:07fcb036cd79904d559a2dc68758c6fa53112f0540018a775a022394cafc1e37",
         "config/admin/navigation.php": "sha256:6bf816092844871019c9a2209ff85f5eac736f29041281175f160030d9f3c2f1",
         "config/admin/roles.php": "sha256:fb59e2ec30cdda4117419d9d3b99d51becdccd0c63ac101c611141b85e07a1fd",
@@ -244,7 +244,7 @@
         "lang/ja/route-slug.php": "sha256:4e68afc077a97f86d35cf5a62482915a5a37b021052e8e2102b49686a19fd7f2",
         "license-info.json": "sha256:5de113518b11e99ed9225ec2ad86b92876c624f999f6f034f3303149abf94c84",
         "package-lock.json": "sha256:96e681edce401cf72055b9471a5888c60ac56f74c6ac27339a16ef884cca23f0",
-        "package.json": "sha256:d358c380ad43ddeb72ab104e0fbb0f0e29debac7ff4965004009cdd2f26948ca",
+        "package.json": "sha256:7893ffaf6ad2ce96243ae3d39987cb6b39f7d1e79c9787d9808bc58d5988f9ca",
         "phpunit.xml": "sha256:b13518d34f83455218ef8e120f454140a1926e3e588b3e256b411da79d24bf00",
         "resources/comment-translations/ja/app/Actions/Page/RestoreDixlasePagesPageRevisionAction.php": "sha256:a3b113ab5deead0ecb18b8ca5207720455393e4248da8427f26b9aacfc661c7b",
         "resources/comment-translations/ja/app/Actions/Page/ToggleDixlasePagesPageRevisionProtectionAction.php": "sha256:b02b9d83979891414968c542445051b7e7f8a9a1701c364592939a4b805df090",
@@ -287,7 +287,7 @@
         "resources/views/admin/pages/settings.blade.php": "sha256:7645a91a375ded2a5cc25ea28f700f163f51ad7b5e2ce83776126ddf770bac94",
         "resources/views/admin/pages/trash.blade.php": "sha256:dcadf39a08bb154585765415faf83db98b514bd35394f8ebd9191cf53611d8c2",
         "resources/views/components/page-content-editor.blade.php": "sha256:268e2f4c55c864180e2972e373110e6eda4c80fa9ab485029686495309994d40",
-        "resources/views/front/page.blade.php": "sha256:05ceb00af23b893e5fdbee12f8a17e74089ea3160306764440fed19e560289bb",
+        "resources/views/front/page.blade.php": "sha256:e43b2ec24078ec3538a9f48206335c14eb945763e67893e24122c4887599a23c",
         "routes/admin.php": "sha256:94cb808b31c2bbc044d90b9518472e073ca6062321c31684f686871c1f4012aa",
         "routes/web.php": "sha256:7171103c83090345a6b898edfde18a378a527620c955c69904d32bfc5a48074c",
         "scripts/bump-version.php": "sha256:84ff512dc83e485e7ac406ec4abe0a1e240a593c9bd9817456bdec1cca5058ef",
@@ -310,6 +310,7 @@
         "tests/Unit/BladeExecutionPathRemovedTest.php": "sha256:a3502d54340f0e01ca7dc00a5aaa591ec8d609d35e64eadea907051a35043565",
         "tests/Unit/DixlasePagesLocalizedUrlProviderTest.php": "sha256:bc0034484ec50144a69716611c6bc992ced4a10b6926f095920ead73caab9015",
         "tests/Unit/DixlasePagesRouteSlugProviderTest.php": "sha256:277481bf2e0b3af80d240d9ae204c30073e735a2508feee86c00508b8df02bde",
+        "tests/Unit/FrontPageSeoTitleTest.php": "sha256:d7c546b851d730236255789c5de781bff0a6fdfaf89204070c83dc958ea2870c",
         "tests/Unit/Models/DixlasePagesPageHierarchyTest.php": "sha256:5722d652b338eb19edd510abd5aab8568fd0b7542740469fc2f96529eb3b9e43",
         "tests/Unit/Models/DixlasePagesPageModelTest.php": "sha256:e6fe57ec7292366835f4c284cdaba9e0d2c8e61fb1dc7afad85a434ec7d2e5c2",
         "tests/Unit/RolesConfigResolvesTest.php": "sha256:2d96aa053bee1615142848adabe43b5a1705ff7fe2bfaba04bc51d053fe073f6",
@@ -322,6 +323,6 @@
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-11-01T15:44:24+00:00"
+        "signed_at": "2026-11-05T13:01:58+00:00"
     }
 }
