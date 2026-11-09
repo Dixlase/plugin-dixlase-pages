@@ -2,7 +2,7 @@
     "name": "Dixlase Pages",
     "package_name": "dixlase/dixlase-pages",
     "slug": "dixlase-pages",
-    "version": "0.4.3-dev",
+    "version": "0.4.3",
     "description": {
         "ja": "固定ページ管理機能を提供するプラグインです。",
         "en": "This plugin provides static page management functionality."
@@ -160,8 +160,8 @@
     "files": {
         ".backlog/SPINOFF-extension-prebuilt-assets-release.ja.md": "sha256:c5b79561e4d94b9909ac2c2d609620b939b632bc65a085ccafbcdb2c278f4ed8",
         ".backlog/SPINOFF-extension-prebuilt-assets-release.md": "sha256:cb389be98e08fc5839d05e147d3cf1fbe921163de078f577ca8fad5ed2974831",
-        "CHANGELOG.ja.md": "sha256:a09d68e3439e17faeac5f6809cdc9472e9d4ca7f2403eacc52d6b567766ca2ed",
-        "CHANGELOG.md": "sha256:ea9558aee3684e7c2399061ed82d2b32fe71b9825199ba3f4b8e45120ffb13c9",
+        "CHANGELOG.ja.md": "sha256:2089710232d2a42f58a427247ce60cf7d13d2be3c350a6006ee92c617d7e8942",
+        "CHANGELOG.md": "sha256:2096ec1bb429c0dfdc3a88b79bb45ad89c5e119eac7337935fc6abc84108c500",
         "CONTRIBUTING.ja.md": "sha256:ac820817fcf5ed262e8c2682ba53b83b1c1d7eb5534d5be533e33c4a8d66502b",
         "CONTRIBUTING.md": "sha256:5fbdd10d5e28524543990de605a1b647414eea9d469c68a14683267104304a81",
         "COPYRIGHT-POLICY.ja.md": "sha256:700b70255711f3a34477af8f0b83c262976b0c18d1113e5611f683f9f146c922",
@@ -200,7 +200,7 @@
         "app/Services/DixlasePagesPageContentService.php": "sha256:9c13bb4995dab2da0085037723da27dd378da9bac1aba7949cae1293fb88d44e",
         "app/Services/DixlasePagesPageLinkableProvider.php": "sha256:c57979eac9fb1fc8a77dba39cc2e222d0492b18cd727dc269c4bdafe1ca3d4a3",
         "app/Services/ScriptAuthoringPolicy.php": "sha256:12bf8ae6f487d805fe488cc580766db0acb0e87cb6051f49225fd0c17b9cbb05",
-        "composer.json": "sha256:e74a13681d4389e151bbd4c3316ea8a75d1d7620c97f98b53a716c43b0eb9abe",
+        "composer.json": "sha256:f3a2fecba59e7b8b7f9715594e42f7b9d993019ba133941adf697e172a88391e",
         "config/admin.php": "sha256:07fcb036cd79904d559a2dc68758c6fa53112f0540018a775a022394cafc1e37",
         "config/admin/navigation.php": "sha256:6bf816092844871019c9a2209ff85f5eac736f29041281175f160030d9f3c2f1",
         "config/admin/roles.php": "sha256:fb59e2ec30cdda4117419d9d3b99d51becdccd0c63ac101c611141b85e07a1fd",
@@ -244,7 +244,7 @@
         "lang/ja/route-slug.php": "sha256:4e68afc077a97f86d35cf5a62482915a5a37b021052e8e2102b49686a19fd7f2",
         "license-info.json": "sha256:5de113518b11e99ed9225ec2ad86b92876c624f999f6f034f3303149abf94c84",
         "package-lock.json": "sha256:96e681edce401cf72055b9471a5888c60ac56f74c6ac27339a16ef884cca23f0",
-        "package.json": "sha256:7407a2280a757d575393bcb0b21b3e4a81f2bce9150fd3f9420d62e2a2e14b0e",
+        "package.json": "sha256:18dab37f7bfbf123f24efef886c753748432fec7da10ed2954509044955d4437",
         "phpunit.xml": "sha256:b13518d34f83455218ef8e120f454140a1926e3e588b3e256b411da79d24bf00",
         "resources/assets/css/style-x1XGuNl0.css": "sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
         "resources/assets/js/app-CpbsJWAV.js": "sha256:f2a550155584034355271573fd1d301ce8fe224c8d7083c4e765cad55cefa6e7",
@@ -326,6 +326,6 @@
     "signing": {
         "algo": "ed25519",
         "key_id": "dixlase-authority-2026",
-        "signed_at": "2026-11-05T18:43:47+00:00"
+        "signed_at": "2026-11-09T13:55:07+00:00"
     }
 }
