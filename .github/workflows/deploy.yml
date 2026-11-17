@@ -4,10 +4,19 @@ on:
   # Production receives a tagged release, never a merge. Nothing signs on a
   # merge -- signing happens in one place, from a working copy that holds the
   # key -- so `main` is free to drift from the signature manifest. What ships
-  # is the release, whose tree release.yml has already checked against that
+  # is the tag, whose tree release.yml has already checked against that
   # manifest. Dixlase/dixlase-core#520.
-  release:
-    types: [published]
+  #
+  # The trigger is the tag push and not `release: published`, because
+  # release.yml publishes this repository's Release itself, with
+  # GITHUB_TOKEN -- and an event raised by GITHUB_TOKEN starts no other
+  # workflow, so a deploy keyed on it would never run. The tag is pushed by
+  # a person, so this one does. (The author of the latest Release here is
+  # github-actions[bot]; where it is a person, the deploy keys on
+  # `release: published` instead.)
+  push:
+    tags:
+      - 'v*'
 
   # Manual entry point, for re-running the deploy of a tag that is already
   # published (the recovery path core#529 added for the core deploy).
@@ -46,11 +55,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          # Name the ref explicitly: on a release event the default is the
-          # tag's commit, but on workflow_dispatch it is the branch the run
-          # was started from -- and the guard below would then inspect a
-          # different tree from the one the sites are moved onto.
-          ref: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+          # Name the ref explicitly: on the tag push the default is already
+          # the tag, but on workflow_dispatch it is the branch the run was
+          # started from -- and the guard below would then inspect a different
+          # tree from the one the sites are moved onto.
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
 
       - name: Refuse a tree that carries no built assets
         # The guard that replaces the build. If this ref was pushed without
@@ -107,7 +116,7 @@ jobs:
 
             # The ref every site is moved onto. A tag, so a site holds a
             # released, signed tree and nothing else.
-            TAG="${{ github.event.release.tag_name || github.event.inputs.tag }}"
+            TAG="${{ github.event.inputs.tag || github.ref_name }}"
             if [ -z "$TAG" ]; then
               echo "ERROR: no tag to deploy." >&2
               exit 1
