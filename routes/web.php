@@ -32,7 +32,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Plugins\DixlasePages\App\Http\Controllers\Front\DixlasePagesCustomAssetController;
-use Plugins\DixlasePages\App\Models\DixlasePagesPage;
+use Plugins\DixlasePages\App\Http\Controllers\Front\DixlasePagesPageController;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
 
 // Individual pages
@@ -59,90 +59,11 @@ Route::middleware(['front.ip'])->group(
         // Page display route. {path} accepts the full hierarchical URL
         // (e.g. "parent/child"), which the model resolver walks segment
         // by segment against (parent_id, slug) to find the target page.
-        // Use Request->route('path') instead of a positional closure
-        // parameter: when this route is mirrored under the {locale}
-        // prefix, Laravel binds the closure's first scalar argument to
-        // the {locale} value, not {path}.
-        Route::get($pagesDirectory.'/{path}', function (\Illuminate\Http\Request $request) {
-            $path = (string) ($request->route('path') ?? '');
-            $locale = app()->getLocale();
-
-            // Admins see drafts and future-scheduled pages so the admin
-            // preview works; public visitors only get published rows.
-            // auth('member') cannot answer this on a front request: the
-            // admin login lives in the member guard's own session row, so
-            // core's SignedInMemberResolver is asked instead.
-            // Two storage patterns are supported:
-            //
-            //   1. Legacy "one row per language" — distinct rows per
-            //      (slug, lang). resolvePath() tries the current locale
-            //      first via forLang($locale).
-            //
-            //   2. Translation overlay (TranslationResolver) — a single
-            //      row at the site's primary locale plus per-locale
-            //      overlays. resolvePath() falls back to the primary
-            //      locale when forLang($locale) misses, and the
-            //      TranslatableTrait inside getContentByEditorType()
-            //      surfaces the right translation at render time.
-            $member = app(\App\Services\Auth\SignedInMemberResolver::class)->resolve();
-            $page = DixlasePagesPage::resolvePath(
-                $path,
-                $locale,
-                publishedOnly: $member === null
-            );
-
-            if ($page === null) {
-                abort(404);
-            }
-
-            // Prepare front view variables
-            $contentService = app(\Plugins\DixlasePages\App\Services\DixlasePagesPageContentService::class);
-            $editorType = $page->editor_type->slug() ?? 'html';
-            $content = $page->getContentByEditorType() ?? '';
-
-            // GUI editor: render JSON content to HTML for front display
-            if ($editorType === 'gui' && $content) {
-                $editorManager = app(\App\Services\Editor\EditorManager::class);
-                $renderedHtml = $editorManager->renderContent('gui', $content);
-                if ($renderedHtml !== '') {
-                    $content = $renderedHtml;
-                    $editorType = 'html';
-                }
-            }
-
-            $hasCustomCss = ! empty($contentService->getCssContent($page, $locale));
-            $hasCustomJs = ! empty($contentService->getJsContent($page, $locale));
-            $customAssetVersion = $page->updated_at?->timestamp ?? time();
-
-            // The page's edit screen, for core's admin bar, when the member
-            // signed in to the admin may open it (#109). The plugin's role
-            // settings, with a site's overrides, decide, as they do for the
-            // edit route itself. No link when the admin routes are not
-            // loaded.
-            $role = $member?->getMemberRole();
-            $adminEditUrl = $role !== null
-                && Route::has('dixlase-pages::admin.pages.edit')
-                && \App\Services\PermissionRegistry::canAccessPlugin('DixlasePages', 'pages.edit', $role)
-                ? route('dixlase-pages::admin.pages.edit', ['page' => $page->id])
-                : null;
-
-            $response = response()->view('dixlase-pages::front.page', compact(
-                'page',
-                'editorType',
-                'content',
-                'hasCustomCss',
-                'hasCustomJs',
-                'customAssetVersion',
-                'adminEditUrl',
-            ));
-
-            // An unpublished page is served only to a signed-in member; a
-            // shared cache must never keep it and hand it to a visitor.
-            if (! $page->isPublished()) {
-                $response->header('Cache-Control', 'private, no-store');
-            }
-
-            return $response;
-        })->where('path', '.+')->name('dixlase-pages::page.show');
+        // The action reads the path off the route by name rather than by
+        // position, because the locale-prefixed mirror of this route puts
+        // a {locale} parameter ahead of {path}.
+        Route::get($pagesDirectory.'/{path}', [DixlasePagesPageController::class, 'show'])
+            ->where('path', '.+')
+            ->name('dixlase-pages::page.show');
     }
 );
