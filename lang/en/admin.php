@@ -39,4 +39,9 @@ return [
     'provider' => [
         'label' => 'Pages',
     ],
+    // The group label a theme shows over this plugin's choices where an
+    // operator picks what the front page body displays.
+    'front_page_body' => [
+        'label' => 'Pages',
+    ],
 ];

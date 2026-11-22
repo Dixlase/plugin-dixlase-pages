@@ -35,10 +35,12 @@ namespace Plugins\DixlasePages\App\Providers;
 use App\Contracts\RouteSlugProvider;
 use App\DTO\RouteSlug\RegisteredSlug;
 use App\Services\Content\FileContentRegistry;
+use App\Services\Plugin\PluginServiceResolver;
 use App\Traits\PluginLoaderTrait;
 use Illuminate\Support\ServiceProvider;
 use Plugins\DixlasePages\App\Models\DixlasePagesPage;
 use Plugins\DixlasePages\App\Models\DixlasePagesPageSetting;
+use Plugins\DixlasePages\App\Services\DixlasePagesFrontPageBodyProvider;
 use Plugins\DixlasePages\App\Services\DixlasePagesLocalizedUrlProvider;
 use Plugins\DixlasePages\App\Services\DixlasePagesPageLinkableProvider;
 
@@ -60,6 +62,16 @@ class DixlasePagesServiceProvider extends ServiceProvider implements RouteSlugPr
         // Optional dependency: nothing breaks if no extension collects it.
         $this->app->singleton(DixlasePagesLocalizedUrlProvider::class);
         $this->app->tag([DixlasePagesLocalizedUrlProvider::class], 'localized-url.providers');
+
+        // A published page, offered as the body of a theme's front page
+        // (#127). Tagged in register() rather than boot(): the resolver
+        // reads the tag, and a capability registered after the container
+        // has been asked for it is simply absent.
+        $this->app->singleton(DixlasePagesFrontPageBodyProvider::class);
+        $this->app->tag(
+            [DixlasePagesFrontPageBodyProvider::class],
+            PluginServiceResolver::CAPABILITY_TAG
+        );
     }
 
     public function boot()
