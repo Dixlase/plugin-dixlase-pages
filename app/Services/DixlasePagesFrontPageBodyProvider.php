@@ -246,11 +246,13 @@ final class DixlasePagesFrontPageBodyProvider implements FrontPageBodyProviderIn
     /**
      * One label per page, with the path appended only where it is needed.
      *
-     * A theme's chooser may render nothing but the label — the OnePage theme's
-     * is a `<select>` of `<option>` elements — so two pages called "About"
-     * would be indistinguishable there. The DTO's description and meta carry
-     * the path for a chooser that shows more; the label has to carry it too
-     * for one that does not.
+     * The label is the only field a chooser is given. Core's own
+     * FrontPageBodyResolver::groupedBodies() and availableBodies() fold each
+     * DTO down to `choice => label` and drop the description and the meta
+     * before a theme ever sees them, so two pages called "About" would be
+     * indistinguishable in any chooser built on them. The path therefore has
+     * to be in the label; it is kept in the description and the meta as well,
+     * for a caller that reads the DTOs directly.
      *
      * Appended only on a collision, because a path on every row is noise on
      * the sites that have no collision, which is most of them. When the path

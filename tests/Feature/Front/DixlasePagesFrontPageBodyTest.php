@@ -282,10 +282,11 @@ class DixlasePagesFrontPageBodyTest extends TestCase
     }
 
     /**
-     * A theme's chooser may render nothing but the label — the OnePage
-     * theme's is a <select> of <option> elements, which shows neither the
-     * description nor the meta. Two pages with one title would be
-     * indistinguishable there, so the path goes into the label as well.
+     * The label is all a chooser gets: core's FrontPageBodyResolver folds
+     * each DTO down to `choice => label` in both groupedBodies() and
+     * availableBodies(), dropping the description and the meta before a theme
+     * sees them. Two pages with one title would be indistinguishable in any
+     * chooser built on those, so the path goes into the label as well.
      */
     public function test_a_repeated_title_gets_its_path_in_the_label(): void
     {
