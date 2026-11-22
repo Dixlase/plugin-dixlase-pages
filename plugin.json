@@ -39,7 +39,8 @@
     "capabilities": [
         "seo-meta",
         "linkable",
-        "multilingual-content"
+        "multilingual-content",
+        "front-page-body"
     ],
     "multilingual_content": {
         "types": [
@@ -68,7 +69,7 @@
         ]
     },
     "requires": {
-        "dixlase": ">=0.2.1",
+        "dixlase": ">=0.2.18",
         "dixlase_api": "^0.1",
         "php": ">=8.3"
     },

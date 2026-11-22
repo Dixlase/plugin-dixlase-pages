@@ -103,55 +103,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 @endif
 
 @section('content')
-    <div class="dixlase-page">
-        @php
-            $hasAdminBar = $signedIn;
-        @endphp
-        <!-- Main content -->
-        {{-- No card wrapper: the article sits flat on the page background so
-             the body's colour shows through. Pages that want a card or
-             other styling can re-apply it via custom CSS (see the
-             philosophy page's override for the inverse). --}}
-        <div class="container mx-auto {{ $hasAdminBar ? 'pt-14' : 'pt-12' }} px-6 sm:px-8 lg:px-12">
-            <article>
-                <!-- Page header -->
-                <header class="pt-10 pb-5">
-                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
-                        {{ $page->getTranslation('title') }}
-                    </h1>
-                </header>
-
-                <!-- Page content -->
-                <div>
-                    <div class="prose prose-lg dark:prose-invert max-w-none">
-                        @if($editorType === 'markdown')
-                            {{-- Markdown: rendered by core exactly as the preview renders it
-                                 (javascript: links stripped, same heading normalisation).
-                                 Raw HTML is escaped: editors below ADMIN write Markdown,
-                                 and HTML authoring is reserved for ADMIN and above. --}}
-                            {!! shortcode_parse(app(\App\Services\ContentPreviewService::class)->render($content, \App\Enums\ContentEditorType::MARKDOWN, false)) !!}
-                        @elseif($editorType === 'html')
-                            {{-- HTML: output with shortcode processing --}}
-                            {!! shortcode_parse($content) !!}
-                        @else
-                            {{-- Other: escape and output.
-
-                                 A 'blade' branch calling Blade::render($content)
-                                 used to sit above this one. The admin preview
-                                 action builds an unsaved page straight from
-                                 request input, including editor_type, so that
-                                 branch turned a POST body into executed PHP.
-                                 The Blade editor is not offered by this version
-                                 anyway -- the edit screen excludes it from the
-                                 editor options unconditionally -- so nothing
-                                 legitimate reached it. Anything already stored
-                                 with editor_type=blade now lands here and is
-                                 escaped, which is the safe direction. --}}
-                            {!! nl2br(e($content)) !!}
-                        @endif
-                    </div>
-                </div>
-            </article>
-        </div>
-    </div>
+    {{-- The container and the top padding are this route's own chrome: the
+         padding clears core's admin bar, which only this surface sits
+         directly beneath. The article itself lives in the partial, so a
+         theme's front page renders the same body without them (#127). --}}
+    @include('dixlase-pages::front._page-body', [
+        'wrapperClass' => 'container mx-auto '.($signedIn ? 'pt-14' : 'pt-12').' px-6 sm:px-8 lg:px-12',
+    ])
 @endsection
