@@ -5,6 +5,29 @@ All notable changes to the Dixlase Pages plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this plugin follows Semantic Versioning.
 
+## [0.4.4] — 2026-11-23
+
+### Upgrade notes
+
+- Requires Dixlase core 0.2.18 or later, for the front page body contract.
+
+### Added
+
+- A published page can be shown as a theme's front page body, chosen per page. The page's editor
+  type, its GUI-to-HTML conversion and its custom CSS and JS all apply, exactly as on the page's own
+  URL. Only published pages are offered, and a page unpublished later makes the front page fall
+  back to core's content rather than serving a draft (#131).
+
+### Changed
+
+- A page is prepared by a renderer class rather than inside the route's closure, so the same work
+  can answer a caller that is not an HTTP request. No change in behaviour (#130).
+
+### Development
+
+- The deploy runs on a tag rather than on a merge (#129).
+- CI tests the newest MySQL and MariaDB LTS releases and the supported floor of each (#126).
+
 ## [0.4.3] — 2026-11-09
 
 ### Development
